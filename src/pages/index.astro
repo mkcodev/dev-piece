@@ -1,0 +1,249 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/tools/ToolCard.astro';
+import { getFeaturedTools, getRecentTools, getAllTools } from '../lib/content';
+import { CATEGORY_CONFIG } from '../lib/utils';
+import { getCollection } from 'astro:content';
+
+const featuredTools = await getFeaturedTools();
+const recentTools = await getRecentTools(6);
+const allTools = await getAllTools();
+
+// Category counts
+const categoryCounts: Record<string, number> = {};
+for (const cat of Object.keys(CATEGORY_CONFIG)) {
+  try {
+    const entries = await getCollection(cat as any);
+    categoryCounts[cat] = entries.length;
+  } catch {
+    categoryCounts[cat] = 0;
+  }
+}
+
+const totalTools = allTools.length;
+const totalCategories = Object.keys(CATEGORY_CONFIG).length;
+const totalScripts = (categoryCounts['scripts-ahk'] ?? 0) + (categoryCounts['userscripts'] ?? 0) + (categoryCounts['snippets'] ?? 0);
+
+const categoryAccents: Record<string, string> = {
+  terminales: '#8caaee',
+  'cli-tools': '#a6d189',
+  snippets: '#ef9f76',
+  neovim: '#a6d189',
+  vscode: '#8caaee',
+  'browser-extensions': '#e5c890',
+  'scripts-ahk': '#ca9ee6',
+  userscripts: '#81c8be',
+  dotfiles: '#babbf1',
+  docker: '#85c1dc',
+  'git-hacks': '#ef9f76',
+  fonts: '#f4b8e4',
+  'ai-tools': '#babbf1',
+  'windows-tools': '#99d1db',
+};
+---
+
+<BaseLayout title="Inicio" description="DevVault — El hub definitivo de productividad para desarrolladores. CLI tools, configs, scripts, y más.">
+
+  <!-- Hero -->
+  <section class="relative text-center py-16 md:py-24 mb-16">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gradient-to-r from-blue/10 via-lavender/10 to-mauve/10 blur-3xl rounded-full" />
+    </div>
+
+    <div class="relative">
+      <div class="inline-flex items-center gap-2 bg-surface0 border border-surface1 rounded-full px-4 py-1.5 text-xs text-subtext1 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-green animate-pulse" aria-hidden="true" />
+        Open source &amp; siempre gratis
+      </div>
+
+      <h1 class="text-5xl md:text-7xl font-black mb-4 leading-none">
+        <span class="text-gradient">DevVault</span>
+      </h1>
+
+      <p class="text-lg md:text-xl text-subtext1 mb-4 max-w-2xl mx-auto leading-relaxed">
+        Tu arsenal definitivo de productividad como desarrollador.
+        Herramientas CLI, configuraciones, scripts y trucos curados para el
+        <span class="text-lavender font-semibold">flujo de trabajo</span> perfecto.
+      </p>
+
+      <div class="inline-flex items-center bg-crust border border-surface0 rounded-lg px-4 py-2.5 mb-8 font-mono text-sm">
+        <span class="text-green mr-2" aria-hidden="true">$</span>
+        <span id="typewriter" class="text-sky" aria-label="Ejemplo de comando CLI">winget install sharkdp.bat</span>
+        <span class="w-0.5 h-4 bg-text ml-0.5 animate-pulse" aria-hidden="true" />
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-6 mb-8 text-sm text-subtext0">
+        <div class="flex items-center gap-1.5">
+          <span class="font-bold text-text text-base">{totalTools}</span>
+          herramientas
+        </div>
+        <span class="text-surface2" aria-hidden="true">·</span>
+        <div class="flex items-center gap-1.5">
+          <span class="font-bold text-text text-base">{totalCategories}</span>
+          categorías
+        </div>
+        <span class="text-surface2" aria-hidden="true">·</span>
+        <div class="flex items-center gap-1.5">
+          <span class="font-bold text-text text-base">{totalScripts}</span>
+          scripts
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button
+          id="hero-search-btn"
+          class="flex items-center gap-2 bg-blue hover:bg-lavender text-crust font-semibold px-6 py-2.5 rounded-lg transition-colors duration-200"
+          aria-label="Abrir búsqueda de herramientas"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Buscar herramientas
+          <kbd class="text-xs bg-crust/30 px-1.5 py-0.5 rounded font-mono opacity-70">⌘K</kbd>
+        </button>
+        <a
+          href="/cli-tools"
+          class="flex items-center gap-2 bg-surface0 hover:bg-surface1 text-text border border-surface1 font-medium px-6 py-2.5 rounded-lg transition-colors duration-200"
+        >
+          Explorar CLI Tools
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Tools -->
+  {featuredTools.length > 0 && (
+    <section class="mb-16" aria-labelledby="featured-heading">
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="featured-heading" class="text-xl font-bold text-text flex items-center gap-2">
+          <span class="text-yellow" aria-hidden="true">★</span>
+          Herramientas Destacadas
+        </h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {featuredTools.slice(0, 6).map((tool) => (
+          <ToolCard
+            name={tool.data.name}
+            description={tool.data.description}
+            tags={tool.data.tags}
+            os={tool.data.os}
+            category={tool.collectionName}
+            slug={tool.slug}
+            featured={tool.data.featured}
+            difficulty={tool.data.difficulty}
+            install={tool.data.install}
+            accent={categoryAccents[tool.collectionName] ?? '#8caaee'}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <!-- Category Grid -->
+  <section class="mb-16" aria-labelledby="categories-heading">
+    <h2 id="categories-heading" class="text-xl font-bold text-text mb-6">
+      Explorar por Categoría
+    </h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {Object.entries(CATEGORY_CONFIG).map(([slug, config]) => (
+        <a
+          href={`/${slug}`}
+          class="group relative flex flex-col gap-2 p-4 bg-surface0 rounded-xl border border-surface1 hover:border-lavender/40 transition-all duration-200 overflow-hidden"
+        >
+          <div
+            class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            style={`background: radial-gradient(circle at 50% 0%, ${config.accent}15 0%, transparent 70%);`}
+            aria-hidden="true"
+          />
+          <div class="relative flex items-center justify-between">
+            <span class="font-semibold text-sm text-text">{config.label}</span>
+            <span
+              class="text-xs font-mono px-1.5 py-0.5 rounded-full"
+              style={`background-color: ${config.accent}20; color: ${config.accent};`}
+            >
+              {categoryCounts[slug] ?? 0}
+            </span>
+          </div>
+          <p class="relative text-xs text-subtext0 leading-relaxed line-clamp-2">
+            {config.description}
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Recently Added -->
+  {recentTools.length > 0 && (
+    <section class="mb-8" aria-labelledby="recent-heading">
+      <h2 id="recent-heading" class="text-xl font-bold text-text flex items-center gap-2 mb-6">
+        <svg class="w-5 h-5 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Añadidas Recientemente
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {recentTools.map((tool) => (
+          <ToolCard
+            name={tool.data.name}
+            description={tool.data.description}
+            tags={tool.data.tags}
+            os={tool.data.os}
+            category={tool.collectionName}
+            slug={tool.slug}
+            featured={tool.data.featured}
+            difficulty={tool.data.difficulty}
+            install={tool.data.install}
+            accent={categoryAccents[tool.collectionName] ?? '#8caaee'}
+          />
+        ))}
+      </div>
+    </section>
+  )}
+
+</BaseLayout>
+
+<script>
+  document.getElementById('hero-search-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-command-palette'));
+  });
+
+  // Typewriter
+  const commands = [
+    'winget install sharkdp.bat',
+    'brew install fzf',
+    'cargo install zoxide',
+    'scoop install lazygit',
+    'apt install ripgrep',
+    'npm install -g tldr',
+  ];
+  let ci = 0, ci2 = 0, deleting = false, paused = false;
+  const el = document.getElementById('typewriter');
+
+  function type() {
+    if (!el) return;
+    const cmd = commands[ci % commands.length];
+    if (paused) {
+      paused = false;
+      deleting = true;
+      setTimeout(type, 1500);
+      return;
+    }
+    if (!deleting) {
+      el.textContent = cmd.slice(0, ci2 + 1);
+      ci2++;
+      if (ci2 === cmd.length) { paused = true; setTimeout(type, 80); return; }
+      setTimeout(type, 60);
+    } else {
+      el.textContent = cmd.slice(0, ci2 - 1);
+      ci2--;
+      if (ci2 === 0) { deleting = false; ci++; setTimeout(type, 400); return; }
+      setTimeout(type, 30);
+    }
+  }
+  if (el) setTimeout(type, 1000);
+</script>

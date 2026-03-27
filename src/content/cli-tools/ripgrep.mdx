@@ -1,0 +1,181 @@
+---
+name: ripgrep (rg)
+description: Búsqueda en código fuente ultrarrápida que respeta .gitignore. 10-100x más rápido que grep.
+category: cli-tools
+tags: [search, grep-replacement, rust, fast, gitignore-aware]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install BurntSushi.ripgrep.MSVC
+  brew: brew install ripgrep
+  apt: sudo apt install ripgrep
+links:
+  repo: https://github.com/BurntSushi/ripgrep
+addedAt: 2025-01-20
+---
+
+## ¿Qué es ripgrep?
+
+ripgrep (comando: `rg`) es una herramienta de búsqueda de texto en línea de comandos escrita en Rust por Andrew Gallant (BurntSushi). Es el reemplazo moderno de `grep`, `ag` (the Silver Searcher) y `ack`. Su velocidad es legendaria: en benchmarks reales sobre proyectos grandes como el kernel de Linux, rg es entre 10 y 100 veces más rápido que grep.
+
+Sus ventajas sobre grep:
+
+- Respeta automáticamente `.gitignore`, `.ignore` y `.rgignore`
+- Búsqueda recursiva por defecto (no necesitas `-r`)
+- Salida con colores y números de línea por defecto
+- Soporte para Unicode y expresiones regulares modernas (Rust regex)
+- Búsqueda en tipos de archivo específicos con `-t`
+
+## Uso básico
+
+```bash
+# Buscar una cadena en el directorio actual (recursivo)
+rg "function getUserById"
+
+# Buscar en un directorio específico
+rg "TODO" src/
+
+# Búsqueda case-insensitive
+rg -i "error"
+
+# Mostrar solo nombres de archivos (sin contenido)
+rg -l "useState"
+
+# Contar matches por archivo
+rg -c "import"
+
+# Buscar palabra completa (no subcadena)
+rg -w "log"   # Encuentra "log" pero no "logger" ni "dialog"
+
+# Invertir búsqueda (líneas que NO coinciden)
+rg -v "^#" .gitignore
+```
+
+## Búsqueda por tipos de archivo
+
+```bash
+# Ver todos los tipos disponibles
+rg --type-list
+
+# Buscar solo en archivos TypeScript
+rg "interface" -t ts
+
+# Buscar en múltiples tipos
+rg "console.log" -t js -t ts -t jsx -t tsx
+
+# Buscar en archivos con extensión específica
+rg "select" -g "*.sql"
+rg "TODO" -g "*.{js,ts,py}"
+
+# Excluir tipos
+rg "error" --type-not=json
+rg "test" -g "!*spec*" -g "!*test*"
+```
+
+## Expresiones regulares avanzadas
+
+```bash
+# Regex básico
+rg "\d{3}-\d{4}"          # Teléfonos tipo 123-4567
+rg "https?://\S+"         # URLs
+rg "^\s*//.*TODO"         # Comentarios con TODO
+
+# Modo multilinea: patrones que cruzan líneas
+rg -U "function\s+\w+\s*\([^)]*\)\s*\{" --multiline
+
+# Lookahead / Lookbehind (con -P para Perl-compat regex)
+rg -P "(?<=const )\w+"    # Palabras después de "const"
+rg -P "import.*(?=from)"  # Lo importado antes de "from"
+
+# Grupos y referencias
+rg "(\w+)=\1"             # Patrones repetidos tipo key=key
+
+# Contexto alrededor del match
+rg "ERROR" -A 3 -B 1      # 3 líneas después, 1 antes
+rg "function" -C 2        # 2 líneas de contexto en ambos lados
+```
+
+## Archivos de configuración
+
+ripgrep lee la configuración desde el archivo indicado en `RIPGREP_CONFIG_PATH`:
+
+```bash
+# ~/.ripgreprc
+# Ignorar ciertos directorios siempre
+--glob=!.git/
+--glob=!node_modules/
+--glob=!target/
+--glob=!dist/
+--glob=!build/
+--glob=!.next/
+--glob=!vendor/
+--glob=!*.lock
+
+# Colores
+--colors=line:fg:yellow
+--colors=line:style:bold
+--colors=path:fg:green
+--colors=path:style:bold
+--colors=match:fg:red
+--colors=match:style:bold
+
+# Comportamiento
+--smart-case
+--follow
+--hidden
+```
+
+```bash
+# Activar en tu shell
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+```
+
+## Comparación: rg vs grep vs ag
+
+```bash
+# Buscar "async" en un proyecto Node.js grande
+
+# grep (lento, no respeta .gitignore, busca en node_modules)
+grep -r "async" . --include="*.js"
+
+# ag (más rápido, respeta .gitignore)
+ag "async" --js
+
+# rg (el más rápido, respeta .gitignore, colores, más features)
+rg "async" -t js
+```
+
+| Característica | grep | ag | rg |
+|---|---|---|---|
+| .gitignore | No | Si | Si |
+| Unicode | Limitado | Si | Si |
+| Velocidad | Lenta | Rapida | Muy rapida |
+| Multiline | No | No | Si (-U) |
+| Tipos de archivo | Manual | Si | Si |
+| Config file | No | .agignore | .ripgreprc |
+
+## Integración con editores
+
+```bash
+# Usar rg como backend de búsqueda en Neovim (telescope.nvim)
+# En lua config:
+# require('telescope').setup { defaults = { vimgrep_arguments = { 'rg', '--color=never', '--no-heading', '--with-filename', '--line-number', '--column', '--smart-case' } } }
+
+# VS Code: rg es el motor de búsqueda por defecto
+# Puedes configurarlo en settings.json:
+# "search.exclude": { "**/node_modules": true, "**/dist": true }
+```
+
+## Pro Tips
+
+**`--smart-case`:** Activa búsqueda case-insensitive automáticamente cuando el patrón está en minúsculas, pero respeta mayúsculas si el patrón las incluye. Pon esto en tu `.ripgreprc`.
+
+**Buscar y reemplazar con `sd`:** rg encuentra, pero para reemplazar en múltiples archivos combínalo con `sd` (alternativa moderna a sed):
+
+```bash
+# Encontrar archivos con "oldName" y reemplazar con sd
+rg -l "oldName" | xargs sd "oldName" "newName"
+```
+
+**Buscar en archivos binarios:** Por defecto rg ignora los binarios. Usa `--binary` o `--text` (-a) para incluirlos cuando sea necesario.

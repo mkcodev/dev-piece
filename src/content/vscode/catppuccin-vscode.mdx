@@ -1,0 +1,97 @@
+---
+name: Catppuccin para VSCode
+description: El tema más hermoso para VS Code. Paleta suave con 4 variantes. Frappé, Latte, Macchiato y Mocha.
+category: vscode
+tags: [vscode, theme, catppuccin, dark, design]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-02-15
+---
+
+Catppuccin es una familia de temas con paleta de colores suave y de alto contraste equilibrado. Sus cuatro variantes cubren desde el modo claro (Latte) hasta el oscuro profundo (Mocha), pasando por tonos medios (Frappé y Macchiato). La coherencia de la paleta en todos los lenguajes de programación y la integración con cientos de otras aplicaciones lo convierten en uno de los temas más adoptados del ecosistema dev.
+
+## Instalación
+
+**ID de extensión:** `Catppuccin.catppuccin-vsc`
+
+```bash
+code --install-extension Catppuccin.catppuccin-vsc
+# Iconos opcionales pero muy recomendados
+code --install-extension Catppuccin.catppuccin-vsc-icons
+```
+
+Selecciona la variante desde `Ctrl+K Ctrl+T`:
+- **Catppuccin Latte** — modo claro, fondo crema
+- **Catppuccin Frappé** — oscuro suave, fondo azul grisáceo
+- **Catppuccin Macchiato** — oscuro medio
+- **Catppuccin Mocha** — oscuro intenso, el más popular
+
+## Configuración recomendada (variante Frappé)
+
+```jsonc
+{
+  "workbench.colorTheme": "Catppuccin Frappé",
+  "workbench.iconTheme": "catppuccin-frappe",
+
+  // Activar cursiva en comentarios y keywords (requiere fuente con cursivas)
+  "catppuccin.italicComments": true,
+  "catppuccin.italicKeywords": true,
+
+  // Resaltado de color en brackets
+  "catppuccin.colorOverrides": {},
+
+  // Personalización de colores específicos del editor (Frappé)
+  "workbench.colorCustomizations": {
+    "[Catppuccin Frappé]": {
+      // Fondo de la barra de título
+      "titleBar.activeBackground":   "#292c3c",
+      "titleBar.activeForeground":   "#c6d0f5",
+
+      // Borde del panel activo más visible
+      "tab.activeBorder":            "#ca9ee6",
+
+      // Fondo de la barra lateral
+      "sideBar.background":          "#292c3c",
+
+      // Color del cursor
+      "editorCursor.foreground":     "#f4b8e4",
+
+      // Resaltado de la línea actual más sutil
+      "editor.lineHighlightBackground": "#414559"
+    }
+  },
+
+  // Semántica de tokens de color por lenguaje
+  "editor.semanticTokenColorCustomizations": {
+    "[Catppuccin Frappé]": {
+      "rules": {
+        "variable.constant": { "foreground": "#ef9f76", "fontStyle": "bold" },
+        "type.declaration":  { "foreground": "#85c1dc", "fontStyle": "bold" }
+      }
+    }
+  }
+}
+```
+
+## Pairing de iconos recomendado
+
+```jsonc
+{
+  // Catppuccin Icons (mismo nombre de variante)
+  "workbench.iconTheme": "catppuccin-frappe",
+
+  // Alternativa: Material Icon Theme con colores catppuccin
+  // "workbench.iconTheme": "material-icon-theme"
+}
+```
+
+## Las 4 variantes en código
+
+```
+Latte     → fondo #eff1f5  texto #4c4f69  ← modo claro
+Frappé    → fondo #303446  texto #c6d0f5  ← oscuro suave
+Macchiato → fondo #24273a  texto #cad3f5  ← oscuro medio
+Mocha     → fondo #1e1e2e  texto #cdd6f4  ← oscuro profundo
+```
+
+La paleta completa de Catppuccin está documentada en [catppuccin.com](https://catppuccin.com) y tiene ports para terminal, Neovim, JetBrains, Obsidian, Slack, Discord y más de 250 aplicaciones, lo que permite mantener un aspecto coherente en todo tu entorno de trabajo.

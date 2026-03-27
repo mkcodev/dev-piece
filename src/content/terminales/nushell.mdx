@@ -1,0 +1,155 @@
+---
+name: Nushell
+description: Shell moderno que trata la salida como datos estructurados. Pipes con tipos, tablas y scripting potente.
+category: terminales
+tags: [shell, structured-data, tables, rust, scripting]
+os: [windows, macos, linux]
+difficulty: advanced
+install:
+  winget: winget install Nushell.Nushell
+  brew: brew install nushell
+  cargo: cargo install nu
+links:
+  repo: https://github.com/nushell/nushell
+  docs: https://www.nushell.sh/
+addedAt: 2025-01-14
+---
+
+## ¿Qué es Nushell?
+
+Nushell (Nu) es un shell completamente diferente a bash, zsh o fish. Mientras que los shells tradicionales tratan toda la entrada/salida como texto plano, Nushell trata la salida de los comandos como **datos estructurados con tipos**: tablas, listas, registros, strings, fechas, duraciones y más.
+
+Esto cambia fundamentalmente cómo se trabaja con la terminal: en lugar de parsear texto con `awk`, `sed` y `grep`, puedes filtrar, ordenar y transformar datos de forma declarativa como si fuera SQL o una hoja de cálculo.
+
+## Datos estructurados vs texto plano
+
+En bash, listar los 3 archivos más grandes requiere:
+
+```bash
+# Bash: parsear texto con herramientas externas
+du -sh * | sort -rh | head -3
+```
+
+En Nushell, los datos fluyen como objetos:
+
+```nu
+# Nushell: datos estructurados, pipeline tipado
+ls | sort-by size --reverse | first 3 | select name size
+```
+
+La salida es una tabla real con columnas tipadas, no texto que hay que interpretar.
+
+## Ejemplos de pipelines
+
+```nu
+# Ver procesos que usan más de 100MB de memoria
+ps | where mem > 100mb | sort-by mem --reverse
+
+# Parsear un JSON desde la web
+http get https://api.github.com/repos/nushell/nushell | get stargazers_count
+
+# Trabajar con CSV
+open datos.csv | where edad > 30 | group-by ciudad | transpose
+
+# Listar extensiones de archivos en un directorio
+ls **/* | get name | path parse | get extension | uniq --count | sort-by count --reverse
+
+# Variables de entorno como tabla
+env | where name =~ "PATH" | first
+
+# Fechas nativas
+ls | where modified > (date now) - 7day | select name modified
+```
+
+## Comandos personalizados
+
+Nushell tiene un sistema de scripting con tipado opcional:
+
+```nu
+# Función con tipos y valores por defecto
+def greet [name: string, --loud (-l): bool = false] {
+  let msg = $"Hola, ($name)!"
+  if $loud { $msg | str upcase } else { $msg }
+}
+
+greet "mundo"         # Hola, mundo!
+greet "mundo" --loud  # HOLA, MUNDO!
+
+# Comando que devuelve una tabla
+def top-dirs [n: int = 5] {
+  ls | where type == "dir" | sort-by size --reverse | first $n
+}
+```
+
+## Configuración: config.nu
+
+```nu
+# ~/.config/nushell/config.nu
+
+# Historial
+$env.config.history.max_size    = 10000
+$env.config.history.sync_on_enter = true
+$env.config.history.file_format = "sqlite"
+
+# Editor
+$env.config.buffer_editor = "nvim"
+
+# Tabla por defecto
+$env.config.table.mode  = "rounded"
+$env.config.table.index_mode = "always"
+
+# Completions
+$env.config.completions.algorithm = "fuzzy"
+$env.config.completions.case_sensitive = false
+
+# Prompt con Starship
+use std "path add"
+$env.config.show_banner = false
+
+# Aliases
+alias ll = ls -la
+alias la = ls -a
+alias g  = git
+alias v  = nvim
+
+# Integración con zoxide
+zoxide init nushell | save -f ~/.zoxide.nu
+source ~/.zoxide.nu
+```
+
+```nu
+# ~/.config/nushell/env.nu
+
+# PATH
+$env.PATH = ($env.PATH | split row (char esep)
+  | prepend [
+      "/usr/local/bin"
+      ($env.HOME | path join ".cargo/bin")
+      ($env.HOME | path join ".local/bin")
+    ]
+  | uniq
+)
+
+# Editor
+$env.EDITOR   = "nvim"
+$env.VISUAL   = "nvim"
+$env.MANPAGER = "nvim +Man!"
+```
+
+## Tabla comparativa Nu vs Bash
+
+| Tarea | Bash | Nushell |
+|---|---|---|
+| Filtrar por columna | `awk '{if($3>100) print}'` | `where col > 100` |
+| Ordenar | `sort -k3 -n` | `sort-by col` |
+| Primeros N | `head -5` | `first 5` |
+| Contar ocurrencias | `sort \| uniq -c \| sort -rn` | `uniq --count \| sort-by count --reverse` |
+| Parsear JSON | `jq '.field'` | `get field` |
+
+## Pro Tips
+
+**REPL inteligente:** Nushell muestra el tipo de cada variable mientras escribes. Pulsa `Ctrl+Space` para autocompletado contextual.
+
+**Compatibilidad:** Nushell puede ejecutar scripts de bash con `bash -c "..."`. Para comandos externos que devuelven texto, usa `| lines` para convertir la salida en una lista.
+
+**Overlay:** El sistema de módulos de Nushell permite activar entornos virtuales y namespaces con `overlay use mi-modulo`.

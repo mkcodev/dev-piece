@@ -1,0 +1,134 @@
+---
+name: PowerShell Profile Supercargado
+description: Perfil de PowerShell completo con Oh My Posh, PSReadLine, funciones útiles y autocompletado avanzado.
+category: snippets
+tags: [powershell, windows, profile, prompt, productivity]
+os: [windows]
+difficulty: intermediate
+addedAt: 2025-02-04
+---
+
+El archivo `$PROFILE` de PowerShell es el equivalente al `.bashrc` en Unix. Cargado en cada sesión, es el lugar ideal para definir tu entorno de desarrollo en Windows. Esta configuración combina un prompt visual con Oh My Posh, historial inteligente y autocompletados que hacen la diferencia.
+
+## Localización del perfil
+
+```powershell
+# Ver la ruta del perfil actual
+$PROFILE
+
+# Crear el archivo si no existe
+if (!(Test-Path $PROFILE)) {
+    New-Item -ItemType File -Path $PROFILE -Force
+}
+
+# Abrir en VS Code
+code $PROFILE
+```
+
+## Configuración completa del $PROFILE
+
+```powershell
+# ── Oh My Posh ─────────────────────────────────────────────────
+# Instalar: winget install JanDeLaHaye.oh-my-posh
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\catppuccin_mocha.omp.json" | Invoke-Expression
+
+# ── PSReadLine: historial inteligente ──────────────────────────
+Import-Module PSReadLine
+
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+Set-PSReadLineOption -PredictionViewStyle ListView
+Set-PSReadLineOption -EditMode Windows
+Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+
+# Navegar historial con flechas (filtra por lo ya escrito)
+Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+# Ctrl+R: búsqueda interactiva en el historial
+Set-PSReadLineKeyHandler -Key Ctrl+r -Function ReverseSearchHistory
+
+# Ctrl+Backspace: borrar palabra completa
+Set-PSReadLineKeyHandler -Key Ctrl+Backspace -Function BackwardKillWord
+
+# ── Autocompletado para winget ─────────────────────────────────
+Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
+    $Local:word = $wordToComplete.Replace('"', '""')
+    $Local:ast = $commandAst.ToString().Replace('"', '""')
+    winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition |
+        ForEach-Object { [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_) }
+}
+
+# ── Autocompletado para kubectl ────────────────────────────────
+if (Get-Command kubectl -ErrorAction SilentlyContinue) {
+    kubectl completion powershell | Out-String | Invoke-Expression
+}
+
+# ── Autocompletado para git (posh-git) ────────────────────────
+# Instalar: Install-Module posh-git -Scope CurrentUser
+Import-Module posh-git -ErrorAction SilentlyContinue
+
+# ── Funciones útiles ───────────────────────────────────────────
+
+# which: encontrar el ejecutable de un comando
+function which($command) {
+    Get-Command $command -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty Source
+}
+
+# touch: crear archivo vacío (comportamiento Unix)
+function touch($file) {
+    if (Test-Path $file) {
+        (Get-Item $file).LastWriteTime = Get-Date
+    } else {
+        New-Item -ItemType File -Path $file | Out-Null
+    }
+}
+
+# grep: alias amigable para Select-String
+function grep($pattern, $path) {
+    if ($path) {
+        Select-String -Pattern $pattern -Path $path
+    } else {
+        $input | Select-String -Pattern $pattern
+    }
+}
+
+# mkcd: crear directorio y entrar
+function mkcd($dir) {
+    New-Item -ItemType Directory -Path $dir -Force | Out-Null
+    Set-Location $dir
+}
+
+# ── Aliases ────────────────────────────────────────────────────
+Set-Alias -Name g    -Value git
+Set-Alias -Name k    -Value kubectl
+Set-Alias -Name d    -Value docker
+Set-Alias -Name ll   -Value Get-ChildItem
+Set-Alias -Name c    -Value Clear-Host
+
+# ── Variables de entorno rápidas ───────────────────────────────
+$env:EDITOR = "code"
+```
+
+## Instalar módulos necesarios
+
+```powershell
+# Oh My Posh (gestor de temas del prompt)
+winget install JanDeLaHaye.oh-my-posh
+
+# PSReadLine (ya incluido en PS 7+, actualizar si es PS 5)
+Install-Module PSReadLine -Scope CurrentUser -Force
+
+# posh-git (autocompletado + info de rama en el prompt)
+Install-Module posh-git -Scope CurrentUser -Force
+```
+
+## Recargar el perfil sin reiniciar
+
+```powershell
+. $PROFILE
+```
+
+El predictor `ListView` de PSReadLine es uno de los cambios más impactantes: muestra hasta 10 sugerencias del historial en una lista desplegable mientras escribes, sin necesidad de ejecutar ningún fuzzy finder externo.

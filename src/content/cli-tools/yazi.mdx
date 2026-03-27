@@ -1,0 +1,286 @@
+---
+name: Yazi
+description: File manager TUI asynchronous escrito en Rust con preview de imágenes, video y código. El ranger killer.
+category: cli-tools
+tags: [file-manager, tui, terminal, image-preview, rust]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install sxyazi.yazi
+  brew: brew install yazi
+links:
+  repo: https://github.com/sxyazi/yazi
+  docs: https://yazi-rs.github.io/
+addedAt: 2025-01-22
+---
+
+## ¿Qué es Yazi?
+
+Yazi es un file manager de terminal (TUI) escrito en Rust que destaca por su arquitectura completamente asíncrona. A diferencia de `ranger` (Python), `lf` (Go) o `nnn` (C), Yazi renderiza previews de archivos sin bloquear la interfaz gracias a su diseño basado en tareas paralelas.
+
+Sus capacidades de preview son excepcionales:
+- **Imágenes** inline (protocolo Kitty, Sixel, iTerm2, Überzug++)
+- **Videos** con miniaturas via ffmpegthumbnailer
+- **PDFs** con página previa
+- **Archivos de código** con resaltado via bat o chroma
+- **Archivos comprimidos** (zip, tar.gz, etc.) mostrando contenidos
+- **Office documents** con libreoffice
+
+## Archivos de configuración
+
+Yazi usa tres archivos de configuración en `~/.config/yazi/`:
+
+```
+~/.config/yazi/
+├── yazi.toml      # Configuración principal
+├── keymap.toml    # Atajos de teclado
+├── theme.toml     # Colores y estilos
+└── plugins/       # Plugins Lua
+```
+
+### yazi.toml
+
+```toml
+# ~/.config/yazi/yazi.toml
+
+[manager]
+ratio          = [1, 3, 4]  # Proporciones columna izq/central/preview
+sort_by        = "alphabetical"
+sort_sensitive = false
+sort_reverse   = false
+sort_dir_first = true
+linemode       = "size"      # size | permissions | mtime | none
+show_hidden    = false
+show_symlink   = true
+scrolloff      = 5
+
+[preview]
+tab_size       = 2
+max_width      = 1200
+max_height     = 900
+cache_dir      = ""
+image_filter   = "triangle"  # triangle | lanczos3 | bilinear | nearest
+image_quality  = 80
+sixel_fraction = 15
+ueberzug_scale = 1
+ueberzug_offset = [0, 0, 0, 0]
+
+[opener]
+edit = [
+  { run = 'nvim "$@"', desc = "Neovim", block = true },
+]
+open = [
+  { run = 'xdg-open "$@"', desc = "Abrir con app por defecto" },
+]
+reveal = [
+  { run = 'xdg-open "$(dirname "$1")"', desc = "Revelar en explorador" },
+]
+extract = [
+  { run = 'unar "$1"', desc = "Extraer aquí" },
+]
+play = [
+  { run = 'mpv "$@"', desc = "Reproducir con mpv" },
+]
+
+[open]
+rules = [
+  { mime = "text/*", use = "edit" },
+  { mime = "image/*", use = "open" },
+  { mime = "video/*", use = "play" },
+  { mime = "audio/*", use = "play" },
+  { mime = "application/pdf", use = "open" },
+  { mime = "application/zip", use = "extract" },
+  { mime = "application/x-tar", use = "extract" },
+  { name = "*.{ts,tsx,js,jsx,rs,py,go,lua,toml,yaml,json}", use = "edit" },
+]
+
+[tasks]
+micro_workers    = 10
+macro_workers    = 25
+bizarre_retry    = 5
+image_alloc      = 536870912  # 512MB
+image_bound      = [0, 0]
+suppress_preload = false
+
+[log]
+enabled = false
+```
+
+### keymap.toml
+
+```toml
+# ~/.config/yazi/keymap.toml
+
+[manager]
+keymap = [
+  { on = "q", run = "quit", desc = "Salir de Yazi" },
+  { on = "<Esc>", run = "escape", desc = "Escapar modo actual" },
+
+  # Navegación
+  { on = "h", run = "leave",    desc = "Ir al directorio padre" },
+  { on = "j", run = "arrow 1",  desc = "Abajo" },
+  { on = "k", run = "arrow -1", desc = "Arriba" },
+  { on = "l", run = "enter",    desc = "Entrar al directorio / abrir archivo" },
+
+  { on = "g g", run = "arrow -99999999", desc = "Ir al primer archivo" },
+  { on = "G",   run = "arrow 99999999",  desc = "Ir al último archivo" },
+  { on = "<C-u>", run = "arrow -50%",    desc = "Media página arriba" },
+  { on = "<C-d>", run = "arrow 50%",     desc = "Media página abajo" },
+
+  # Operaciones de archivo
+  { on = "y", run = "yank",          desc = "Copiar" },
+  { on = "x", run = "yank --cut",    desc = "Cortar" },
+  { on = "p", run = "paste",         desc = "Pegar" },
+  { on = "d", run = "remove",        desc = "Mover a la papelera" },
+  { on = "D", run = "remove --permanently", desc = "Eliminar permanentemente" },
+  { on = "a", run = "create",        desc = "Crear archivo/directorio" },
+  { on = "r", run = "rename --cursor=before_ext", desc = "Renombrar" },
+  { on = ".", run = "hidden toggle",  desc = "Mostrar/ocultar archivos ocultos" },
+
+  # Selección
+  { on = "<Space>", run = "select --state=none", desc = "Seleccionar/deseleccionar" },
+  { on = "v",       run = "visual_mode",          desc = "Modo selección visual" },
+  { on = "V",       run = "select_all --state=none", desc = "Seleccionar todo" },
+
+  # Búsqueda y filtro
+  { on = "f", run = "filter --smart",  desc = "Filtrar archivos" },
+  { on = "/", run = "find --smart",    desc = "Buscar archivo siguiente" },
+  { on = "s", run = "search fd",       desc = "Búsqueda fd" },
+  { on = "S", run = "search rg",       desc = "Búsqueda en contenido rg" },
+
+  # Tabs
+  { on = "t",     run = "tab_create --current", desc = "Nueva pestaña" },
+  { on = "[",     run = "tab_switch -1 --relative", desc = "Pestaña anterior" },
+  { on = "]",     run = "tab_switch 1 --relative",  desc = "Pestaña siguiente" },
+  { on = "<C-c>", run = "close",  desc = "Cerrar pestaña" },
+
+  # Shell
+  { on = "!", run = "shell --interactive", desc = "Abrir shell interactivo" },
+  { on = "e", run = "shell '$EDITOR $0' --block", desc = "Editar en $EDITOR" },
+]
+```
+
+### theme.toml (Catppuccin Frappé)
+
+```toml
+# ~/.config/yazi/theme.toml
+
+[manager]
+cwd = { fg = "#8caaee" }
+
+hovered         = { fg = "#232634", bg = "#8caaee" }
+preview_hovered = { underline = true }
+
+find_keyword  = { fg = "#e5c890", bold = true, italic = true, underline = true }
+find_position = { fg = "#f4b8e4", bg = "reset", bold = true, italic = true }
+
+marker_copied  = { fg = "#a6d189", bg = "#a6d189" }
+marker_cut     = { fg = "#e78284", bg = "#e78284" }
+marker_marked  = { fg = "#ca9ee6", bg = "#ca9ee6" }
+marker_selected = { fg = "#8caaee", bg = "#8caaee" }
+
+tab_active   = { fg = "#232634", bg = "#8caaee" }
+tab_inactive = { fg = "#c6d0f5", bg = "#303446" }
+tab_width    = 1
+
+count_copied   = { fg = "#232634", bg = "#a6d189" }
+count_cut      = { fg = "#232634", bg = "#e78284" }
+count_selected = { fg = "#232634", bg = "#8caaee" }
+
+border_symbol = "│"
+border_style  = { fg = "#626880" }
+
+[status]
+separator_open  = ""
+separator_close = ""
+separator_style = { fg = "#303446", bg = "#303446" }
+
+mode_normal = { fg = "#232634", bg = "#8caaee", bold = true }
+mode_select = { fg = "#232634", bg = "#a6d189", bold = true }
+mode_unset  = { fg = "#232634", bg = "#f4b8e4", bold = true }
+
+progress_label  = { fg = "#c6d0f5", bold = true }
+progress_normal = { fg = "#8caaee", bg = "#303446" }
+progress_error  = { fg = "#e78284", bg = "#303446" }
+
+permissions_t = { fg = "#8caaee" }
+permissions_r = { fg = "#e5c890" }
+permissions_w = { fg = "#e78284" }
+permissions_x = { fg = "#a6d189" }
+permissions_s = { fg = "#626880" }
+
+[input]
+border   = { fg = "#8caaee" }
+title    = {}
+value    = {}
+selected = { reversed = true }
+
+[select]
+border   = { fg = "#8caaee" }
+active   = { fg = "#f4b8e4" }
+inactive = {}
+
+[tasks]
+border  = { fg = "#8caaee" }
+title   = {}
+hovered = { underline = true }
+
+[which]
+mask            = { bg = "#292c3c" }
+cand            = { fg = "#81c8be" }
+rest            = { fg = "#838ba7" }
+desc            = { fg = "#f4b8e4" }
+separator       = "  "
+separator_style = { fg = "#51576d" }
+
+[help]
+on      = { fg = "#f4b8e4" }
+exec    = { fg = "#81c8be" }
+desc    = { fg = "#838ba7" }
+hovered = { bg = "#51576d", bold = true }
+footer  = { fg = "#303446", bg = "#c6d0f5" }
+```
+
+## Shell wrapper: ya() para cambiar de directorio al salir
+
+Yazi no puede cambiar el directorio de la shell padre directamente. Esta función wrapper lo soluciona:
+
+```bash
+# ~/.bashrc o ~/.zshrc
+function ya() {
+  local tmp cwd
+  tmp="$(mktemp -t "yazi-cwd.XXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
+```
+
+```powershell
+# PowerShell ($PROFILE)
+function ya {
+  $tmp = [System.IO.Path]::GetTempFileName()
+  yazi $args --cwd-file="$tmp"
+  $cwd = Get-Content -Path $tmp -ErrorAction SilentlyContinue
+  if (-not [String]::IsNullOrEmpty($cwd) -and $cwd -ne $PWD.Path) {
+    Set-Location -LiteralPath $cwd
+  }
+  Remove-Item -Path $tmp -ErrorAction SilentlyContinue
+}
+```
+
+Ahora `ya` abre Yazi y al salir con `q`, la terminal cambia al último directorio visitado.
+
+## Pro Tips
+
+**Preview de imágenes:** Para imágenes inline necesitas un terminal compatible (Kitty, WezTerm, iTerm2) y tener instalado `ueberzugpp` para el resto. En macOS con iTerm2 funciona out of the box.
+
+**Plugin de git:** Instala el plugin `git.yazi` para ver el estado de git en cada archivo directamente en el panel:
+
+```bash
+ya pack -a yazi-rs/plugins:git
+```
+
+**Búsqueda recursiva:** Presiona `s` para usar fd como búsqueda de nombres, o `S` para usar ripgrep y buscar en el contenido de los archivos.

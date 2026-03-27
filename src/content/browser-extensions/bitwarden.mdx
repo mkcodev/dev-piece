@@ -1,0 +1,111 @@
+---
+name: Bitwarden
+description: Gestor de contraseñas open source con extensión de navegador. Seguro, gratuito y con apps para todos los dispositivos.
+category: browser-extensions
+tags: [browser, password-manager, security, open-source, privacy]
+os: [cross]
+difficulty: beginner
+links:
+  website: https://bitwarden.com/
+  repo: https://github.com/bitwarden
+addedAt: 2025-02-21
+---
+
+Bitwarden es el gestor de contraseñas open source más completo. A diferencia de 1Password o Dashlane, el código es auditado públicamente, el tier gratuito incluye sincronización ilimitada entre dispositivos, y puedes auto-hostearlo si no confías en sus servidores en la nube.
+
+## Extensión de navegador
+
+La extensión está disponible para Chrome, Firefox, Edge, Safari y Opera. El atajo más importante:
+
+```
+Ctrl + Shift + L   → autocompletar credenciales en la página actual
+Ctrl + Shift + Y   → abrir el vault de Bitwarden
+```
+
+Si hay una sola entrada para el dominio actual, `Ctrl+Shift+L` rellena usuario y contraseña directamente. Si hay varias, abre un menú para elegir.
+
+## CLI: bw
+
+El cliente de línea de comandos `bw` permite automatizar y hacer scripting con tu vault:
+
+```bash
+# Instalar
+npm install -g @bitwarden/cli
+# o en macOS
+brew install bitwarden-cli
+
+# Login
+bw login tu@email.com
+
+# Desbloquear y guardar la sesión en variable de entorno
+export BW_SESSION=$(bw unlock --raw)
+
+# Buscar una entrada
+bw list items --search "github" | jq '.[].name'
+
+# Obtener la contraseña de una entrada específica
+bw get password "GitHub"
+
+# Crear un ítem desde CLI
+bw get template item | jq '.name = "Mi App" | .login.username = "usuario" | .login.password = "pass"' | bw encode | bw create item
+
+# Generar contraseña segura
+bw generate --length 24 --uppercase --lowercase --number --special
+
+# Sincronizar vault
+bw sync
+```
+
+## Auto-hosting con Vaultwarden
+
+Vaultwarden es una implementación compatible con la API de Bitwarden escrita en Rust, pensada para auto-hosting. Consume una fracción de los recursos del servidor oficial:
+
+```yaml
+# docker-compose.yml para Vaultwarden
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+      - ./vw-data:/data
+    ports:
+      - "8080:80"
+    environment:
+      DOMAIN: "https://vault.tudominio.com"
+      SIGNUPS_ALLOWED: "false"   # deshabilitar registro público
+      ADMIN_TOKEN: "tu_token_secreto_aqui"
+      LOG_LEVEL: "warn"
+```
+
+Con Vaultwarden auto-hosteado, configuras los clientes de Bitwarden (extensión, app móvil, CLI) para apuntar a tu servidor en lugar del oficial. Toda la sincronización ocurre en tu infraestructura.
+
+## Seguridad y 2FA
+
+```
+Bitwarden admite múltiples factores de segundo factor:
+
+- TOTP (Google Authenticator, Authy) → gratuito
+- FIDO2 / WebAuthn (YubiKey, llaves hardware) → gratuito
+- Email OTP → gratuito
+- Duo Security → plan premium ($10/año)
+```
+
+La contraseña maestra nunca sale de tu dispositivo: Bitwarden usa PBKDF2-SHA256 con 600.000 iteraciones para derivar la clave de cifrado localmente antes de enviar nada al servidor.
+
+## Organización del vault
+
+```
+Estructura recomendada con carpetas:
+
+📁 Trabajo
+   → credenciales de trabajo, VPNs, herramientas internas
+📁 Dev
+   → GitHub, npm, Docker Hub, registros de paquetes
+📁 Infra
+   → servidores, dominios, hosting, DNS
+📁 Personal
+   → banca, email, redes sociales
+📁 Shared
+   → cuentas compartidas con el equipo (requiere Bitwarden Organizations)
+```

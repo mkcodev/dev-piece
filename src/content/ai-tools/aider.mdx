@@ -1,0 +1,141 @@
+---
+name: Aider
+description: Pair programming con IA desde la terminal. Edita tu código con Claude o GPT mientras trabaja directamente con Git.
+category: ai-tools
+tags: [ai, coding, cli, git-integration, pair-programming, aider]
+os: [cross]
+difficulty: intermediate
+install:
+  pip: pip install aider-chat
+links:
+  repo: https://github.com/Aider-AI/aider
+  website: https://aider.chat/
+addedAt: 2025-03-12
+---
+
+## Pair programming desde la terminal
+
+Aider es un agente de coding que opera en tu terminal, entiende tu repositorio Git completo, y hace commits automáticos con cada cambio que realiza. A diferencia de los plugins de IDE, Aider funciona con cualquier editor y en cualquier entorno.
+
+## Instalación
+
+```bash
+pip install aider-chat
+
+# O con uv (recomendado, más rápido)
+uv tool install aider-chat
+```
+
+## Configuración del modelo
+
+Aider funciona con múltiples proveedores. Claude Sonnet es la opción recomendada:
+
+```bash
+# Con Claude (recomendado para código)
+export ANTHROPIC_API_KEY=sk-ant-...
+aider --model claude-sonnet-4-5
+
+# Con OpenAI
+export OPENAI_API_KEY=sk-...
+aider --model gpt-4o
+
+# Con Ollama (local, gratuito)
+aider --model ollama/qwen2.5-coder:7b
+```
+
+## Iniciar una sesión
+
+```bash
+# En la raíz de tu repositorio Git
+cd mi-proyecto
+aider
+
+# Añadir archivos específicos desde el inicio
+aider src/users/service.ts src/users/controller.ts
+```
+
+## Comandos dentro del chat
+
+```
+/add <archivo>      → Añade un archivo al contexto de edición
+/drop <archivo>     → Elimina un archivo del contexto
+/ask <pregunta>     → Pregunta sin modificar archivos (modo lectura)
+/run <comando>      → Ejecuta un comando de shell y muestra el output
+/diff               → Muestra los cambios realizados hasta ahora
+/undo               → Deshace el último commit de Aider
+/commit             → Fuerza un commit con los cambios actuales
+/clear              → Limpia el historial de chat
+/help               → Lista todos los comandos
+```
+
+## Modo Architect: cambios grandes
+
+Para refactorizaciones complejas que afectan muchos archivos, usa el modo architect que divide la tarea en análisis + implementación:
+
+```bash
+aider --architect --model claude-sonnet-4-5
+
+# El modo architect usa:
+# - Claude Sonnet para planificar la arquitectura
+# - Un modelo más barato para implementar los detalles
+aider --architect --editor-model claude-haiku-4-5
+```
+
+## Archivo de configuración
+
+Crea `.aider.conf.yml` en la raíz del proyecto para no repetir flags:
+
+```yaml
+# .aider.conf.yml
+model: claude-sonnet-4-5
+auto-commits: true
+dirty-commits: false
+git: true
+auto-lint: true
+lint-cmd: "npm run lint --fix"
+test-cmd: "npm test"
+suggest-shell-commands: true
+
+# Archivos a excluir siempre del contexto
+read:
+  - CLAUDE.md
+  - README.md
+```
+
+## Integración con Git
+
+Aider hace commits automáticos después de cada cambio satisfactorio, con mensajes en formato Conventional Commits:
+
+```
+feat: add email validation to user registration
+fix: correct pagination offset calculation in getUsersList
+refactor: extract database query logic to repository layer
+```
+
+Para revisar los cambios antes del commit:
+
+```bash
+aider --no-auto-commits
+# Después de revisar con /diff:
+/commit
+```
+
+## Flujo de trabajo típico
+
+```bash
+# 1. Abre sesión con los archivos relevantes
+aider src/api/routes.ts src/api/middleware.ts
+
+# 2. Describe la tarea en lenguaje natural
+> Añade un middleware de rate limiting que permita 100 requests
+  por minuto por IP, usando Redis para el estado compartido
+
+# 3. Aider propone cambios → aprueba o rechaza
+# 4. Los cambios se commiten automáticamente
+# 5. Verifica con /run npm test
+
+# 6. Si algo salió mal
+/undo
+```
+
+> **Tip:** Usa `/ask` para explorar el código antes de editar. Pregunta `¿cómo funciona el sistema de autenticación aquí?` sin que Aider toque ningún archivo, luego usa `/add` para traer los archivos relevantes al contexto de edición.

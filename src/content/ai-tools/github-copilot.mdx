@@ -1,0 +1,103 @@
+---
+name: GitHub Copilot
+description: El asistente de IA más usado por desarrolladores. Autocompletado de código, chat integrado y workspace agent.
+category: ai-tools
+tags: [ai, autocomplete, vscode, productivity, copilot, github]
+os: [cross]
+featured: true
+difficulty: beginner
+addedAt: 2025-03-09
+---
+
+## Más que autocompletado
+
+GitHub Copilot empezó como autocompletado inteligente pero hoy es un sistema completo: sugerencias inline, chat integrado, agente de workspace, generación de tests y commits. Es el asistente de IA que más desarrolladores tienen activo mientras trabajan.
+
+## Atajos de teclado esenciales
+
+| Atajo | Acción |
+|-------|--------|
+| `Tab` | Aceptar sugerencia completa |
+| `Ctrl + →` | Aceptar palabra a palabra |
+| `Alt + ]` | Siguiente sugerencia |
+| `Alt + [` | Sugerencia anterior |
+| `Ctrl + Enter` | Abrir panel con 10 sugerencias |
+| `Escape` | Rechazar sugerencia |
+| `Ctrl + I` | Abrir inline chat |
+| `Ctrl + Alt + I` | Abrir chat lateral |
+
+## Comandos de chat
+
+En el panel de chat de Copilot puedes usar comandos especiales con `/`:
+
+```
+/explain    → Explica el código seleccionado
+/fix        → Sugiere una corrección para el código seleccionado
+/tests      → Genera tests unitarios para el código seleccionado
+/doc        → Genera documentación JSDoc/docstring
+/optimize   → Sugiere optimizaciones de rendimiento
+/simplify   → Simplifica código complejo
+/new        → Crea un nuevo archivo o proyecto
+```
+
+Ejemplo de uso:
+
+```
+Selecciona una función → Ctrl+I → /tests
+→ Copilot genera tests unitarios en el mismo archivo
+```
+
+## Agente @workspace
+
+El agente `@workspace` entiende todo tu proyecto, no solo el archivo abierto:
+
+```
+@workspace ¿Dónde se maneja la autenticación en este proyecto?
+@workspace ¿Qué archivos necesito modificar para añadir un nuevo endpoint de API?
+@workspace Explica la arquitectura de la capa de base de datos
+```
+
+Otros agentes disponibles:
+
+```
+@terminal  → Ayuda con comandos de terminal
+@vscode    → Ayuda con configuración de VS Code
+@github    → Busca en repositorios y documentación de GitHub
+```
+
+## Inline chat (Ctrl + I)
+
+El inline chat es el modo más rápido para modificaciones puntuales:
+
+```
+// Selecciona código → Ctrl+I → escribe instrucción
+"Convierte esta función de callbacks a async/await"
+"Añade manejo de errores"
+"Refactoriza usando el patrón Strategy"
+```
+
+## Escribir mejores comentarios como prompts
+
+Copilot usa el contexto circundante como prompt. Un buen comentario antes de una función produce mejores sugerencias:
+
+```typescript
+// Mal comentario (vago)
+// función de usuarios
+
+// Buen comentario (específico y contextual)
+// Fetches paginated users from the database, filtering by role.
+// Returns { data: User[], total: number, page: number }
+// Throws UserServiceError if the database is unavailable.
+async function getUsers(role: UserRole, page = 1, limit = 20) {
+    // Copilot completará con una implementación mucho mejor
+```
+
+## Mejores prácticas
+
+1. **Mantén archivos relacionados abiertos** — Copilot usa las pestañas abiertas como contexto adicional
+2. **Acepta parcialmente** con `Ctrl + →` cuando solo quieres parte de la sugerencia
+3. **Usa nombres descriptivos** — variables y funciones con nombres claros generan mejores completados
+4. **Itera con /fix** — si una sugerencia no es perfecta, úsala como base y pide correcciones
+5. **Aprovecha /tests temprano** — genera tests antes de escribir la implementación para practicar TDD asistido
+
+> **Privacidad:** En planes de empresa, el código no se usa para entrenar modelos. En planes individuales, puedes optar por no participar en el entrenamiento en la configuración de tu cuenta de GitHub.

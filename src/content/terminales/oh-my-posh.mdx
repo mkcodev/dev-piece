@@ -1,0 +1,237 @@
+---
+name: Oh My Posh
+description: Motor de prompt totalmente customizable para cualquier shell. Temas hermosos con iconos Nerd Font.
+category: terminales
+tags: [prompt, theme, powershell, cross-platform, icons]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install JanDeDobbeleer.OhMyPosh
+  brew: brew install jandedobbeleer/oh-my-posh/oh-my-posh
+  scoop: scoop install https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/oh-my-posh.json
+links:
+  repo: https://github.com/JanDeDobbeleer/oh-my-posh
+  docs: https://ohmyposh.dev/
+addedAt: 2025-01-15
+---
+
+## ¿Qué es Oh My Posh?
+
+Oh My Posh es un motor de temas para el prompt de la terminal que funciona con **cualquier shell**: PowerShell, bash, zsh, fish, CMD, Nushell y más. Creado por Jan De Dobbeleer, permite mostrar información contextual en el prompt: rama de git, versión de Node/Python/Go, estado del entorno virtual, batería, hora y mucho más, con iconos gracias a Nerd Fonts.
+
+A diferencia de Starship (también cross-shell), Oh My Posh usa temas en formato JSON con una configuración más visual y detallada. Soporta segmentos con formas personalizadas (powerline, hexágonos, bloques redondeados) y animaciones.
+
+## Requisito: Nerd Fonts
+
+Oh My Posh requiere una fuente con iconos. La más recomendada:
+
+```powershell
+# Instalar fuente con Oh My Posh directamente
+oh-my-posh font install meslo
+
+# O descargar manualmente desde
+# https://www.nerdfonts.com/font-downloads
+# Recomendadas: JetBrainsMono, MesloLGS, CaskaydiaCove
+```
+
+Configura la fuente en tu terminal:
+- **Windows Terminal**: Settings > Perfil > Apariencia > Tipo de fuente
+- **Alacritty**: `font.normal.family = "JetBrainsMono Nerd Font"`
+- **VS Code**: `"terminal.integrated.fontFamily": "JetBrainsMono Nerd Font"`
+
+## Configuración en PowerShell
+
+```powershell
+# Abrir el perfil de PowerShell
+notepad $PROFILE
+# o con Neovim:
+nvim $PROFILE
+```
+
+```powershell
+# $PROFILE (Microsoft.PowerShell_profile.ps1)
+
+# Inicializar Oh My Posh con un tema
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\catppuccin_frappe.omp.json" | Invoke-Expression
+
+# Alternativamente, con ruta absoluta a un tema personalizado
+# oh-my-posh init pwsh --config "C:\Users\TuUsuario\.config\omp\mi-tema.json" | Invoke-Expression
+```
+
+## Configuración en bash/zsh
+
+```bash
+# ~/.bashrc o ~/.zshrc
+eval "$(oh-my-posh init bash --config ~/.config/omp/catppuccin_frappe.omp.json)"
+# zsh:
+eval "$(oh-my-posh init zsh --config ~/.config/omp/catppuccin_frappe.omp.json)"
+```
+
+## Tema personalizado: Catppuccin Frappé
+
+Guarda este archivo como `~/.config/omp/catppuccin_frappe.omp.json`:
+
+```json
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
+  "console_title_template": "{{ .Shell }} - {{ .Folder }}",
+  "palette": {
+    "rosewater": "#f2d5cf",
+    "flamingo":  "#eebebe",
+    "pink":      "#f4b8e4",
+    "mauve":     "#ca9ee6",
+    "red":       "#e78284",
+    "maroon":    "#ea999c",
+    "peach":     "#ef9f76",
+    "yellow":    "#e5c890",
+    "green":     "#a6d189",
+    "teal":      "#81c8be",
+    "sky":       "#99d1db",
+    "sapphire":  "#85c1dc",
+    "blue":      "#8caaee",
+    "lavender":  "#babbf1",
+    "text":      "#c6d0f5",
+    "subtext1":  "#b5bfe2",
+    "subtext0":  "#a5adce",
+    "overlay2":  "#949cbb",
+    "overlay1":  "#838ba7",
+    "surface2":  "#626880",
+    "surface1":  "#51576d",
+    "surface0":  "#414559",
+    "base":      "#303446",
+    "mantle":    "#292c3c",
+    "crust":     "#232634"
+  },
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "os",
+          "style": "diamond",
+          "leading_diamond": "\ue0b6",
+          "trailing_diamond": "\ue0b0",
+          "foreground": "p:crust",
+          "background": "p:blue",
+          "template": " {{ if .WSL }}\uf17c{{ else }}{{ .Icon }}{{ end }} "
+        },
+        {
+          "type": "path",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "p:crust",
+          "background": "p:lavender",
+          "properties": {
+            "style": "folder",
+            "max_depth": 3
+          },
+          "template": "  {{ .Path }} "
+        },
+        {
+          "type": "git",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "p:crust",
+          "background": "p:green",
+          "background_templates": [
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}p:yellow{{ end }}",
+            "{{ if and (gt .Ahead 0) (gt .Behind 0) }}p:red{{ end }}",
+            "{{ if gt .Ahead 0 }}p:sky{{ end }}",
+            "{{ if gt .Behind 0 }}p:peach{{ end }}"
+          ],
+          "template": "  {{ .HEAD }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }} ",
+          "properties": {
+            "fetch_status": true,
+            "fetch_upstream_icon": true
+          }
+        },
+        {
+          "type": "node",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "p:crust",
+          "background": "p:green",
+          "template": "  {{ .Full }} ",
+          "properties": { "display_mode": "files" }
+        },
+        {
+          "type": "python",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "p:crust",
+          "background": "p:yellow",
+          "template": "  {{ if .Venv }}({{ .Venv }}) {{ end }}{{ .Full }} ",
+          "properties": { "display_mode": "files" }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "p:overlay1",
+          "template": " {{ .FormattedMs }} ",
+          "properties": { "threshold": 2000 }
+        },
+        {
+          "type": "time",
+          "style": "diamond",
+          "leading_diamond": "\ue0b6",
+          "trailing_diamond": "\ue0b4",
+          "foreground": "p:crust",
+          "background": "p:surface0",
+          "template": "  {{ .CurrentDate | date \"15:04\" }} "
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}p:red{{ else }}p:green{{ end }}"
+          ],
+          "template": "❯ "
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Ver todos los temas disponibles
+
+```powershell
+# PowerShell: explorar temas interactivamente
+Get-ChildItem "$env:POSH_THEMES_PATH" | Select-Object Name
+
+# Previsualizar un tema específico
+oh-my-posh print primary --config "$env:POSH_THEMES_PATH\tokyo.omp.json"
+
+# Cambiar tema temporalmente en la sesión actual
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH\agnoster.omp.json" | Invoke-Expression
+```
+
+## Pro Tips
+
+**Actualizar Oh My Posh:**
+```powershell
+winget upgrade JanDeDobbeleer.OhMyPosh
+# o
+oh-my-posh upgrade
+```
+
+**Caché de segmentos lentos:** Si el prompt tarda demasiado, puedes cachear segmentos costosos (como git) con `"cache": { "duration": 60000 }` dentro del segmento.
+
+**Prompt transitorio:** Activa `"transient_prompt"` para que el prompt de comandos anteriores se simplifique, manteniendo el terminal limpio.

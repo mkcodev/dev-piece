@@ -1,0 +1,121 @@
+---
+name: "Git Reflog — Recuperar commits perdidos"
+description: El seguro de vida de Git. Recupera commits, branches borrados y cualquier cambio que creías perdido para siempre.
+category: git-hacks
+tags: [git, recovery, safety, reflog, commits, branches]
+os: [cross]
+difficulty: intermediate
+addedAt: 2025-03-07
+---
+
+## Git nunca olvida (hasta que expira)
+
+El reflog (reference log) es un registro local de todos los movimientos de HEAD. Cada vez que haces checkout, reset, commit, merge o rebase, Git anota el estado anterior. Es tu red de seguridad personal.
+
+```bash
+# Ver el reflog completo
+git reflog
+
+# Salida típica:
+# abc1234 (HEAD -> main) HEAD@{0}: commit: feat: add login page
+# def5678 HEAD@{1}: reset: moving to HEAD~1
+# ghi9012 HEAD@{2}: commit: fix: typo in button
+# jkl3456 HEAD@{3}: checkout: moving from feature to main
+```
+
+## Escenario 1: Recuperar un branch borrado
+
+```bash
+# Borraste una branch por error
+git branch -D feature/mi-trabajo-importante
+
+# Encuentra el último commit de esa branch en el reflog
+git reflog | grep "feature/mi-trabajo-importante"
+# o simplemente busca los commits recientes
+git reflog --all | head -20
+
+# Recrea la branch desde ese commit
+git checkout -b feature/mi-trabajo-importante abc1234
+```
+
+## Escenario 2: Deshacer un reset --hard
+
+El peor momento: hiciste `git reset --hard` y perdiste commits:
+
+```bash
+# ¡Commits "perdidos"! Pero están en el reflog
+git reflog
+
+# Encuentra el commit justo antes del reset
+# HEAD@{2}: commit: feat: la feature que perdí
+
+# Recupera con reset o checkout
+git reset --hard HEAD@{2}
+# o crea una branch nueva desde ese punto
+git checkout -b recovery/salvado HEAD@{2}
+```
+
+## Escenario 3: Salir de un detached HEAD
+
+```bash
+# Estás en detached HEAD y has hecho commits
+git log --oneline -5
+# abc1234 (HEAD) mi commit en detached HEAD
+
+# Crea una branch para no perder esos commits
+git checkout -b feature/rescatada
+
+# Si ya saliste del detached HEAD y perdiste la referencia:
+git reflog | grep "HEAD@"
+git checkout -b feature/rescatada abc1234
+```
+
+## Formato del reflog
+
+```bash
+# Mostrar con fechas relativas
+git reflog --relative-date
+
+# Mostrar un branch específico (no solo HEAD)
+git reflog show main
+git reflog show origin/main
+
+# Formato personalizado
+git reflog --format="%h %gd %gs %s"
+```
+
+## ORIG_HEAD y FETCH_HEAD
+
+Git guarda referencias especiales para operaciones destructivas:
+
+```bash
+# ORIG_HEAD: punto anterior a merge, rebase o reset
+# Deshacer un merge problemático:
+git reset --hard ORIG_HEAD
+
+# Deshacer un rebase:
+git reset --hard ORIG_HEAD
+
+# FETCH_HEAD: último fetch de todos los remotes
+git diff HEAD FETCH_HEAD  # Ver qué hay en el remote antes de mergear
+git log FETCH_HEAD --oneline -10
+```
+
+## Configuración de expiración
+
+Por defecto, el reflog expira a los 90 días (30 días para entradas unreachable). Puedes ajustarlo:
+
+```ini
+# En .gitconfig
+[gc]
+    reflogExpire = 180 days
+    reflogExpireUnreachable = 60 days
+```
+
+```bash
+# Limpiar el reflog manualmente (raramente necesario)
+git reflog expire --expire=30.days --all
+git gc --prune=30.days
+```
+
+> **Regla de oro:** Antes de cualquier operación destructiva (`reset --hard`, `rebase`, `checkout -f`), anota el hash actual con `git rev-parse HEAD`. Si algo sale mal, `git reflog` te salva. Git solo pierde datos si ejecutas `git gc` o esperas a que expiren las entradas.

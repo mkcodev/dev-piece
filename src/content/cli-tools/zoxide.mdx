@@ -1,0 +1,152 @@
+---
+name: zoxide
+description: Reemplazo inteligente de cd que recuerda tus directorios más usados. Navega con z y un fragmento del nombre.
+category: cli-tools
+tags: [navigation, cd-replacement, smart, frecency]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install ajeetdsouza.zoxide
+  brew: brew install zoxide
+  cargo: cargo install zoxide
+links:
+  repo: https://github.com/ajeetdsouza/zoxide
+addedAt: 2025-01-18
+---
+
+## ¿Qué es zoxide?
+
+zoxide es un reemplazo inteligente del comando `cd`. En lugar de escribir rutas completas, simplemente escribes `z` seguido de un fragmento del nombre del directorio y zoxide navega al lugar correcto basándose en tu historial de visitas.
+
+Está escrito en Rust y es instantáneo. Aprende de tus patrones de navegación y clasifica los directorios por **frecency** (frecuencia + recencia), priorizando los que visitas más a menudo y más recientemente.
+
+## El algoritmo de Frecency
+
+El sistema de frecency funciona con una puntuación que combina:
+
+- **Frecuencia**: cuántas veces has visitado un directorio
+- **Recencia**: cuándo fue la última vez que lo visitaste
+
+Los directorios visitados recientemente tienen más peso, pero los muy frecuentados nunca desaparecen del historial. Es el mismo algoritmo que usa Firefox para las sugerencias de URLs.
+
+```
+# Ejemplo de historial interno de zoxide
+/home/mike/projects/devvault    [frecency: 847]
+/home/mike/projects/blog        [frecency: 234]
+/home/mike/.config/nvim         [frecency: 189]
+/home/mike/downloads            [frecency: 45]
+```
+
+## Inicialización por shell
+
+```bash
+# bash (~/.bashrc)
+eval "$(zoxide init bash)"
+
+# zsh (~/.zshrc)
+eval "$(zoxide init zsh)"
+
+# fish (~/.config/fish/config.fish)
+zoxide init fish | source
+
+# PowerShell ($PROFILE)
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
+
+# Nushell (~/.config/nushell/config.nu)
+# Ejecuta primero: zoxide init nushell | save -f ~/.zoxide.nu
+source ~/.zoxide.nu
+```
+
+## Uso básico
+
+```bash
+# Navegar a un directorio (fuzzy match)
+z devvault         # Va a ~/projects/devvault
+z nvim             # Va a ~/.config/nvim
+z dow              # Va a ~/downloads
+
+# Si hay varios matches, z elige el de mayor frecency
+z proj             # Va al proyecto más visitado que contiene "proj"
+
+# Múltiples fragmentos (AND implícito)
+z proj dev         # Directorio que contiene "proj" Y "dev"
+
+# Ruta absoluta sigue funcionando
+z /etc/nginx
+
+# Volver al directorio anterior (como cd -)
+z -
+```
+
+## zi: selector interactivo con fzf
+
+`zi` abre un selector interactivo que muestra todos los directorios del historial y permite buscar con fzf:
+
+```bash
+# Requiere fzf instalado
+zi             # Abre selector interactivo
+zi dev         # Selector prefiltrando por "dev"
+```
+
+La integración es automática: si fzf está instalado cuando inicializas zoxide, `zi` estará disponible.
+
+## Configuración avanzada
+
+```bash
+# ~/.zshrc o ~/.bashrc
+
+# Cambiar el comando de z a cd (reemplaza cd completamente)
+eval "$(zoxide init zsh --cmd cd)"
+
+# No reemplazar cd, mantener z como alias
+eval "$(zoxide init zsh)"
+# Ahora tienes z, zi, y cd original
+
+# Variable para el directorio de datos
+export _ZO_DATA_DIR="$HOME/.local/share/zoxide"
+
+# Excluir directorios del historial
+export _ZO_EXCLUDE_DIRS="$HOME:$HOME/downloads:/tmp/*"
+
+# Resolver symlinks antes de guardar
+export _ZO_RESOLVE_SYMLINKS=1
+
+# Echo del directorio al que se navega
+export _ZO_ECHO=1
+```
+
+## Gestión del historial
+
+```bash
+# Ver todos los directorios en el historial con su puntuación
+zoxide query --list --score
+
+# Buscar en el historial
+zoxide query nvim
+
+# Añadir manualmente un directorio
+zoxide add /ruta/al/directorio
+
+# Eliminar un directorio del historial
+zoxide remove /ruta/al/directorio
+
+# Limpiar directorios que ya no existen
+zoxide query --list | while read -r dir; do
+  [[ ! -d "$dir" ]] && zoxide remove "$dir"
+done
+```
+
+## Pro Tips
+
+**Reemplazar cd completamente:** Si usas `--cmd cd`, zoxide reemplaza el `cd` nativo pero sigue siendo compatible con `cd /ruta/completa` y `cd ..`. Es la opción más cómoda para no romper muscle memory.
+
+**Combinación con fzf para historial de shell:** Usa `z` junto con la búsqueda de historial de fzf (`Ctrl+R`) para recordar tanto comandos como directorios de forma intuitiva.
+
+**Exportar historial:** El historial de zoxide es un archivo de texto en `~/.local/share/zoxide/db.zo`. Puedes hacer backup y restaurarlo en otra máquina para transferir tus patrones de navegación.
+
+**Alias recomendados:**
+```bash
+alias zz="z -"          # Volver al directorio anterior
+alias zl="zoxide query --list --score | sort -rn | head -20"  # Top 20 dirs
+```

@@ -1,0 +1,151 @@
+---
+name: Windows Terminal Supercargado
+description: El terminal de Windows moderno con perfiles múltiples, pestañas, paneles y soporte completo de colores y fuentes.
+category: windows-tools
+tags: [windows, terminal, profiles, tabs, panes, themes, wsl]
+os: [windows]
+difficulty: beginner
+install:
+  winget: winget install Microsoft.WindowsTerminal
+links:
+  repo: https://github.com/microsoft/terminal
+addedAt: 2025-03-16
+---
+
+## El terminal que Windows merecía
+
+Windows Terminal es el reemplazo moderno del cmd y PowerShell clásico: soporte de Unicode y emoji, colores de 24 bits, múltiples pestañas y paneles, perfiles configurables, y una experiencia comparable a iTerm2 o Alacritty.
+
+## Instalación
+
+```powershell
+winget install Microsoft.WindowsTerminal
+# O ya viene preinstalado en Windows 11
+```
+
+## settings.json completo
+
+Abre la configuración con `Ctrl + ,` o a través del menú. El archivo está en `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_...\LocalState\settings.json`:
+
+```json
+{
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+    "copyOnSelect": false,
+    "copyFormatting": "none",
+    "initialRows": 30,
+    "initialCols": 120,
+
+    "actions": [
+        { "command": "closePane",               "keys": "ctrl+w" },
+        { "command": "newTab",                  "keys": "ctrl+t" },
+        { "command": "nextTab",                 "keys": "ctrl+tab" },
+        { "command": "prevTab",                 "keys": "ctrl+shift+tab" },
+        { "command": { "action": "splitPane", "split": "vertical" },   "keys": "ctrl+shift+5" },
+        { "command": { "action": "splitPane", "split": "horizontal" }, "keys": "ctrl+shift+2" },
+        { "command": "moveFocusLeft",           "keys": "ctrl+alt+left" },
+        { "command": "moveFocusRight",          "keys": "ctrl+alt+right" },
+        { "command": "moveFocusUp",             "keys": "ctrl+alt+up" },
+        { "command": "moveFocusDown",           "keys": "ctrl+alt+down" },
+        { "command": { "action": "resizePane", "direction": "right" }, "keys": "ctrl+shift+right" },
+        { "command": { "action": "resizePane", "direction": "left" },  "keys": "ctrl+shift+left" },
+        { "command": "toggleFullscreen",        "keys": "f11" },
+        { "command": "find",                    "keys": "ctrl+f" }
+    ],
+
+    "profiles": {
+        "defaults": {
+            "font": {
+                "face": "JetBrainsMono Nerd Font",
+                "size": 13,
+                "ligatures": true
+            },
+            "opacity": 95,
+            "useAcrylic": true,
+            "scrollbarState": "hidden",
+            "colorScheme": "Catppuccin Frappe"
+        },
+        "list": [
+            {
+                "guid": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+                "name": "PowerShell",
+                "source": "Windows.Terminal.PowershellCore",
+                "icon": "ms-appx:///ProfileIcons/{574e775e-4f2a-5b96-ac1e-a2962a402336}.png",
+                "startingDirectory": "%USERPROFILE%"
+            },
+            {
+                "guid": "{07b52e3e-de2c-5db4-bd2d-ba144ed6c273}",
+                "name": "Ubuntu (WSL2)",
+                "source": "Windows.Terminal.Wsl",
+                "colorScheme": "Catppuccin Frappe",
+                "startingDirectory": "//wsl$/Ubuntu/home/mikel",
+                "icon": "https://assets.ubuntu.com/v1/49a1a858-favicon-32x32.png"
+            },
+            {
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "name": "Command Prompt",
+                "commandline": "cmd.exe",
+                "hidden": false
+            }
+        ]
+    },
+
+    "schemes": [
+        {
+            "name": "Catppuccin Frappe",
+            "background": "#303446",
+            "foreground": "#C6D0F5",
+            "cursorColor": "#F2D5CF",
+            "selectionBackground": "#626880",
+            "black":         "#51576D",
+            "red":           "#E78284",
+            "green":         "#A6D189",
+            "yellow":        "#E5C890",
+            "blue":          "#8CAAEE",
+            "purple":        "#CA9EE6",
+            "cyan":          "#81C8BE",
+            "white":         "#B5BFE2",
+            "brightBlack":   "#626880",
+            "brightRed":     "#E78284",
+            "brightGreen":   "#A6D189",
+            "brightYellow":  "#E5C890",
+            "brightBlue":    "#8CAAEE",
+            "brightPurple":  "#CA9EE6",
+            "brightCyan":    "#81C8BE",
+            "brightWhite":   "#A5ADCE"
+        }
+    ]
+}
+```
+
+## Instalar fuente con Nerd Font
+
+```powershell
+# Con Scoop (más fácil para fuentes Nerd)
+scoop bucket add nerd-fonts
+scoop install JetBrainsMono-NF
+
+# O descarga manual desde https://www.nerdfonts.com/
+# Descomprime y haz clic derecho → Instalar para todos los usuarios
+```
+
+## Acciones de inicio automático (startup)
+
+En `settings.json`, añade `startupActions` para abrir una configuración específica al arrancar:
+
+```json
+{
+    "startupActions": "new-tab -p PowerShell; split-pane -p \"Ubuntu (WSL2)\" -H"
+}
+```
+
+Esto abre dos paneles al inicio: PowerShell arriba y WSL2 abajo.
+
+## Tips para power users
+
+- **Ctrl + Shift + P** abre la paleta de comandos (como en VS Code)
+- **Ctrl + clic** en una URL la abre en el navegador
+- **Arrastra y suelta** un archivo en la terminal para insertar su ruta
+- Usa **perfiles de color diferentes** por contexto: rojo para servidores de producción, verde para desarrollo, azul para local
+
+> **Perfil recomendado:** Configura PowerShell 7 (no el Windows PowerShell clásico) como perfil por defecto. Instálalo con `winget install Microsoft.PowerShell` para tener la versión cross-platform con mejor rendimiento y más features.

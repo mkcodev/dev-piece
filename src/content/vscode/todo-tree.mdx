@@ -1,0 +1,140 @@
+---
+name: Todo Tree
+description: Encuentra y navega todos tus TODOs, FIXMEs y HACKs del proyecto en una vista de árbol en el sidebar.
+category: vscode
+tags: [vscode, todos, fixme, comments, navigation, productivity]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-02-13
+---
+
+Todo Tree escanea todos los archivos del proyecto en busca de comentarios especiales (`TODO`, `FIXME`, `HACK`, `BUG`, etc.) y los lista en una vista de árbol en el sidebar. En lugar de perder TODOs entre miles de líneas de código, tienes un inventario centralizado y navegable de toda la deuda técnica pendiente.
+
+## Instalación
+
+**ID de extensión:** `Gruntfuggly.todo-tree`
+
+```bash
+code --install-extension Gruntfuggly.todo-tree
+```
+
+## Configuración completa en settings.json
+
+```jsonc
+{
+  // ── Todo Tree ──────────────────────────────────────────────────
+
+  // Tags que se buscan en el código
+  "todo-tree.general.tags": [
+    "TODO",
+    "FIXME",
+    "HACK",
+    "BUG",
+    "NOTE",
+    "WARN",
+    "PERF",
+    "XXX"
+  ],
+
+  // Colores e iconos por tag
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon":            "check",
+      "foreground":      "#000000",
+      "background":      "#ffcc00",
+      "iconColour":      "#ffcc00",
+      "type":            "tag"
+    },
+    "FIXME": {
+      "icon":            "flame",
+      "foreground":      "#ffffff",
+      "background":      "#e06c75",
+      "iconColour":      "#e06c75",
+      "type":            "tag"
+    },
+    "HACK": {
+      "icon":            "alert",
+      "foreground":      "#ffffff",
+      "background":      "#e5c07b",
+      "iconColour":      "#e5c07b",
+      "type":            "tag"
+    },
+    "BUG": {
+      "icon":            "bug",
+      "foreground":      "#ffffff",
+      "background":      "#c678dd",
+      "iconColour":      "#c678dd",
+      "type":            "tag"
+    },
+    "NOTE": {
+      "icon":            "note",
+      "foreground":      "#000000",
+      "background":      "#61afef",
+      "iconColour":      "#61afef",
+      "type":            "tag"
+    },
+    "PERF": {
+      "icon":            "zap",
+      "foreground":      "#000000",
+      "background":      "#98c379",
+      "iconColour":      "#98c379",
+      "type":            "tag"
+    }
+  },
+
+  // Usar el color del highlight también en el árbol
+  "todo-tree.highlights.useColourScheme": true,
+
+  // Mostrar el contador de cada tag
+  "todo-tree.tree.showCountsInTree": true,
+
+  // Agrupar por tag o por archivo
+  "todo-tree.tree.groupedByTag": false,
+
+  // Escanear también archivos ignorados por .gitignore
+  "todo-tree.filtering.useBuiltInExcludes": "file and search excludes",
+
+  // Excluir node_modules y carpetas de build
+  "todo-tree.filtering.excludeGlobs": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**"
+  ]
+}
+```
+
+## Ejemplo de uso en el código
+
+```typescript
+// TODO: refactorizar esta función cuando tengamos tiempo
+// FIXME: falla con inputs vacíos, ver issue #234
+// HACK: workaround temporal hasta que el backend arregle el endpoint
+// PERF: optimizar esta consulta, actualmente O(n²)
+// NOTE: este comportamiento es intencional, ver decisión de diseño en JIRA-456
+
+function processUserData(users: User[]) {
+  // BUG: no maneja usuarios con caracteres especiales en el nombre
+  return users.map(u => u.name.toUpperCase());
+}
+```
+
+## Filtrar por tag
+
+En la vista de árbol del sidebar, haz clic derecho en un tag para filtrar la vista y mostrar solo ese tipo de comentario. También puedes usar los botones de la barra de herramientas del árbol para expandir/colapsar todos los grupos.
+
+## Atajos de teclado
+
+Todo Tree no incluye keybindings por defecto, pero puedes añadirlos en `keybindings.json`:
+
+```jsonc
+[
+  {
+    "key":     "ctrl+alt+t",
+    "command": "todo-tree.showTree",
+    "when":    "workspaceHasFolder"
+  }
+]
+```
+
+La integración más productiva es combinar Todo Tree con la búsqueda de VS Code: `Ctrl+Shift+F` con el término `FIXME` te da los resultados con contexto, mientras que Todo Tree te da la vista de árbol navegable para una visión general del proyecto.

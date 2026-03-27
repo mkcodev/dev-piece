@@ -1,0 +1,197 @@
+---
+name: delta
+description: Paginador de git diff con resaltado de sintaxis, vista side-by-side y numeración de líneas. Reemplaza el diff de Git.
+category: cli-tools
+tags: [git-diff, syntax-highlight, side-by-side, pager]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install dandavison.delta
+  brew: brew install git-delta
+  cargo: cargo install git-delta
+links:
+  repo: https://github.com/dandavison/delta
+addedAt: 2025-01-26
+---
+
+## ¿Qué es delta?
+
+delta es un paginador para `git diff`, `git show`, `git log` y `git blame` escrito en Rust. Transforma la salida monocromática y difícil de leer del diff estándar de Git en una experiencia visual rica con resaltado de sintaxis por lenguaje, vista side-by-side (lado a lado), numeración de líneas, y resaltado de los cambios exactos dentro de cada línea modificada.
+
+Es la diferencia entre leer un diff en el bloc de notas y leerlo en VS Code, pero desde la terminal.
+
+## Integración con Git: .gitconfig completo
+
+```ini
+# ~/.gitconfig
+
+[core]
+  pager = delta
+
+[interactive]
+  diffFilter = delta --color-only
+
+[add.interactive]
+  useBuiltin = false  # Requerido para delta con git add -p
+
+[delta]
+  navigate = true
+  light = false
+  side-by-side = true
+  line-numbers = true
+  syntax-theme = Catppuccin Frappe
+  file-style = bold yellow
+  file-decoration-style = yellow ul
+  hunk-header-style = file line-number syntax
+  hunk-header-decoration-style = "#626880" box ul
+  line-numbers-left-format = "{nm:>4}┤"
+  line-numbers-right-format = "{np:>4}│"
+  line-numbers-left-style  = "#626880"
+  line-numbers-right-style = "#626880"
+  line-numbers-minus-style = "#e78284"
+  line-numbers-plus-style  = "#a6d189"
+  line-numbers-zero-style  = "#626880"
+  minus-style                   = syntax "#3d2b2b"
+  minus-emph-style              = syntax "#6d3030"
+  minus-non-emph-style          = syntax "#3d2b2b"
+  minus-empty-line-marker-style = normal "#3d2b2b"
+  plus-style                    = syntax "#1e3528"
+  plus-emph-style               = syntax "#1e5040"
+  plus-non-emph-style           = syntax "#1e3528"
+  plus-empty-line-marker-style  = normal "#1e3528"
+  zero-style           = syntax
+  whitespace-error-style = "#e78284" reverse
+  blame-code-style = syntax
+  blame-format = "{author:<18} {commit:<8} {timestamp:<14}"
+  blame-palette = "#303446 #292c3c #232634"
+  merge-conflict-begin-symbol = ▼
+  merge-conflict-end-symbol   = ▲
+  merge-conflict-ours-diff-header-style = "#e5c890" bold
+  merge-conflict-theirs-diff-header-style = "#8caaee" bold
+  merge-conflict-ours-diff-header-decoration-style = box
+  merge-conflict-theirs-diff-header-decoration-style = box
+
+[merge]
+  conflictstyle = diff3
+
+[diff]
+  colorMoved = default
+```
+
+## Instalar el tema Catppuccin para delta
+
+```bash
+# delta usa los temas de bat automáticamente.
+# Instala los temas de bat:
+mkdir -p "$(bat --config-dir)/themes"
+curl -LO --output-dir "$(bat --config-dir)/themes" \
+  "https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Frappe.tmTheme"
+
+# Reconstruir la caché
+bat cache --build
+
+# Verificar que el tema está disponible
+delta --list-syntax-themes | grep -i catppuccin
+```
+
+## Uso básico
+
+```bash
+# git diff automáticamente usa delta como paginador
+git diff
+git diff HEAD~3
+
+# git show también
+git show abc1234
+
+# git log con diff
+git log -p --follow archivo.ts
+
+# git blame con colores
+git blame src/main.rs
+
+# Comparar archivos directamente (sin git)
+delta archivo_viejo.py archivo_nuevo.py
+
+# Con stdin
+diff -u old.txt new.txt | delta
+```
+
+## Modo side-by-side vs modo normal
+
+```bash
+# Activar/desactivar side-by-side en cualquier momento
+git diff --no-pager | delta --side-by-side
+git diff --no-pager | delta --no-side-by-side
+
+# O con variable de entorno temporal
+DELTA_FEATURES=+side-by-side git diff
+```
+
+## Perfiles/features para diferentes situaciones
+
+```ini
+# En ~/.gitconfig puedes definir features (perfiles)
+
+[delta "decorations"]
+  commit-decoration-style = bold yellow box ul
+  file-style              = bold yellow ul
+  file-decoration-style   = none
+
+[delta "line-numbers"]
+  line-numbers = true
+
+[delta "side-by-side"]
+  side-by-side = true
+
+# Activar múltiples features
+[delta]
+  features = side-by-side line-numbers decorations
+```
+
+## Navegar con teclas
+
+Cuando delta está activo como paginador, puedes navegar con las teclas de `less`:
+
+```
+n / N     → Siguiente / anterior resultado (con navigate = true)
+j / k     → Bajar / subir una línea
+d / u     → Media página abajo / arriba
+f / b     → Página completa adelante / atrás
+q         → Salir
+/patrón   → Buscar
+```
+
+## Integración con otros comandos
+
+```bash
+# diff convencional con delta
+diff -u archivo1 archivo2 | delta
+
+# Comparar output de comandos
+diff <(ls dir1/) <(ls dir2/) | delta
+
+# Ver cambios de un stash
+git stash show -p stash@{0}   # delta activo automáticamente
+```
+
+## Pro Tips
+
+**`navigate = true`:** Con esta opción activada, puedes saltar entre archivos modificados usando `n` y `N` mientras navegas el diff. Esencial para diffs con muchos archivos.
+
+**Ancho de columna en side-by-side:** Si la vista se ve cortada, ajusta el ancho:
+
+```ini
+[delta]
+  side-by-side = true
+  # auto detecta el ancho, pero puedes forzarlo:
+  # width = 220
+```
+
+**Conflictos de merge:** delta hace los conflictos de merge mucho más legibles. Con `merge-conflict-begin-symbol` y `merge-conflict-end-symbol` customizados, identificas visualmente los bloques en conflicto de un vistazo.
+
+**Para pull requests en la terminal:** Combina delta con la CLI de GitHub (`gh`):
+
+```bash
+gh pr diff 123 | delta
+```

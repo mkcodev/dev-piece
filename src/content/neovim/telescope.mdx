@@ -1,0 +1,122 @@
+---
+name: Telescope.nvim
+description: El fuzzy finder definitivo para Neovim. Busca archivos, texto, buffers, git commits y cualquier cosa imaginable.
+category: neovim
+tags: [fuzzy-finder, neovim, search, picker, telescope]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  manual: Via lazy.nvim
+links:
+  repo: https://github.com/nvim-telescope/telescope.nvim
+addedAt: 2025-02-07
+---
+
+Telescope transforma Neovim en una herramienta de búsqueda de nivel superior. En lugar de depender del explorador de archivos o de comandos externos, puedes encontrar cualquier cosa —archivos, texto, símbolos, commits, ayuda— desde una ventana flotante con preview en tiempo real.
+
+## Instalación con lazy.nvim
+
+```lua
+-- lua/plugins/editor.lua
+return {
+  {
+    "nvim-telescope/telescope.nvim",
+    branch = "0.1.x",
+    cmd = "Telescope",
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>",               desc = "Buscar archivos" },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>",                desc = "Buscar texto (grep)" },
+      { "<leader>fb", "<cmd>Telescope buffers<cr>",                  desc = "Buscar buffers" },
+      { "<leader>fh", "<cmd>Telescope help_tags<cr>",                desc = "Buscar ayuda" },
+      { "<leader>fr", "<cmd>Telescope oldfiles<cr>",                 desc = "Archivos recientes" },
+      { "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>",     desc = "Símbolos del documento" },
+      { "<leader>gc", "<cmd>Telescope git_commits<cr>",              desc = "Git commits" },
+      { "<leader>gb", "<cmd>Telescope git_branches<cr>",             desc = "Git branches" },
+      { "<leader>gs", "<cmd>Telescope git_status<cr>",               desc = "Git status" },
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",   -- en Windows: build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release"
+      },
+    },
+    config = function()
+      local telescope = require("telescope")
+      local actions   = require("telescope.actions")
+
+      telescope.setup({
+        defaults = {
+          prompt_prefix   = " ",
+          selection_caret = " ",
+          path_display    = { "smart" },
+          sorting_strategy = "ascending",
+          layout_config = {
+            horizontal = {
+              prompt_position = "top",
+              preview_width   = 0.55,
+            },
+          },
+          mappings = {
+            i = {
+              ["<C-k>"] = actions.move_selection_previous,
+              ["<C-j>"] = actions.move_selection_next,
+              ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+              ["<Esc>"] = actions.close,
+            },
+          },
+        },
+        pickers = {
+          find_files = {
+            hidden = true,          -- incluye archivos ocultos (.env, etc.)
+            find_command = { "fd", "--type", "f", "--strip-cwd-prefix" },
+          },
+          live_grep = {
+            additional_args = { "--hidden" },
+          },
+        },
+        extensions = {
+          fzf = {
+            fuzzy                   = true,
+            override_generic_sorter = true,
+            override_file_sorter    = true,
+            case_mode               = "smart_case",
+          },
+        },
+      })
+
+      -- Cargar extensión fzf-native para mejor rendimiento
+      telescope.load_extension("fzf")
+    end,
+  },
+}
+```
+
+## Keymaps esenciales
+
+| Keymap | Picker | Descripción |
+|--------|--------|-------------|
+| `<leader>ff` | `find_files` | Buscar archivos en el proyecto |
+| `<leader>fg` | `live_grep` | Buscar texto en todos los archivos |
+| `<leader>fb` | `buffers` | Cambiar entre buffers abiertos |
+| `<leader>fh` | `help_tags` | Buscar en la documentación de Neovim |
+| `<leader>fr` | `oldfiles` | Archivos abiertos recientemente |
+| `<leader>gc` | `git_commits` | Historial de commits con diff |
+
+## Atajos dentro del picker
+
+Cuando Telescope está abierto:
+
+```
+Ctrl+j / Ctrl+k    → moverse por los resultados
+Enter              → abrir archivo
+Ctrl+v             → abrir en split vertical
+Ctrl+x             → abrir en split horizontal
+Ctrl+t             → abrir en nueva pestaña
+Ctrl+q             → enviar selección a quickfix list
+Esc                → cerrar Telescope
+```
+
+## telescope-fzf-native
+
+La extensión `fzf-native` reemplaza el sorter predeterminado de Telescope con uno compilado en C, lo que mejora drásticamente la velocidad de búsqueda en proyectos grandes. Requiere `make` en Linux/macOS o `cmake` en Windows. Sin ella, proyectos con miles de archivos pueden sentirse lentos.

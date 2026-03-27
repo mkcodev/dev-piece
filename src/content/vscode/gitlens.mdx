@@ -1,0 +1,89 @@
+---
+name: GitLens
+description: Supercharge tus capacidades de Git en VS Code. Blame inline, historial de archivos, visualización de ramas y más.
+category: vscode
+tags: [vscode, git, blame, history, visualization, productivity]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+addedAt: 2025-02-12
+---
+
+GitLens es la extensión de Git más completa para VS Code. Su característica más conocida es el blame inline —el texto gris al final de cada línea que muestra quién la escribió y cuándo— pero esconde docenas de funciones igualmente valiosas: historial de archivos, comparación de ramas, grafo de commits y mucho más.
+
+## Características principales
+
+- **Blame inline**: quién modificó cada línea, en qué commit y hace cuánto tiempo
+- **Current Line Blame**: detalle del commit al hacer hover sobre la línea
+- **File History**: historial completo de cambios de un archivo con diff
+- **Branch Comparison**: comparar dos ramas directamente desde el editor
+- **Commit Graph**: visualización gráfica del historial de commits
+- **Worktrees**: gestión de worktrees de Git
+- **Interactive Rebase**: rebase interactivo con UI visual
+
+## Configuración recomendada en settings.json
+
+GitLens tiene muchas funciones activadas por defecto que consumen recursos. Esta configuración mantiene lo esencial y desactiva lo redundante:
+
+```jsonc
+{
+  // ── GitLens ────────────────────────────────────────────────────
+
+  // Blame inline: muestra al final de la línea actual
+  "gitlens.currentLine.enabled": true,
+  "gitlens.currentLine.format": "${author}, ${agoOrDate} · ${message|50}",
+
+  // Desactivar annotations en el gutter (puede ser ruidoso)
+  "gitlens.blame.highlight.enabled": false,
+
+  // Blame al hacer hover: muestra el diff del commit
+  "gitlens.hovers.currentLine.over": "line",
+  "gitlens.hovers.enabled": true,
+
+  // Status bar: muestra rama + último commit
+  "gitlens.statusBar.enabled": true,
+  "gitlens.statusBar.format": "${branch} · ${agoOrDate}",
+
+  // Desactivar CodeLens (recuento de autores en funciones)
+  // Actívalo si quieres ver quién escribió cada función
+  "gitlens.codeLens.enabled": false,
+
+  // Vistas del sidebar: mantener solo las que usas
+  "gitlens.views.commits.files.layout": "tree",
+  "gitlens.views.fileHistory.enabled": true,
+
+  // Desactivar telemetría
+  "gitlens.telemetry.enabled": false
+}
+```
+
+## Comandos más útiles
+
+Accede a todos los comandos con `Ctrl+Shift+P` y escribe "GitLens":
+
+| Comando | Descripción |
+|---------|-------------|
+| `GitLens: Show File History` | Historial completo del archivo actual |
+| `GitLens: Show Line History` | Historial de la línea seleccionada |
+| `GitLens: Open Commit on Remote` | Abrir el commit en GitHub/GitLab |
+| `GitLens: Compare with Branch or Tag` | Diff con otra rama |
+| `GitLens: Toggle File Blame` | Activar/desactivar blame de todo el archivo |
+| `GitLens: Open Changes with Working File` | Ver qué cambió desde el último commit |
+
+## Blame inline: interpretar el mensaje
+
+```
+// El texto al final de la línea sigue este formato:
+// "Autor, hace X días · mensaje del commit"
+
+const apiUrl = "https://api.example.com";  ← mikel, hace 3 días · fix: update API endpoint
+```
+
+Al hacer hover sobre ese texto, aparece un panel con:
+- El mensaje completo del commit
+- El diff exacto de esa línea en ese commit
+- Botones para abrir el commit, copiar el SHA, o abrir el archivo en esa versión
+
+## Consejo de rendimiento
+
+En repositorios grandes (más de 50k commits), el Commit Graph puede ser lento. Si notas lag al abrir VS Code, desactívalo con `"gitlens.graph.enabled": false`. El blame inline es muy ligero y generalmente no afecta al rendimiento.

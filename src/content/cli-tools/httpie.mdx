@@ -1,0 +1,242 @@
+---
+name: HTTPie
+description: Cliente HTTP moderno para la terminal. Colorized output, JSON por defecto. El curl que debería existir.
+category: cli-tools
+tags: [http, api, curl-replacement, colorized, rest]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  pip: pip install httpie
+  brew: brew install httpie
+  apt: sudo apt install httpie
+links:
+  repo: https://github.com/httpie/cli
+  website: https://httpie.io/
+addedAt: 2025-01-29
+---
+
+## ¿Qué es HTTPie?
+
+HTTPie es un cliente HTTP para la línea de comandos diseñado para ser amigable y legible. Mientras que `curl` es enormemente potente pero tiene una sintaxis críptica y difícil de recordar, HTTPie tiene una sintaxis intuitiva en lenguaje natural, coloriza la salida automáticamente y usa JSON por defecto para los cuerpos de las peticiones.
+
+Es el cliente HTTP que usarías en el día a día para probar APIs, hacer debugging de endpoints y explorar servicios web desde la terminal.
+
+## Sintaxis básica
+
+```bash
+# Formato: http [MÉTODO] URL [OPCIONES] [ITEMS]
+# (GET es el método por defecto)
+
+# GET simple
+http GET https://httpbin.org/get
+http httpbin.org/get              # HTTPS asumido, GET por defecto
+
+# POST con cuerpo JSON
+http POST https://httpbin.org/post name=Alice age:=30
+
+# PUT
+http PUT https://api.ejemplo.com/users/1 name="Bob Updated"
+
+# DELETE
+http DELETE https://api.ejemplo.com/users/1
+
+# PATCH
+http PATCH https://api.ejemplo.com/users/1 status=active
+```
+
+## Tipos de datos en el cuerpo
+
+HTTPie distingue entre diferentes tipos de valores con operadores especiales:
+
+```bash
+# key=value  → string JSON
+# key:=value → JSON literal (números, booleanos, arrays, objetos)
+# key==value → query string parameter
+# key:value  → cabecera HTTP
+# key@file   → adjuntar archivo (form data)
+
+# Ejemplo completo
+http POST https://api.ejemplo.com/users \
+  name="Alice García" \
+  age:=28 \
+  active:=true \
+  tags:='["admin","user"]' \
+  address:='{"city":"Madrid","zip":"28001"}'
+
+# Salida equivalente:
+# {
+#   "name": "Alice García",
+#   "age": 28,
+#   "active": true,
+#   "tags": ["admin", "user"],
+#   "address": {"city": "Madrid", "zip": "28001"}
+# }
+```
+
+## Cabeceras HTTP
+
+```bash
+# Añadir cabeceras custom
+http GET https://api.ejemplo.com/data \
+  Authorization:"Bearer mi-token-jwt" \
+  X-Custom-Header:"valor" \
+  Accept:application/json
+
+# Content-Type se establece automáticamente para JSON
+# pero puedes sobreescribirlo:
+http POST https://api.ejemplo.com/data \
+  Content-Type:application/xml \
+  @payload.xml
+```
+
+## Autenticación
+
+```bash
+# Basic Auth
+http -a usuario:contraseña GET https://api.ejemplo.com/protected
+
+# Bearer Token
+http GET https://api.ejemplo.com/protected \
+  "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9..."
+
+# API Key en cabecera
+http GET https://api.ejemplo.com/data \
+  X-API-Key:mi-api-key-secreta
+
+# API Key en query string
+http GET "https://api.ejemplo.com/data?api_key=mi-key"
+# o equivalente con ==
+http GET https://api.ejemplo.com/data api_key==mi-key
+
+# Digest auth
+http --auth-type=digest -a user:pass GET https://api.ejemplo.com/secure
+
+# Netrc
+http --netrc GET https://api.privada.com
+```
+
+## Sesiones: persistir cookies y auth
+
+HTTPie puede guardar y reutilizar cookies, cabeceras y credenciales entre requests con sesiones nombradas:
+
+```bash
+# Crear/usar una sesión named
+http --session=mi-api POST https://api.ejemplo.com/login \
+  username=alice password=secreta
+
+# La siguiente request reutiliza la sesión (con cookies, auth, etc.)
+http --session=mi-api GET https://api.ejemplo.com/profile
+http --session=mi-api GET https://api.ejemplo.com/posts
+
+# Las sesiones se guardan en:
+# ~/.config/httpie/sessions/{host}/{nombre}.json
+
+# Sesión anónima (sin nombre, temporal)
+http --session=/tmp/sesion-temporal GET https://api.ejemplo.com/data
+```
+
+## Opciones de visualización
+
+```bash
+# Solo mostrar cabeceras de respuesta
+http --headers GET https://httpbin.org/get
+http -h GET https://httpbin.org/get
+
+# Solo mostrar el cuerpo
+http --body GET https://httpbin.org/get
+http -b GET https://httpbin.org/get
+
+# Ver la request completa (útil para debugging)
+http --verbose GET https://httpbin.org/get
+http -v GET https://httpbin.org/get
+
+# Modo offline: construir la request sin enviarla
+http --offline POST https://api.ejemplo.com/data key=val
+
+# Descargar archivo
+http --download GET https://ejemplo.com/archivo.zip
+http -d --output=archivo.zip GET https://ejemplo.com/archivo.zip
+
+# Seguir redirecciones
+http --follow GET https://t.co/cortourl
+
+# Verificación SSL
+http --verify=no GET https://localhost:8443/api  # Deshabilitar (dev)
+http --verify=/ruta/ca.crt GET https://internal.api  # CA personalizada
+```
+
+## Enviar archivos y formularios
+
+```bash
+# Form data (application/x-www-form-urlencoded)
+http --form POST https://httpbin.org/post nombre=Alice email=alice@ejemplo.com
+
+# Multipart form (subir archivo)
+http --multipart POST https://api.ejemplo.com/upload \
+  archivo@/ruta/imagen.jpg \
+  descripcion="Mi foto"
+
+# Cuerpo desde un archivo JSON
+http POST https://api.ejemplo.com/users < datos.json
+http POST https://api.ejemplo.com/users @datos.json
+```
+
+## xh: la alternativa en Rust
+
+`xh` es un cliente compatible con HTTPie reescrito en Rust. Es entre 5-10x más rápido en arrancar y soporta prácticamente toda la sintaxis de HTTPie:
+
+```bash
+# Instalación
+cargo install xh
+winget install ducaale.xh
+brew install xh
+
+# Uso idéntico a HTTPie
+xh GET https://api.github.com/users/octocat
+xh POST https://httpbin.org/post name=Alice age:=30
+
+# xh tiene además modo --curl para generar el equivalente curl
+xh --curl POST https://httpbin.org/post name=Alice
+# Muestra: curl -X POST https://httpbin.org/post -d '{"name":"Alice"}'
+```
+
+## Comparación: HTTPie vs curl
+
+```bash
+# Misma petición POST con JSON
+
+# curl (difícil de leer y recordar)
+curl -X POST https://api.ejemplo.com/users \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer token123" \
+  -d '{"name":"Alice","age":28}' \
+  --silent | python3 -m json.tool
+
+# HTTPie (legible y natural)
+http POST https://api.ejemplo.com/users \
+  "Authorization: Bearer token123" \
+  name=Alice age:=28
+```
+
+## Pro Tips
+
+**Modo `--check-status`:** Por defecto HTTPie siempre devuelve exit code 0. Usa `--check-status` para que devuelva error si el status HTTP es 4xx o 5xx, útil en scripts:
+
+```bash
+http --check-status GET https://api.ejemplo.com/health || echo "API no disponible"
+```
+
+**Config global:** Crea un archivo de configuración para defaults:
+
+```json
+// ~/.config/httpie/config.json
+{
+  "default_options": ["--style=catppuccin-frappe", "--pretty=all", "--check-status"]
+}
+```
+
+**Integración con jq:** La salida de HTTPie ya es JSON formateado, pero puedes filtrarlo directamente con jq:
+
+```bash
+http GET https://api.github.com/users/octocat | jq '.public_repos'
+```

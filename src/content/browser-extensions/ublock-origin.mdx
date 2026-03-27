@@ -1,0 +1,98 @@
+---
+name: uBlock Origin
+description: El bloqueador de anuncios más eficiente. Open source, bajo consumo de memoria y filtros avanzados.
+category: browser-extensions
+tags: [browser, adblocker, privacy, performance, security]
+os: [cross]
+featured: true
+difficulty: beginner
+links:
+  repo: https://github.com/gorhill/uBlock
+addedAt: 2025-02-19
+---
+
+uBlock Origin (uBO) no es solo un bloqueador de anuncios: es un bloqueador de contenido de amplio espectro. Bloquea rastreadores, malware, paywall scripts y elementos de página no deseados con un consumo de memoria que avergüenza a sus competidores. La diferencia de rendimiento con Adblock Plus en páginas pesadas puede superar el 30% en tiempo de carga.
+
+## Listas de filtros recomendadas
+
+Accede a las listas desde el panel de uBO → Filterlists (botón de engranaje → Filter Lists):
+
+```
+── Activadas por defecto (mantenerlas) ──────────────────────────
+✅ uBlock filters                    → filtros propios de uBO
+✅ EasyList                          → anuncios generales
+✅ EasyPrivacy                       → rastreadores
+✅ Online Malicious URL Blocklist     → URLs maliciosas
+✅ Peter Lowe's Ad and tracking server list
+
+── Recomendadas para activar ────────────────────────────────────
+✅ AdGuard Base Filters              → complementa EasyList
+✅ AdGuard Tracking Protection       → rastreadores adicionales
+✅ Fanboy's Social Blocking List     → botones sociales
+✅ uBlock filters – Annoyances       → popups de cookies, newsletters
+✅ EasyList Cookie                   → banners de consentimiento de cookies
+✅ I don't care about cookies        → más banners de cookies
+
+── Para usuarios españoles ───────────────────────────────────────
+✅ EasyList Spain                    → anuncios en dominios .es
+```
+
+## Modo avanzado y filtrado dinámico
+
+El modo avanzado de uBO desbloquea el filtrado dinámico por dominio y tipo de recurso. Actívalo en Opciones → Avanzado → "Activar modo avanzado":
+
+```
+En el popup de uBO aparece una tabla con columnas:
+  all   → regla para todos los tipos de recurso
+  3p    → recursos de terceros
+  3p-script → scripts de terceros
+  3p-frame  → iframes de terceros
+
+Colores:
+  gris  → regla heredada del filtro de lista
+  verde → permitir siempre
+  rojo  → bloquear siempre
+```
+
+## Element picker: bloquear elementos específicos
+
+Para elementos molestos que los filtros no capturan (modales, banners flotantes):
+
+```
+1. Haz clic en el icono de uBO
+2. Pulsa el ícono de cuenta gotas (element picker)
+3. Haz clic en el elemento que quieres bloquear
+4. uBO genera una regla CSS y te muestra una preview
+5. Pulsa "Create" para añadirla a tus filtros personales
+```
+
+## Filtros personales (my filters)
+
+Puedes escribir reglas propias en texto plano en Opciones → My Filters:
+
+```
+! Bloquear script de analytics concreto
+||analytics.example.com^
+
+! Ocultar elemento por clase CSS en un dominio
+example.com##.cookie-banner
+
+! Bloquear todos los scripts de terceros en un dominio
+||ads.^$script,third-party
+
+! Desbloquear algo que fue bloqueado por error (regla de excepción)
+@@||cdn.jsdelivr.net^$script
+```
+
+## uBO vs Adblock Plus: comparativa rápida
+
+| Característica | uBlock Origin | Adblock Plus |
+|----------------|:---:|:---:|
+| Open source | Si | Si |
+| Acceptable Ads (pagados) | No | Si por defecto |
+| Consumo de RAM | Bajo (~50MB) | Alto (~150MB) |
+| Filtrado dinámico | Si | No |
+| Element picker | Si | Si |
+| Modo avanzado | Si | No |
+
+La diferencia clave es que ABP incluye el programa "Acceptable Ads" que permite algunos anuncios de pago por defecto. uBO no tiene acuerdos comerciales y bloquea todo lo que las listas indican sin excepciones pagadas.

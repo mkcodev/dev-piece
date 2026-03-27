@@ -1,0 +1,91 @@
+---
+name: Error Lens
+description: Muestra los errores y warnings directamente en la línea del código, sin necesidad de hover. Indispensable para productividad.
+category: vscode
+tags: [vscode, errors, diagnostics, inline, productivity]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-02-11
+---
+
+Error Lens elimina la fricción de tener que hacer hover sobre el subrayado rojo para ver el mensaje de error. El diagnóstico aparece directamente en la línea donde ocurre, en texto de color, sin interrumpir el flujo de escritura.
+
+## Instalación
+
+**ID de extensión:** `usernamehw.errorlens`
+
+```bash
+# Desde la terminal
+code --install-extension usernamehw.errorlens
+```
+
+O busca "Error Lens" en el marketplace de VS Code (autor: Alexander).
+
+## Configuración recomendada en settings.json
+
+```jsonc
+{
+  // ── Error Lens ─────────────────────────────────────────────────
+  // Mostrar solo errores y warnings (omitir hints e info)
+  "errorLens.enabledDiagnosticLevels": ["error", "warning"],
+
+  // Retraso antes de mostrar el mensaje (evita parpadeos mientras escribes)
+  "errorLens.delay": 300,
+
+  // Reducir la opacidad del fondo coloreado (menos intrusivo)
+  "errorLens.messageBackgroundMode": "none",
+
+  // Mostrar solo el mensaje sin el icono de severidad
+  "errorLens.messageTemplate": "$message",
+
+  // Limitar la longitud del mensaje en línea
+  "errorLens.messageMaxChars": 80,
+
+  // Mostrar el número de errores/warnings en la barra de estado
+  "errorLens.statusBarIconsEnabled": true,
+  "errorLens.statusBarMessageEnabled": true,
+
+  // Colores personalizados (opcional, sobrescribe el tema)
+  "errorLens.errorGutterIconColor":   "#e06c75",
+  "errorLens.warningGutterIconColor": "#e5c07b",
+  "errorLens.infoGutterIconColor":    "#61afef",
+
+  // Excluir diagnósticos de fuentes específicas si son muy ruidosas
+  "errorLens.exclude": [],
+
+  // Mostrar en archivos de solo lectura también
+  "errorLens.enabledFileGlob": "**/*"
+}
+```
+
+## Personalización de colores
+
+Para ajustar los colores del texto inline sin tocar el tema global, usa `editor.tokenColorCustomizations` o `workbench.colorCustomizations`:
+
+```jsonc
+{
+  "workbench.colorCustomizations": {
+    "errorLens.errorForeground":         "#e06c75",
+    "errorLens.errorBackground":         "#e06c7510",
+    "errorLens.warningForeground":       "#e5c07b",
+    "errorLens.warningBackground":       "#e5c07b10",
+    "errorLens.infoForeground":          "#61afef",
+    "errorLens.hintForeground":          "#98c379"
+  }
+}
+```
+
+## Atajos de teclado útiles
+
+Error Lens no añade keymaps propios, pero estos comandos nativos de VS Code se complementan perfectamente con él:
+
+| Atajo | Acción |
+|-------|--------|
+| `F8` | Ir al siguiente error/warning |
+| `Shift+F8` | Ir al error/warning anterior |
+| `Ctrl+Shift+M` | Abrir el panel de Problems |
+| `Ctrl+.` | Ver quick fixes en la línea actual |
+
+## Consejo de productividad
+
+Si el texto inline resulta demasiado ruidoso durante la escritura inicial, configura un `delay` alto (600-800ms) o activa el modo de solo mostrar en la línea del cursor con `"errorLens.followCursor": "activeLine"`. Esto limita los mensajes a la línea donde está el cursor, reduciendo el ruido visual sin perder la información.

@@ -1,0 +1,131 @@
+---
+name: Ghostty
+description: Terminal ultrarrápido escrito en Zig por el creador de Hashicorp. Nativo y blazing fast.
+category: terminales
+tags: [terminal, zig, native, fast]
+os: [macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install --cask ghostty
+  manual: https://ghostty.org/
+links:
+  repo: https://github.com/ghostty-org/ghostty
+  website: https://ghostty.org/
+addedAt: 2025-01-13
+---
+
+## ¿Qué es Ghostty?
+
+Ghostty es un emulador de terminal creado por Mitchell Hashimoto, el fundador de HashiCorp (creadores de Vagrant, Terraform, Vault y Consul). Lanzado como open source a finales de 2024 tras años de desarrollo privado, Ghostty se ha convertido rápidamente en uno de los terminales más populares del ecosistema.
+
+Está escrito en **Zig**, un lenguaje de sistemas moderno que compite con C y Rust. La filosofía de Ghostty es simple: ser completamente nativo en cada plataforma (usa AppKit en macOS y GTK en Linux), rápido como Alacritty, pero con más características que este.
+
+## ¿Por qué Zig?
+
+Zig ofrece varias ventajas sobre C y Rust para este caso de uso:
+
+- **Control total sobre la memoria** sin garbage collector
+- **Compilación cruzada** trivial: un solo binario para todas las plataformas
+- **Comptime**: código que se evalúa en tiempo de compilación para cero overhead en runtime
+- **Interop con C** directamente, sin FFI
+
+El resultado es un terminal con latencia de input menor a 1ms en la mayoría de sistemas y un consumo de memoria extremadamente bajo.
+
+## Características destacadas
+
+- UI nativa por plataforma (no Electron, no WebView, no Qt)
+- Soporte completo para gráficos inline (protocolo Kitty)
+- Ligatures de fuentes
+- Splits y pestañas nativos
+- Quick terminal (como Quake mode): aparece con un atajo de teclado global
+- Soporte para shell integration (OSC 7, semantic prompts)
+
+## Configuración: Catppuccin Frappé
+
+El archivo de configuración es `~/.config/ghostty/config` (formato propio, sin TOML ni YAML).
+
+```ini
+# ~/.config/ghostty/config
+
+# ─── Fuente ────────────────────────────────────────────────────────────────
+font-family = JetBrainsMono Nerd Font
+font-size = 13
+font-feature = calt
+font-feature = liga
+font-feature = clig
+
+# ─── Apariencia ────────────────────────────────────────────────────────────
+theme = catppuccin-frappe
+background-opacity = 0.95
+background-blur-radius = 20
+window-padding-x = 12
+window-padding-y = 10
+window-decoration = false
+
+# ─── Cursor ────────────────────────────────────────────────────────────────
+cursor-style = block
+cursor-style-blink = true
+
+# ─── Comportamiento ────────────────────────────────────────────────────────
+scrollback-limit = 10000
+copy-on-select = true
+clipboard-trim-trailing-spaces = true
+confirm-close-surface = false
+
+# ─── Shell ─────────────────────────────────────────────────────────────────
+shell-integration = zsh
+shell-integration-features = cursor,sudo,title
+
+# ─── Quick Terminal ────────────────────────────────────────────────────────
+quick-terminal-position = top
+quick-terminal-screen = main
+quick-terminal-animation-duration = 0.2
+
+# ─── Keybindings ───────────────────────────────────────────────────────────
+keybind = cmd+t=new_tab
+keybind = cmd+w=close_surface
+keybind = cmd+d=new_split:right
+keybind = cmd+shift+d=new_split:down
+keybind = cmd+]=goto_split:next
+keybind = cmd+[=goto_split:previous
+keybind = cmd+shift+enter=toggle_split_zoom
+keybind = global:cmd+grave_accent=toggle_quick_terminal
+```
+
+## Colores manuales (alternativa al tema built-in)
+
+Si quieres ajustar los colores individualmente:
+
+```ini
+# Catppuccin Frappé manual
+background  = #303446
+foreground  = #c6d0f5
+cursor-color = #f2d5cf
+selection-background = #626880
+selection-foreground = #c6d0f5
+
+palette = 0=#51576d
+palette = 1=#e78284
+palette = 2=#a6d189
+palette = 3=#e5c890
+palette = 4=#8caaee
+palette = 5=#f4b8e4
+palette = 6=#81c8be
+palette = 7=#b5bfe2
+palette = 8=#626880
+palette = 9=#e78284
+palette = 10=#a6d189
+palette = 11=#e5c890
+palette = 12=#8caaee
+palette = 13=#f4b8e4
+palette = 14=#81c8be
+palette = 15=#a5adce
+```
+
+## Pro Tips
+
+**Quick Terminal:** Una de las funciones más amadas de Ghostty. Configura un atajo global (`global:cmd+grave_accent`) para que el terminal aparezca y desaparezca desde cualquier aplicación, como un panel desplegable desde la parte superior de la pantalla.
+
+**Shell Integration:** Con `shell-integration = zsh` activado, Ghostty entiende los límites de cada prompt. Puedes navegar entre comandos con `Cmd+Up/Down` y seleccionar la salida de un comando específico con un solo click.
+
+**Splits nativos:** A diferencia de Alacritty, Ghostty incluye splits horizontales y verticales sin necesidad de tmux. Son más lentos de configurar pero suficientes para la mayoría de casos de uso.

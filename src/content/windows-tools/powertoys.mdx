@@ -1,0 +1,108 @@
+---
+name: Microsoft PowerToys
+description: Suite de utilidades de Microsoft para power users de Windows. FancyZones, PowerToys Run, Color Picker, OCR y más.
+category: windows-tools
+tags: [windows, productivity, utilities, microsoft, system, tools]
+os: [windows]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install Microsoft.PowerToys
+  scoop: scoop install powertoys
+links:
+  repo: https://github.com/microsoft/PowerToys
+addedAt: 2025-03-13
+---
+
+## La navaja suiza de Windows
+
+PowerToys es una colección de utilidades open source de Microsoft que añade superpoderes a Windows. Una sola instalación, más de 20 herramientas. Aquí están las más útiles para desarrolladores.
+
+## FancyZones — Layouts de ventanas
+
+Define zonas de pantalla personalizadas y arrastra ventanas a ellas. Ideal para monitores ultrawide o setups de múltiples pantallas.
+
+- **Activar:** `Win + Shift + ~` abre el editor de zonas
+- **Usar:** Mantén `Shift` mientras arrastras una ventana para ver las zonas
+- Crea layouts de cuadrículas, columnas o cualquier forma personalizada
+- Los layouts se guardan por monitor y se restauran al reconectar
+
+## PowerToys Run — Launcher de aplicaciones
+
+Un launcher rápido similar a Spotlight (macOS) o Alfred.
+
+- **Atajo:** `Alt + Space`
+- Busca aplicaciones, archivos, procesos en ejecución
+- Calcula expresiones matemáticas directamente
+- Navega el sistema de archivos con `>`
+- Plugin de historial del portapapeles integrado
+
+```
+Alt+Space → "calc" → Abre calculadora
+Alt+Space → "= 15 * 8" → Muestra 120
+Alt+Space → "> C:\proyectos" → Navega a la carpeta
+```
+
+## Keyboard Manager — Remap de teclas
+
+Remapea teclas y atajos de forma permanente en Windows:
+
+- Cambia `CapsLock` → `Escape` (ideal para Vim)
+- Remapea atajos de teclado completos
+- Las reglas se aplican globalmente o por aplicación específica
+- Sin necesidad de AutoHotkey para remaps simples 1-a-1
+
+## Color Picker — `Win + Shift + C`
+
+Captura el color de cualquier píxel en pantalla:
+
+- Formatos: HEX, RGB, HSL, HSV y más
+- Historial de colores recientes
+- Copia el valor al portapapeles automáticamente
+- Indispensable para diseño y front-end
+
+## Screen Ruler — `Win + Shift + M`
+
+Mide píxeles en pantalla:
+
+- Mide anchuras, alturas y distancias entre elementos
+- Útil para revisar espaciados en diseños UI
+- Funciona en cualquier aplicación
+
+## Text Extractor (OCR) — `Win + Shift + T`
+
+Extrae texto de cualquier parte de la pantalla:
+
+- Funciona en imágenes, PDFs sin capa de texto, videos pausados
+- Soporte multiidioma
+- Texto copiado al portapapeles en segundos
+- Perfecto para copiar mensajes de error de imágenes o capturas de pantalla
+
+## Paste As Plain Text — `Win + Ctrl + Alt + V`
+
+Pega el contenido del portapapeles sin formato. Elimina estilos, fuentes y colores al pegar:
+
+- Ideal para pegar desde Word o páginas web a editores de código
+- Evita que el formato externo ensucie tu documento
+
+## File Locksmith
+
+Clic derecho en cualquier archivo → "¿Qué está usando este archivo?" para ver qué procesos lo tienen bloqueado. Útil cuando Windows no te deja borrar o mover un archivo.
+
+## Image Resizer
+
+Clic derecho en una o varias imágenes → **Resize with Image Resizer**. Define tamaños predefinidos (pequeño, medio, grande) o dimensiones personalizadas. Procesa lotes de imágenes sin abrir ningún editor.
+
+## Always on Top — `Win + Ctrl + T`
+
+Fija cualquier ventana para que permanezca siempre visible sobre las demás. Las ventanas fijadas reciben un borde de color configurable.
+
+## Instalación y actualización
+
+```powershell
+winget install Microsoft.PowerToys
+# O actualizar a la última versión:
+winget upgrade Microsoft.PowerToys
+```
+
+> **Tip:** Accede a la configuración completa desde el icono de PowerToys en la bandeja del sistema. Cada módulo se puede activar o desactivar individualmente para no sobrecargar el sistema con herramientas que no uses.

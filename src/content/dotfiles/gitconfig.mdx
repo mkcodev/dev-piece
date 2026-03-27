@@ -1,0 +1,189 @@
+---
+name: .gitconfig Global Definitivo
+description: El archivo .gitconfig más completo y optimizado. Aliases, delta, configuración de merge, y tips de productividad.
+category: dotfiles
+tags: [git, dotfiles, config, aliases, delta, productivity]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-03-17
+---
+
+## El .gitconfig que deberías tener
+
+El archivo `~/.gitconfig` es la configuración global de Git que aplica a todos tus repositorios. Una buena configuración base ahorra horas de trabajo y evita errores comunes.
+
+## Configuración completa
+
+```ini
+# ~/.gitconfig
+
+[user]
+    name = Tu Nombre
+    email = tu@email.com
+    # signingkey = TU_GPG_KEY_ID  # Descomenta si firmas commits
+
+[core]
+    autocrlf = input          # En Windows usa: autocrlf = true
+    editor = nvim             # O: code --wait (VS Code)
+    pager = delta             # Instala: cargo install git-delta
+    whitespace = fix
+    excludesfile = ~/.gitignore_global
+
+[init]
+    defaultBranch = main
+
+[push]
+    default = simple
+    autoSetupRemote = true    # git push sin -u origin automáticamente
+
+[pull]
+    rebase = true             # pull --rebase por defecto (evita merge commits)
+
+[merge]
+    tool = nvimdiff
+    conflictstyle = zdiff3    # Mejor visualización de conflictos (Git 2.35+)
+
+[diff]
+    tool = nvimdiff
+    algorithm = histogram     # Mejor algoritmo de diff que el default
+    colorMoved = default      # Colorea líneas movidas diferente a añadidas
+
+[fetch]
+    prune = true              # Borra ramas remotas eliminadas al hacer fetch
+    prunetags = true
+
+[rebase]
+    autosquash = true         # Aplica fixup!/squash! automáticamente
+    autostash = true          # Stash automático antes de rebase
+
+[rerere]
+    enabled = true            # Recuerda resoluciones de conflictos
+
+[branch]
+    sort = -committerdate     # Ordena branches por actividad reciente
+
+[tag]
+    sort = -version:refname   # Ordena tags por versión semántica
+
+# ── Delta: pager mejorado ────────────────────────────────────
+[delta]
+    navigate = true           # n/N para navegar entre cambios
+    side-by-side = true       # Vista lado a lado
+    line-numbers = true
+    syntax-theme = Catppuccin-Frappe
+    hyperlinks = true
+
+[interactive]
+    diffFilter = delta --color-only
+
+# ── Aliases ──────────────────────────────────────────────────
+[alias]
+    # Shortcuts básicos
+    st   = status -sb
+    co   = checkout
+    sw   = switch
+    br   = branch --sort=-committerdate
+    cp   = cherry-pick
+    rb   = rebase
+    rs   = restore
+
+    # Log bonito
+    lg   = log --oneline --decorate --graph
+    lga  = log --oneline --decorate --graph --all
+    ll   = log --oneline --decorate -20
+    who  = log --oneline --no-walk --format="%h %s (%cr) <%an>"
+
+    # Diff
+    d    = diff
+    ds   = diff --staged
+    dw   = diff --word-diff
+
+    # Staging interactivo
+    a    = add -p              # Staging por hunks (interactivo)
+    ap   = add --patch
+
+    # Commit rápido
+    cm   = commit -m
+    ca   = commit --amend --no-edit
+    can  = commit --amend
+
+    # Push/Pull
+    ps   = push
+    pl   = pull
+    pf   = push --force-with-lease  # Force push seguro
+
+    # Worktrees
+    wt   = worktree
+    wtl  = worktree list
+    wta  = worktree add
+
+    # Utilidades
+    aliases  = config --get-regexp alias
+    branches = branch -a
+    tags     = tag -l
+    remotes  = remote -v
+    ignore   = "!f() { echo \"$1\" >> .gitignore; }; f"
+
+    # Recuperación
+    undo  = reset HEAD~1 --mixed    # Deshace el último commit, mantiene cambios
+    nuke  = reset HEAD~1 --hard     # Deshace el último commit y los cambios
+    unstage = reset HEAD --
+
+    # Flujo de trabajo
+    save  = stash push -u -m        # git save "descripción"
+    wip   = commit -am "wip: work in progress [skip ci]"
+    unwip = reset HEAD~1 --mixed
+
+    # Limpieza
+    cleanup = "!git branch --merged main | grep -v 'main\\|master\\|develop' | xargs git branch -d"
+```
+
+## Instalar delta
+
+`delta` es un pager alternativo que mejora enormemente la visualización de diffs:
+
+```bash
+# Linux/Mac con cargo
+cargo install git-delta
+
+# Mac con homebrew
+brew install git-delta
+
+# Windows con winget
+winget install dandavison.delta
+
+# Windows con scoop
+scoop install delta
+```
+
+## .gitignore_global recomendado
+
+```bash
+# ~/.gitignore_global
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs y temporales
+*.log
+*.tmp
+*.cache
+
+# Variables de entorno
+.env
+.env.local
+.env.*.local
+```
+
+> **Tip:** Ejecuta `git config --global -e` para abrir el `.gitconfig` directamente en tu editor configurado. Después de cambiar el pager a `delta`, los `git diff` y `git log -p` lucen completamente diferentes.

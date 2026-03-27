@@ -1,0 +1,143 @@
+---
+name: Text Expander con AHK
+description: Expande abreviaturas a texto completo automáticamente. Email signatures, fechas, snippets de código y más.
+category: scripts-ahk
+tags: [ahk, text-expansion, snippets, automation, windows, productivity]
+os: [windows]
+difficulty: beginner
+addedAt: 2025-03-03
+---
+
+## ¿Qué es un text expander?
+
+Un text expander detecta cuando escribes una abreviatura corta y la reemplaza automáticamente por texto largo. Escribes `;sig` y aparece tu firma completa de email. Escribes `dts` y aparece la fecha de hoy. Es automatización de tipeo pura.
+
+## Sintaxis de hotstrings en AHK
+
+La sintaxis básica es `::abreviatura::expansión`:
+
+```ahk
+; Expansión simple en la misma línea
+::saludos::Hola, espero que estés bien.
+
+; Expansión multilinea (con paréntesis)
+::sig::
+(
+Saludos,
+Miguel
+Desarrollador Web
+miguel@ejemplo.com
+)
+```
+
+Por defecto, AHK espera un carácter disparador (espacio, punto, Enter) después de la abreviatura. El modificador `*` hace que expanda inmediatamente sin esperar:
+
+```ahk
+:*:dts::  ; Se expande al escribir "dts" sin esperar espacio
+```
+
+## Script completo: email y firmas
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; ── Firmas de email ──────────────────────────────────────────
+::;sig::
+(
+Saludos cordiales,
+Miguel García
+Desarrollador Full Stack | Empresa S.L.
+Tel: +34 600 000 000
+)
+
+::;sig2::
+(
+Best regards,
+Miguel García
+Full Stack Developer
+)
+
+; ── Frases frecuentes ────────────────────────────────────────
+::;gm::Buenos días,
+::;ty::Muchas gracias por tu respuesta.
+::;ooo::Estaré fuera de la oficina hasta el lunes. Me pondré en contacto contigo a la vuelta.
+
+; ── Datos de contacto ────────────────────────────────────────
+::;em::miguel@ejemplo.com
+::;ph::+34 600 000 000
+::;addr::Calle Mayor 1, 28001 Madrid, España
+```
+
+## Insertar fechas dinámicas
+
+Para fechas dinámicas necesitas una función, no una expansión estática:
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; dts → fecha de hoy (2025-03-03)
+:*:dts::
+{
+    Send FormatTime(A_Now, "yyyy-MM-dd")
+}
+
+; dtl → fecha larga (lunes, 3 de marzo de 2025)
+:*:dtl::
+{
+    Send FormatTime(A_Now, "dddd, d 'de' MMMM 'de' yyyy")
+}
+
+; dtt → fecha y hora (2025-03-03 14:30)
+:*:dtt::
+{
+    Send FormatTime(A_Now, "yyyy-MM-dd HH:mm")
+}
+```
+
+## Snippets de código frecuentes
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; JavaScript / TypeScript
+:*:clg::console.log()
+:*:cle::console.error()
+:*:afw::
+{
+    Send "async function () {{}{}}"
+    Send "{Left 2}"  ; Mueve el cursor dentro de las llaves
+}
+
+; HTML
+::html5::
+(
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documento</title>
+</head>
+<body>
+
+</body>
+</html>
+)
+
+; Git commits convencionales
+:*:gfc::feat:
+:*:gbc::fix:
+:*:gcc::chore:
+```
+
+## Opciones útiles de hotstrings
+
+| Modificador | Efecto |
+|-------------|--------|
+| `*` | Expande sin esperar carácter disparador |
+| `?` | Expande aunque la abreviatura esté dentro de una palabra |
+| `C` | Sensible a mayúsculas/minúsculas |
+| `B0` | No borra la abreviatura original |
+| `T` | Interpreta el texto como si fuera teclas enviadas (para `Send`) |
+
+> **Convención recomendada:** Usa un prefijo como `;` o `,` para tus abreviaturas. Así evitas expansiones accidentales al escribir palabras reales que contengan la secuencia.

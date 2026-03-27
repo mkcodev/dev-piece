@@ -1,0 +1,136 @@
+---
+name: VSCodeVim
+description: Emulación completa de Vim en VS Code. Modal editing, surround, easymotion y todos los motions que amas.
+category: vscode
+tags: [vscode, vim, keybindings, modal-editing, productivity]
+os: [windows, macos, linux]
+featured: true
+difficulty: intermediate
+addedAt: 2025-02-14
+---
+
+VSCodeVim trae el modal editing de Vim a VS Code con una emulación muy fiel, incluyendo características avanzadas como `vim-surround`, `vim-easymotion`, `vim-commentary` y `CamelCaseMotion`. Una vez que tu cerebro adopta el modelo de edición modal, la velocidad con la que manipulas texto cambia para siempre.
+
+## Configuración en settings.json
+
+```jsonc
+{
+  // ── VSCodeVim ──────────────────────────────────────────────────
+  "vim.leader": "<space>",
+  "vim.useSystemClipboard": true,
+  "vim.useCtrlKeys": true,
+  "vim.hlsearch": true,
+  "vim.incsearch": true,
+  "vim.ignorecase": true,
+  "vim.smartcase": true,
+
+  // Plugins emulados
+  "vim.easymotion": true,
+  "vim.surround": true,
+  "vim.camelCaseMotion.enable": true,
+  "vim.sneak": false,
+
+  // Teclas en Insert mode que VS Code debe manejar (no Vim)
+  "vim.handleKeys": {
+    "<C-a>": false,
+    "<C-f>": false,
+    "<C-z>": false
+  },
+
+  // Keymaps en Normal mode
+  "vim.normalModeKeyBindingsNonRecursive": [
+    // Limpiar búsqueda resaltada
+    { "before": ["<leader>", "h"], "commands": [":nohlsearch"] },
+
+    // Guardar con leader+w
+    { "before": ["<leader>", "w"], "commands": ["workbench.action.files.save"] },
+
+    // Cerrar editor
+    { "before": ["<leader>", "q"], "commands": ["workbench.action.closeActiveEditor"] },
+
+    // Abrir Telescope equivalente (Quick Open)
+    { "before": ["<leader>", "f", "f"], "commands": ["workbench.action.quickOpen"] },
+
+    // Buscar en archivos
+    { "before": ["<leader>", "f", "g"], "commands": ["workbench.action.findInFiles"] },
+
+    // Navegar entre tabs
+    { "before": ["H"], "commands": ["workbench.action.previousEditor"] },
+    { "before": ["L"], "commands": ["workbench.action.nextEditor"] },
+
+    // Ir a definición / referencias
+    { "before": ["g", "d"], "commands": ["editor.action.revealDefinition"] },
+    { "before": ["g", "r"], "commands": ["editor.action.goToReferences"] },
+    { "before": ["g", "h"], "commands": ["editor.action.showDefinitionPreviewHover"] },
+
+    // Code actions
+    { "before": ["<leader>", "c", "a"], "commands": ["editor.action.quickFix"] },
+
+    // Renombrar símbolo
+    { "before": ["<leader>", "r", "n"], "commands": ["editor.action.rename"] },
+
+    // Diagnósticos
+    { "before": ["]", "d"], "commands": ["editor.action.marker.nextInFiles"] },
+    { "before": ["[", "d"], "commands": ["editor.action.marker.prevInFiles"] },
+
+    // EasyMotion: saltar a cualquier palabra con <leader><leader>w
+    { "before": ["<leader>", "<leader>", "w"], "after": ["<leader>", "<leader>", "w"] }
+  ],
+
+  // Keymaps en Visual mode
+  "vim.visualModeKeyBindingsNonRecursive": [
+    // Mantener selección al indentar
+    { "before": [">"], "commands": ["editor.action.indentLines"] },
+    { "before": ["<"], "commands": ["editor.action.outdentLines"] }
+  ]
+}
+```
+
+## Referencia rápida de Vim motions esenciales
+
+```
+── Movimiento básico ─────────────────────────────────────────────
+h j k l      → izquierda, abajo, arriba, derecha
+w / b        → siguiente / anterior palabra
+e            → fin de palabra
+0 / $        → inicio / fin de línea
+gg / G       → inicio / fin del archivo
+Ctrl+d / u   → media página abajo / arriba
+{ / }        → párrafo anterior / siguiente
+
+── Operadores + movimientos ──────────────────────────────────────
+d{motion}    → borrar (dw, dd, d$, d5j)
+c{motion}    → cambiar (cw, cc, ci")
+y{motion}    → copiar (yy, yw, y$)
+v{motion}    → seleccionar visualmente
+
+── Text objects ──────────────────────────────────────────────────
+ci"   → cambiar el contenido de las comillas dobles
+ca(   → cambiar paréntesis y su contenido
+di{   → borrar el contenido de las llaves
+yip   → copiar el párrafo actual
+
+── vim-surround ──────────────────────────────────────────────────
+ys{motion}{char}  → rodear con char (ysiw" rodea palabra con "")
+cs"'              → cambiar " por '
+ds"               → borrar las ""
+```
+
+## EasyMotion
+
+Con EasyMotion activado, `<leader><leader>w` activa el salto visual: todas las palabras visibles se etiquetan con 1-2 letras. Pulsas las letras de la etiqueta y el cursor salta instantáneamente. Es la forma más rápida de mover el cursor a cualquier punto visible.
+
+## Consejo: deshabilitar el cursor en paneles no editables
+
+```jsonc
+{
+  "vim.disableExtension": false,
+  "vim.statusBarColorControl": true,
+  "vim.statusBarColors.normal":  "#4c566a",
+  "vim.statusBarColors.insert":  "#a3be8c",
+  "vim.statusBarColors.visual":  "#ebcb8b",
+  "vim.statusBarColors.replace": "#bf616a"
+}
+```
+
+El color de la barra de estado que cambia con el modo es una de las mejoras de UX más pequeñas pero más útiles: un vistazo a la barra y ya sabes en qué modo estás sin leer nada.

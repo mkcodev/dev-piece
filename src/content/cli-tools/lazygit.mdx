@@ -1,0 +1,301 @@
+---
+name: lazygit
+description: TUI para Git con interfaz visual increíble. Rebase interactivo, stash, diffs y más con atajos de teclado.
+category: cli-tools
+tags: [git, tui, visual, interactive, rebase]
+os: [windows, macos, linux]
+featured: true
+difficulty: intermediate
+install:
+  winget: winget install JesseDuffield.lazygit
+  brew: brew install lazygit
+  scoop: scoop install lazygit
+links:
+  repo: https://github.com/jesseduffield/lazygit
+addedAt: 2025-01-24
+---
+
+## ¿Qué es lazygit?
+
+lazygit es una interfaz de terminal (TUI) para Git que hace visualmente accesibles todas las operaciones de git: staging, commits, branches, stash, rebase interactivo, cherry-pick y mucho más, todo con atajos de teclado mnemónicos y sin tener que recordar la sintaxis exacta de cada comando.
+
+Creado por Jesse Duffield en Go, lazygit transforma git de una herramienta de línea de comandos en algo parecido a GitKraken o Sourcetree, pero sin salir de la terminal y sin sacrificar velocidad.
+
+## Interfaz: los 5 paneles principales
+
+```
+┌─────────────────┬──────────────────────────────────────┐
+│   Status/Files  │                                      │
+│   Branches      │           Panel de Diff              │
+│   Commits       │         (contenido principal)        │
+│   Stash         │                                      │
+│   Submodules    │                                      │
+└─────────────────┴──────────────────────────────────────┘
+```
+
+Navega entre paneles con `←→` o los números `1-5`.
+
+## Atajos de teclado esenciales
+
+```
+# Navegación global
+?          → Ayuda contextual con todos los atajos
+q          → Cerrar lazygit
+Tab        → Cambiar de panel
+1-5        → Ir directamente a un panel
+
+# Panel de archivos (staging)
+Space      → Stage/unstage archivo
+a          → Stage/unstage todos los archivos
+c          → Commit (abre editor de mensaje)
+C          → Commit con --amend
+A          → Amend commit anterior
+e          → Editar archivo en $EDITOR
+d          → Ver diff del archivo
+
+# Panel de branches
+n          → Nueva branch
+<Space>    → Checkout branch
+d          → Borrar branch
+r          → Rebase branch actual sobre la seleccionada
+M          → Merge branch seleccionada en la actual
+f          → Fetch
+P          → Pull
+p          → Push
+
+# Panel de commits
+s          → Squash commit con el anterior
+r          → Reword (cambiar mensaje)
+d          → Deshacer commit (drop)
+e          → Editar commit en rebase interactivo
+f          → Fixup commit
+A          → Amend commit con staged changes
+z          → Undo (git undo)
+ctrl+z     → Redo
+
+# Stash
+n          → Nuevo stash
+Space      → Aplicar stash
+g          → Pop stash
+d          → Eliminar stash
+
+# Cherry-pick (copiar commits)
+c          → Marcar commit para cherry-pick
+v          → Pegar commits marcados
+```
+
+## Rebase interactivo visual
+
+El rebase interactivo es donde lazygit brilla. En el panel de commits:
+
+```
+1. Navega con j/k hasta el commit desde donde hacer rebase
+2. Presiona 'e' para entrar en modo rebase interactivo
+3. En la lista de commits puedes:
+   - s → squash (combinar con el anterior)
+   - r → reword (cambiar mensaje)
+   - d → drop (eliminar)
+   - f → fixup (como squash pero sin guardar mensaje)
+   - Arrastrar con mouse para reordenar
+4. Presiona 'm' para continuar el rebase
+```
+
+## Configuración: config.yml con Catppuccin Frappé
+
+```bash
+# Ubicación del archivo de configuración:
+# Linux/macOS: ~/.config/lazygit/config.yml
+# Windows: %APPDATA%\lazygit\config.yml
+```
+
+```yaml
+# ~/.config/lazygit/config.yml
+
+gui:
+  theme:
+    activeBorderColor:
+      - "#8caaee"
+      - bold
+    inactiveBorderColor:
+      - "#626880"
+    optionsTextColor:
+      - "#8caaee"
+    selectedLineBgColor:
+      - "#414559"
+    selectedRangeBgColor:
+      - "#414559"
+    cherryPickedCommitBgColor:
+      - "#51576d"
+    cherryPickedCommitFgColor:
+      - "#8caaee"
+    unstagedChangesColor:
+      - "#e78284"
+    defaultFgColor:
+      - "#c6d0f5"
+    searchingActiveBorderColor:
+      - "#e5c890"
+  authorColors:
+    "*": "#ca9ee6"
+
+  nerdFontsVersion: "3"
+  showIcons: true
+  showFileTree: true
+  expandFocusedSidePanel: false
+  mainPanelSplitMode: "flexible"
+  language: "en"
+  timeFormat: "02 Jan 06 15:04"
+  shortTimeFormat: "15:04"
+  mouseEvents: true
+  scrollHeight: 2
+  scrollPastBottom: true
+  sidePanelWidth: 0.3333
+  border: "rounded"
+  animateExplosion: true
+  portraitMode: "auto"
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  commit:
+    signOff: false
+    autoWrapCommitMessage: true
+    autoWrapWidth: 72
+  merging:
+    manualCommit: false
+    args: ""
+  log:
+    order: "topo-order"
+    showGraph: "when-maximised"
+    showWholeGraph: false
+  skipHookPrefix: WIP
+  autoFetch: true
+  autoRefresh: true
+  branchLogCmd: "git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium {{branchName}} --"
+  allBranchesLogCmd: "git log --graph --all --color=always --abbrev-commit --decorate --date=relative --pretty=medium"
+  parseEmoji: true
+
+os:
+  edit: "nvim {{filename}}"
+  editAtLine: "nvim +{{line}} {{filename}}"
+  editAtLineAndWait: "nvim +{{line}} {{filename}}"
+  open: "xdg-open {{filename}} &>/dev/null &"
+
+refresher:
+  refreshInterval: 10
+  fetchInterval: 60
+
+update:
+  method: prompt
+  days: 14
+
+keybinding:
+  universal:
+    quit: "q"
+    quit-alt1: "<c-c>"
+    return: "<esc>"
+    quitWithoutChangingDirectory: "Q"
+    togglePanel: "<tab>"
+    prevItem: "<up>"
+    nextItem: "<down>"
+    prevItem-alt: "k"
+    nextItem-alt: "j"
+    scrollLeft: "H"
+    scrollRight: "L"
+    confirm: "<enter>"
+    confirmInEditor: "<a-enter>"
+    remove: "d"
+    new: "n"
+    edit: "e"
+    openFile: "o"
+    scrollUpMain: "<pgup>"
+    scrollDownMain: "<pgdn>"
+    copyToClipboard: "<c-o>"
+    submitEditorText: "<enter>"
+    extrasMenu: "@"
+    toggleWhitespaceInDiffView: "<c-w>"
+    increaseContextInDiffView: "}"
+    decreaseContextInDiffView: "{"
+    openDiffTool: "<c-t>"
+  files:
+    commitChanges: "c"
+    commitChangesWithoutHook: "W"
+    amendLastCommit: "A"
+    commitChangesWithEditor: "C"
+    findBaseCommitForFixup: "<c-f>"
+    confirmDiscard: "x"
+    ignoreFile: "i"
+    refreshFiles: "<c-r>"
+    stashAllChanges: "s"
+    viewStashOptions: "S"
+    toggleStagedAll: "a"
+    viewResetOptions: "D"
+    fetch: "f"
+    toggleTreeView: "`"
+    openMergeTool: "M"
+    openStatusFilter: "<c-b>"
+```
+
+## Comandos personalizados
+
+```yaml
+# Añadir a config.yml
+customCommands:
+  - key: "<c-f>"
+    command: "git fetch --all --prune"
+    context: "global"
+    description: "Fetch all remotes"
+    loadingText: "Fetching all remotes..."
+
+  - key: "P"
+    command: "git push --force-with-lease"
+    context: "localBranches"
+    description: "Force push with lease"
+    loadingText: "Force pushing..."
+    prompts:
+      - type: "confirm"
+        title: "Force Push"
+        body: "Are you sure you want to force push?"
+
+  - key: "<c-s>"
+    command: "git stash push -m '{{index .PromptResponses 0}}'"
+    context: "files"
+    description: "Stash con mensaje"
+    prompts:
+      - type: "input"
+        title: "Mensaje del stash"
+        initialValue: ""
+```
+
+## Integración con Neovim
+
+Una de las configuraciones más populares: abrir lazygit dentro de Neovim con un float terminal:
+
+```lua
+-- En tu configuración de Neovim (lazy.nvim)
+{
+  "kdheepak/lazygit.nvim",
+  keys = {
+    { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
+  },
+  dependencies = { "nvim-lua/plenary.nvim" },
+},
+
+-- O con toggleterm.nvim:
+local lazygit = require("toggleterm.terminal").Terminal:new({
+  cmd = "lazygit",
+  hidden = true,
+  direction = "float",
+  float_opts = { border = "curved" },
+})
+
+vim.keymap.set("n", "<leader>gg", function() lazygit:toggle() end)
+```
+
+## Pro Tips
+
+**`z` para deshacer:** lazygit tiene múltiples niveles de undo. Presiona `z` repetidamente para deshacer operaciones de git, incluyendo commits, rebases y merges.
+
+**Filtrar commits:** En el panel de commits, presiona `/` para buscar en el historial de commits por mensaje o hash.
+
+**Modo diff de un archivo:** Navega a un archivo en el panel de staging y presiona `Enter` para ver su diff línea a línea, donde puedes hacer staging de líneas individuales con `Space`.

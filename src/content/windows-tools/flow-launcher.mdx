@@ -1,0 +1,121 @@
+---
+name: Flow Launcher
+description: Launcher de aplicaciones para Windows como Alfred en Mac. Busca, ejecuta, calcula y navega todo con el teclado.
+category: windows-tools
+tags: [windows, launcher, search, productivity, alfred, spotlight]
+os: [windows]
+difficulty: beginner
+install:
+  winget: winget install FlowLauncher.FlowLauncher
+  scoop: scoop install flow-launcher
+links:
+  repo: https://github.com/Flow-Launcher/Flow.Launcher
+  website: https://www.flowlauncher.com/
+addedAt: 2025-03-14
+---
+
+## Alfred para Windows
+
+Flow Launcher es un launcher de aplicaciones open source que te permite hacer casi todo sin levantar las manos del teclado. Busca apps, archivos, calcula, ejecuta comandos, gestiona el portapapeles y mucho más, todo desde un único campo de texto.
+
+## Instalación
+
+```powershell
+winget install FlowLauncher.FlowLauncher
+# o
+scoop install flow-launcher
+```
+
+El atajo por defecto es `Alt + Space`. Puedes cambiarlo en Settings → Hotkey.
+
+## Plugins esenciales
+
+Flow Launcher viene con plugins integrados y permite instalar más desde la propia interfaz (`pm install <nombre>`):
+
+### Búsqueda web con prefijos
+
+```
+g JavaScript closures     → Búsqueda en Google
+gh flow-launcher          → Búsqueda en GitHub
+yt lo-fi music            → Búsqueda en YouTube
+npm react                 → Búsqueda en npmjs.com
+mdn fetch API             → Búsqueda en MDN Web Docs
+```
+
+Configura tus propios prefijos en Settings → Plugins → Web Searches.
+
+### Calculadora
+
+```
+= 1920 / 16     → 120
+= sqrt(144)     → 12
+= hex(255)      → FF
+```
+
+### Búsqueda de archivos
+
+```
+// nombre-archivo.ts    → Busca archivos por nombre (indexado)
+< contenido del archivo → Busca dentro del contenido
+```
+
+### Historial del portapapeles
+
+El plugin **Clipboard History** guarda todo lo que copias:
+
+```
+cb                → Abre el historial del portapapeles
+cb console.log    → Filtra entradas del historial
+```
+
+### Comandos de shell
+
+```
+>  npm run dev       → Ejecuta en PowerShell
+>  code .            → Abre VS Code en el directorio actual
+```
+
+### Gestión de procesos
+
+```
+kill chrome      → Termina procesos por nombre
+```
+
+## Instalar plugins adicionales
+
+```
+pm install Clipboard History
+pm install Everything      → Integración con Everything (búsqueda instantánea)
+pm install Color Picker
+pm install Currency Converter
+pm install Windows Settings
+```
+
+## Tema Catppuccin
+
+Flow Launcher soporta temas personalizados. Para Catppuccin Frappé:
+
+1. Descarga el tema desde [catppuccin/flow-launcher](https://github.com/catppuccin/flow-launcher)
+2. Copia el archivo `.xaml` a `%APPDATA%\FlowLauncher\Themes\`
+3. En Settings → Theme, selecciona "Catppuccin Frappé"
+
+O directamente desde el gestor de temas integrado:
+
+```
+settings → Theme → Browse Themes → Catppuccin
+```
+
+## Flow Launcher vs PowerToys Run
+
+| Característica | Flow Launcher | PowerToys Run |
+|---|---|---|
+| Plugins externos | Sí (ecosystem amplio) | Limitado |
+| Historial portapapeles | Sí (plugin) | No |
+| Temas personalizados | Sí | Limitado |
+| Open source independiente | Sí | Sí (parte de PowerToys) |
+| Instalación | Standalone | Requiere todo PowerToys |
+| Integración Windows | Buena | Muy buena |
+
+**Recomendación:** Si ya usas PowerToys, PowerToys Run es suficiente para el uso básico. Flow Launcher brilla cuando necesitas el ecosistema de plugins, especialmente para historial del portapapeles, búsquedas web personalizadas y scripts propios.
+
+> **Tip de configuración:** En Settings → General → Start Flow Launcher on system startup y minimiza al iniciar. Configura también el índice de búsqueda en Settings → Plugin → Explorer para incluir tus directorios de proyectos.

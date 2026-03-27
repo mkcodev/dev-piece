@@ -1,0 +1,124 @@
+---
+name: Window Snapping & Management
+description: Atajos de teclado para snapping de ventanas, moverlas entre monitores y layouts personalizados.
+category: scripts-ahk
+tags: [ahk, windows, tiling, layouts, window-management, monitors]
+os: [windows]
+difficulty: intermediate
+addedAt: 2025-03-04
+---
+
+## Gestión de ventanas con teclado
+
+Windows tiene snapping nativo con `Win + Flechas`, pero solo cubre mitades. Con AHK puedes añadir cuartos, tercios, tamaños personalizados y mover ventanas entre monitores con un solo atajo.
+
+## Script completo de snapping
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; ── Snapping a mitades ───────────────────────────────────────
+; Win + Alt + Flechas (sin solapar con atajos nativos de Win)
+#!Left::  SnapWindow(0, 0, 50, 100)       ; Mitad izquierda
+#!Right:: SnapWindow(50, 0, 50, 100)      ; Mitad derecha
+#!Up::    SnapWindow(0, 0, 100, 50)       ; Mitad superior
+#!Down::  SnapWindow(0, 50, 100, 50)      ; Mitad inferior
+
+; ── Snapping a cuartos ───────────────────────────────────────
+#!Numpad7:: SnapWindow(0, 0, 50, 50)      ; Cuarto superior izq
+#!Numpad9:: SnapWindow(50, 0, 50, 50)     ; Cuarto superior der
+#!Numpad1:: SnapWindow(0, 50, 50, 50)     ; Cuarto inferior izq
+#!Numpad3:: SnapWindow(50, 50, 50, 50)    ; Cuarto inferior der
+
+; ── Maximizar / Centrar ──────────────────────────────────────
+#!Numpad5:: WinMaximize "A"               ; Maximizar
+#!c::       CenterWindow(70, 80)          ; Centrar 70% x 80%
+
+; ── Función principal de snapping ───────────────────────────
+SnapWindow(xPct, yPct, wPct, hPct) {
+    hwnd := WinGetID("A")
+    WinRestore "ahk_id " hwnd
+
+    ; Obtiene dimensiones del monitor de trabajo (sin taskbar)
+    MonitorGetWorkArea(, &mLeft, &mTop, &mRight, &mBottom)
+    mW := mRight - mLeft
+    mH := mBottom - mTop
+
+    x := mLeft + (mW * xPct // 100)
+    y := mTop  + (mH * yPct // 100)
+    w := mW * wPct // 100
+    h := mH * hPct // 100
+
+    WinMove x, y, w, h, "ahk_id " hwnd
+}
+
+CenterWindow(wPct, hPct) {
+    hwnd := WinGetID("A")
+    WinRestore "ahk_id " hwnd
+
+    MonitorGetWorkArea(, &mLeft, &mTop, &mRight, &mBottom)
+    mW := mRight - mLeft
+    mH := mBottom - mTop
+
+    w := mW * wPct // 100
+    h := mH * hPct // 100
+    x := mLeft + (mW - w) // 2
+    y := mTop  + (mH - h) // 2
+
+    WinMove x, y, w, h, "ahk_id " hwnd
+}
+```
+
+## Mover ventanas entre monitores
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; Win + Shift + Flechas → mover al siguiente monitor
+#+Left::  MoveToMonitor(-1)
+#+Right:: MoveToMonitor(1)
+
+MoveToMonitor(direction) {
+    hwnd := WinGetID("A")
+    WinRestore "ahk_id " hwnd
+
+    ; Obtiene el monitor actual de la ventana
+    WinGetPos &wx, &wy, &ww, &wh, "ahk_id " hwnd
+    currentMon := MonitorFromPoint(wx + ww // 2, wy + wh // 2)
+    targetMon := currentMon + direction
+
+    ; Wrap alrededor
+    MonitorGetCount(&total)
+    if (targetMon < 1)
+        targetMon := total
+    if (targetMon > total)
+        targetMon := 1
+
+    ; Mueve al monitor destino manteniendo posición relativa
+    MonitorGetWorkArea(currentMon, &cx, &cy, &cr, &cb)
+    MonitorGetWorkArea(targetMon,  &tx, &ty, &tr, &tb)
+
+    relX := (wx - cx) / (cr - cx)
+    relY := (wy - cy) / (cb - cy)
+
+    newX := tx + Round((tr - tx) * relX)
+    newY := ty + Round((tb - ty) * relY)
+
+    WinMove newX, newY, ww, wh, "ahk_id " hwnd
+    WinActivate "ahk_id " hwnd
+}
+```
+
+## AHK vs FancyZones (PowerToys)
+
+| Característica | AHK | FancyZones |
+|---|---|---|
+| Layouts personalizados con GUI | No | Sí |
+| Snapping al arrastrar | No | Sí |
+| Atajos de teclado | Total control | Limitado |
+| Lógica condicional por app | Sí | No |
+| Sin dependencias extra | No (AHK requerido) | PowerToys requerido |
+
+**Recomendación:** Usa FancyZones para layouts visuales definidos de antemano, y complementa con AHK para atajos rápidos o comportamientos que FancyZones no cubre (como mover entre monitores con teclado manteniendo posición relativa).
+
+> **Tip:** Para setups de múltiples monitores, considera guardar layouts diferentes por monitor en FancyZones y usar AHK solo para el movimiento entre pantallas.

@@ -1,0 +1,161 @@
+---
+name: fd
+description: Alternativa intuitiva y rápida a find. Sintaxis simple, colorized output, respeta .gitignore.
+category: cli-tools
+tags: [find-replacement, fast, intuitive, rust]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install sharkdp.fd
+  brew: brew install fd
+  apt: sudo apt install fd-find
+links:
+  repo: https://github.com/sharkdp/fd
+addedAt: 2025-01-21
+---
+
+## ¿Qué es fd?
+
+fd es una alternativa moderna al comando `find`, escrita en Rust por David Peter (el mismo autor de `bat`). Su objetivo es ser simple, rápido y con salida amigable. La sintaxis de fd es significativamente más intuitiva que la de find, que es famosa por sus flags crípticos y orden de argumentos inconsistente.
+
+Comparación directa:
+
+```bash
+# find (sintaxis compleja y verbosa)
+find . -name "*.ts" -not -path "*/node_modules/*" -type f
+
+# fd (sintaxis simple y natural)
+fd -e ts
+```
+
+## Uso básico
+
+```bash
+# Buscar por nombre (búsqueda difusa por defecto)
+fd nginx               # Archivos/dirs que contienen "nginx"
+fd config              # Cualquier cosa con "config" en el nombre
+
+# Buscar por extensión
+fd -e py               # Todos los .py
+fd -e js -e ts         # .js y .ts
+fd -e json src/        # .json dentro de src/
+
+# Buscar solo archivos o solo directorios
+fd -t f "readme"       # Solo archivos
+fd -t d "modules"      # Solo directorios
+fd -t l                # Solo symlinks
+fd -t x "script"       # Solo ejecutables
+
+# Búsqueda exacta (sin fuzzy)
+fd -g "*.config.js"    # Glob pattern exacto
+
+# Case sensitive (por defecto es smart-case)
+fd --case-sensitive "Component"
+```
+
+## fd vs find: tabla comparativa
+
+```bash
+# Encontrar archivos por extensión
+find . -name "*.py"
+fd -e py
+
+# Encontrar directorios vacíos
+find . -type d -empty
+fd -t d --type empty
+
+# Buscar archivos modificados en los últimos 7 días
+find . -mtime -7 -type f
+fd --changed-within 1week -t f
+
+# Buscar archivos más grandes de 10MB
+find . -size +10M -type f
+fd --size +10m -t f
+
+# Buscar archivos con permisos específicos
+find . -perm 755 -type f
+fd --owner root         # Por propietario (fd approach)
+
+# Buscar y excluir directorios
+find . -name "*.js" -not -path "*/node_modules/*"
+fd -e js --exclude node_modules
+```
+
+## El flag --exec: ejecutar comandos
+
+```bash
+# Ejecutar un comando por cada resultado (como find -exec)
+fd -e log --exec rm {}           # Borrar todos los .log
+fd -e py --exec black {}         # Formatear todos los .py con black
+fd -e jpg --exec convert {} {.}.webp  # Convertir imágenes
+
+# Ejecutar un comando con TODOS los resultados (como xargs)
+fd -e ts --exec-batch prettier --write
+fd -e md --exec-batch wc -l      # Contar líneas en todos los .md
+
+# Mostrar tamaño de cada archivo encontrado
+fd -e mp4 --exec-batch ls -lh
+
+# Renombrar archivos (cambiando extensión)
+fd -e txt --exec mv {} {.}.md
+```
+
+## Ignorar y excluir
+
+```bash
+# fd respeta .gitignore automáticamente
+# Para incluir archivos ignorados:
+fd -I "*.log"              # -I ignora el .gitignore
+fd --no-ignore "*.log"     # equivalente
+
+# Incluir archivos ocultos (que empiezan con .)
+fd -H ".env"
+fd --hidden ".env"
+
+# Excluir directorios específicos
+fd -e js --exclude node_modules --exclude dist --exclude .next
+
+# Profundidad máxima de búsqueda
+fd -e ts --max-depth 2
+
+# Buscar solo en el directorio actual (no recursivo)
+fd -e json --max-depth 1
+```
+
+## Integración con fzf
+
+```bash
+# Usar fd como fuente de fzf para archivos
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+
+# Abrir archivo con preview
+nvim "$(fd -e lua | fzf --preview 'bat --color=always {}')"
+
+# Función para cd interactivo
+cdf() {
+  local dir
+  dir=$(fd --type d --hidden --exclude .git | fzf --preview 'eza --tree --level=2 --color=always {}')
+  [[ -n "$dir" ]] && cd "$dir"
+}
+```
+
+## Pro Tips
+
+**Colores en la salida:** fd muestra directorios en azul, archivos ejecutables en verde, symlinks en cian, igual que `ls`. No necesitas configuración adicional.
+
+**En Debian/Ubuntu:** El binario se llama `fdfind` para evitar conflictos. Crea el alias:
+
+```bash
+# ~/.bashrc
+alias fd=fdfind
+```
+
+**Buscar dotfiles:** fd ignora los archivos ocultos por defecto. Usa `-H` para incluirlos:
+
+```bash
+fd -H -e toml ~/.config    # Todos los .toml en ~/.config incluyendo ocultos
+```
+
+**Integración con Neovim:** El plugin `telescope.nvim` puede usar fd como backend para la búsqueda de archivos, siendo mucho más rápido que las alternativas basadas en Python.

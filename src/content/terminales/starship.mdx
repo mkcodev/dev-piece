@@ -1,0 +1,242 @@
+---
+name: Starship
+description: Prompt minimalista y ultra-rápido para cualquier shell. Escrito en Rust, zero-config o completamente personalizable.
+category: terminales
+tags: [prompt, rust, fast, minimal, cross-shell]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install Starship.Starship
+  brew: brew install starship
+  cargo: cargo install starship
+  scoop: scoop install starship
+links:
+  repo: https://github.com/starship/starship
+  docs: https://starship.rs/
+addedAt: 2025-01-16
+---
+
+## ¿Qué es Starship?
+
+Starship es un prompt cross-shell ultrarrápido escrito en Rust. Su filosofía es simple: funciona perfectamente sin configuración (zero-config) pero admite personalización completa cuando la necesitas. Es compatible con bash, zsh, fish, PowerShell, Nushell, elvish, tcsh y más.
+
+A diferencia de Oh My Posh, Starship usa un único archivo TOML para todas las shells. La misma configuración produce el mismo prompt en cualquier sistema operativo y cualquier shell, lo que lo hace ideal para mantener dotfiles sincronizados.
+
+## Inicialización por shell
+
+Añade la línea correspondiente al archivo de configuración de tu shell:
+
+```bash
+# bash (~/.bashrc)
+eval "$(starship init bash)"
+
+# zsh (~/.zshrc)
+eval "$(starship init zsh)"
+
+# fish (~/.config/fish/config.fish)
+starship init fish | source
+
+# PowerShell ($PROFILE)
+Invoke-Expression (&starship init powershell)
+
+# Nushell (~/.config/nushell/config.nu)
+# Primero ejecuta: starship init nu | save -f ~/.starship.nu
+source ~/.starship.nu
+```
+
+## Configuración: Catppuccin Frappé
+
+El archivo de configuración es `~/.config/starship.toml`:
+
+```toml
+# ~/.config/starship.toml
+# Paleta Catppuccin Frappé
+
+"$schema" = "https://starship.rs/config-schema.json"
+
+format = """
+[](fg:crust bg:none)\
+$os\
+$username\
+[](fg:crust bg:surface0)\
+$directory\
+[](fg:surface0 bg:surface1)\
+$git_branch\
+$git_status\
+[](fg:surface1 bg:surface2)\
+$nodejs\
+$python\
+$rust\
+$golang\
+[](fg:surface2 bg:none)\
+$line_break\
+$character"""
+
+palette = "catppuccin_frappe"
+
+[palettes.catppuccin_frappe]
+rosewater = "#f2d5cf"
+flamingo  = "#eebebe"
+pink      = "#f4b8e4"
+mauve     = "#ca9ee6"
+red       = "#e78284"
+maroon    = "#ea999c"
+peach     = "#ef9f76"
+yellow    = "#e5c890"
+green     = "#a6d189"
+teal      = "#81c8be"
+sky       = "#99d1db"
+sapphire  = "#85c1dc"
+blue      = "#8caaee"
+lavender  = "#babbf1"
+text      = "#c6d0f5"
+subtext1  = "#b5bfe2"
+subtext0  = "#a5adce"
+overlay2  = "#949cbb"
+overlay1  = "#838ba7"
+surface2  = "#626880"
+surface1  = "#51576d"
+surface0  = "#414559"
+base      = "#303446"
+mantle    = "#292c3c"
+crust     = "#232634"
+
+[os]
+disabled = false
+style    = "bg:crust fg:text"
+
+[os.symbols]
+Windows = " "
+Macos   = " "
+Ubuntu  = " "
+Debian  = " "
+Fedora  = " "
+Arch    = " "
+
+[username]
+show_always = false
+style_user  = "bg:crust fg:text"
+style_root  = "bg:crust fg:red"
+format      = "[$user]($style) "
+
+[directory]
+style            = "bg:surface0 fg:blue"
+format           = "[ $path ]($style)"
+truncation_length = 3
+truncate_to_repo  = true
+
+[directory.substitutions]
+"~"          = "  "
+"Documents"  = "󰈙 "
+"Downloads"  = " "
+"Music"      = "󰝚 "
+"Pictures"   = " "
+"Developer"  = "󰲋 "
+
+[git_branch]
+symbol = " "
+style  = "bg:surface1 fg:mauve"
+format = "[ $symbol$branch ]($style)"
+
+[git_status]
+style         = "bg:surface1 fg:red"
+format        = "[$all_status$ahead_behind]($style)"
+conflicted    = "  "
+up_to_date    = ""
+untracked     = " "
+ahead         = "⇡${count} "
+diverged      = "⇕⇡${ahead_count}⇣${behind_count} "
+behind        = "⇣${count} "
+stashed       = " "
+modified      = " "
+staged        = "[++\\($count\\)](green)"
+renamed       = "󰁕 "
+deleted       = " "
+
+[nodejs]
+symbol = " "
+style  = "bg:surface2 fg:green"
+format = "[ $symbol($version) ]($style)"
+
+[python]
+symbol            = " "
+style             = "bg:surface2 fg:yellow"
+format            = "[ $symbol($version)(\\($virtualenv\\)) ]($style)"
+pyenv_version_name = true
+
+[rust]
+symbol = " "
+style  = "bg:surface2 fg:peach"
+format = "[ $symbol($version) ]($style)"
+
+[golang]
+symbol = " "
+style  = "bg:surface2 fg:sky"
+format = "[ $symbol($version) ]($style)"
+
+[docker_context]
+symbol = " "
+style  = "fg:blue"
+format = "[ $symbol$context ]($style)"
+
+[time]
+disabled       = false
+style          = "fg:overlay1"
+format         = "[$time]($style) "
+time_format    = "%H:%M"
+utc_time_offset = "+1"
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"
+vimcmd_symbol  = "[❮](bold mauve)"
+
+[cmd_duration]
+min_time          = 2000
+style             = "fg:overlay1"
+format            = "[$duration]($style) "
+show_notifications = false
+```
+
+## Módulos más útiles
+
+```toml
+# Mostrar versión de AWS profile activo
+[aws]
+symbol = "  "
+format = "[$symbol($profile)(\\($region\\))]($style) "
+style  = "bold yellow"
+
+# Estado de Kubernetes
+[kubernetes]
+disabled = false
+symbol   = "󱃾 "
+format   = "[$symbol$context(\\($namespace\\))]($style) "
+
+# Nivel de batería
+[battery]
+full_symbol        = "󰁹 "
+charging_symbol    = "󰂄 "
+discharging_symbol = "󰂃 "
+
+[[battery.display]]
+threshold = 20
+style     = "bold red"
+```
+
+## Pro Tips
+
+**Configuración preset:** Starship incluye presets predefinidos. Puedes aplicar uno directamente:
+
+```bash
+starship preset nerd-font-symbols -o ~/.config/starship.toml
+starship preset catppuccin-powerline -o ~/.config/starship.toml
+```
+
+**Variables de entorno:** Define `STARSHIP_CONFIG` para usar una ruta de configuración personalizada, útil para múltiples perfiles:
+
+```bash
+export STARSHIP_CONFIG=~/.config/starship-minimal.toml
+```
+
+**Cacheo:** Starship usa caché automático para módulos lentos como `git_status`. Si el prompt tarda, revisa qué módulos están activos con `starship explain`.

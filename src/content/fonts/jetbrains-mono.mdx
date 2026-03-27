@@ -1,0 +1,111 @@
+---
+name: JetBrains Mono
+description: La fuente monoespaciada diseñada específicamente para código. Ligaduras, altura de x amplia y 8 pesos tipográficos.
+category: fonts
+tags: [fonts, monospace, ligatures, code, jetbrains, nerd-font]
+os: [windows, macos, linux]
+difficulty: beginner
+links:
+  website: https://www.jetbrains.com/legalnotice/
+  repo: https://github.com/JetBrains/JetBrainsMono
+addedAt: 2025-03-19
+---
+
+## Diseñada por y para programadores
+
+JetBrains Mono fue diseñada específicamente para reducir la fatiga visual al leer código. Sus principales características son: altura de x amplia (las minúsculas son más altas que en fuentes genéricas), formas de letras optimizadas para distinguir caracteres similares (`0` vs `O`, `l` vs `1` vs `I`), y ligaduras tipográficas para operadores de código.
+
+## Instalación
+
+### Windows
+
+```powershell
+# Con Scoop (recomendado, incluye Nerd Font variant)
+scoop bucket add nerd-fonts
+scoop install JetBrainsMono-NF
+
+# Con winget (fuente base sin Nerd Font icons)
+winget install JetBrains.Mono
+
+# Manual: descarga desde https://www.jetbrains.com/legalnotice/
+# Descomprime → selecciona todos los .ttf → clic derecho → "Instalar para todos los usuarios"
+```
+
+### macOS
+
+```bash
+# Con Homebrew (fuente base)
+brew install --cask font-jetbrains-mono
+
+# Con Homebrew (Nerd Font variant)
+brew install --cask font-jetbrains-mono-nerd-font
+```
+
+### Linux
+
+```bash
+# Descarga directa
+mkdir -p ~/.local/share/fonts
+cd ~/.local/share/fonts
+curl -L "https://github.com/JetBrains/JetBrainsMono/releases/latest/download/JetBrainsMono-2.304.zip" -o jetbrains-mono.zip
+unzip jetbrains-mono.zip "fonts/ttf/*.ttf" -d .
+fc-cache -fv
+```
+
+## Activar ligaduras en VS Code
+
+Las ligaduras convierten `=>`, `!=`, `===`, `<=`, `>=` en símbolos tipográficos más claros:
+
+```json
+// settings.json de VS Code
+{
+    "editor.fontFamily": "'JetBrains Mono', 'Cascadia Code', monospace",
+    "editor.fontSize": 14,
+    "editor.fontLigatures": true,
+    "editor.lineHeight": 1.6,
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'"
+}
+```
+
+## Activar ligaduras en Neovim
+
+```lua
+-- Si usas Neovide como GUI
+vim.g.neovide_font_hinting = "full"
+vim.o.guifont = "JetBrainsMono Nerd Font:h13"
+
+-- Si usas WezTerm como terminal
+-- wezterm.lua
+config.font = wezterm.font("JetBrainsMono Nerd Font", { weight = "Regular" })
+config.font_size = 13.0
+config.harfbuzz_features = { "calt=1", "clig=1", "liga=1" }
+```
+
+## Nerd Font: iconos en la terminal
+
+La variante **JetBrainsMono Nerd Font** incluye miles de iconos adicionales usados por herramientas como Starship, NvimTree, lualine y Oh My Posh. Es la versión que debes usar en terminales.
+
+```powershell
+# En Windows Terminal settings.json
+"font": {
+    "face": "JetBrainsMono Nerd Font",
+    "size": 13,
+    "ligatures": true
+}
+```
+
+## Comparativa con otras fuentes de código
+
+| Fuente | Ligaduras | Nerd Font | Pesos | Licencia |
+|--------|-----------|-----------|-------|----------|
+| JetBrains Mono | Sí | Sí (variante) | 8 | Apache 2.0 |
+| Fira Code | Sí (muchas) | Sí (variante) | 5 | OFL |
+| Cascadia Code | Sí | Sí (integrado) | 5 | OFL |
+| Geist Mono | Sí | No oficial | 9 | OFL |
+| Iosevka | Muy personalizables | Sí | 20+ | OFL |
+
+**JetBrains Mono** es la mejor elección si usas IntelliJ, Rider, o cualquier IDE de JetBrains (viene preinstalada). Su altura de x alta la hace especialmente cómoda para sesiones largas de coding.
+
+**Fira Code** tiene el conjunto de ligaduras más completo. **Cascadia Code** es excelente si ya usas Windows Terminal (viene de Microsoft). **Iosevka** es para quienes quieren personalización extrema.
+
+> **Recomendación:** Usa JetBrainsMono Nerd Font en tu terminal para tener iconos, y JetBrains Mono regular en el editor. El tamaño óptimo suele estar entre 13-15pt dependiendo de la resolución de tu monitor.

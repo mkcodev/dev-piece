@@ -1,0 +1,145 @@
+---
+name: Claude Code (CLI)
+description: Agente de coding de Anthropic que opera en tu terminal. Entiende tu codebase completo y puede editar, testear y commitear.
+category: ai-tools
+tags: [ai, cli, coding-agent, anthropic, claude, terminal]
+os: [cross]
+featured: true
+difficulty: beginner
+install:
+  npm: npm install -g @anthropic-ai/claude-code
+links:
+  docs: https://docs.anthropic.com/en/docs/claude-code
+addedAt: 2025-03-10
+---
+
+## Un agente que vive en tu terminal
+
+Claude Code no es un chatbot ni un autocompletador. Es un agente que puede leer tu codebase completo, editar múltiples archivos, ejecutar comandos, correr tests y hacer commits, todo desde tu terminal y bajo tu supervisión.
+
+## Instalación
+
+```bash
+npm install -g @anthropic-ai/claude-code
+
+# Autenticación (solo la primera vez)
+claude
+# Sigue las instrucciones para conectar con tu cuenta de Anthropic
+```
+
+Requiere Node.js 18+ y una cuenta en [claude.ai](https://claude.ai).
+
+## Comandos principales
+
+```bash
+# Iniciar Claude Code en el directorio actual
+claude
+
+# Modo no interactivo: ejecutar una tarea y salir
+claude -p "Añade tests para la función getUserById en src/users/service.ts"
+
+# Continuar la última conversación
+claude --continue
+
+# Ver todos los comandos disponibles
+claude --help
+```
+
+### Comandos dentro del REPL
+
+```
+/help       → Lista todos los comandos disponibles
+/compact    → Comprime el contexto para continuar en conversaciones largas
+/clear      → Limpia el historial de la sesión actual
+/cost       → Muestra el coste estimado de tokens de la sesión
+/doctor     → Diagnóstico del entorno y configuración
+/quit       → Salir
+```
+
+## CLAUDE.md: contexto del proyecto
+
+Crea un archivo `CLAUDE.md` en la raíz del proyecto para darle contexto permanente al agente:
+
+```markdown
+# Mi Proyecto
+
+## Stack
+- Next.js 14 (App Router)
+- TypeScript estricto
+- PostgreSQL con Drizzle ORM
+- Tailwind CSS
+
+## Convenciones
+- Componentes en PascalCase, hooks con prefijo `use`
+- Tests con Vitest, archivos `.test.ts` junto al módulo
+- Commits en formato Conventional Commits
+- Español en comentarios y documentación
+
+## Comandos frecuentes
+- `npm run dev` → inicia el servidor de desarrollo
+- `npm test` → corre los tests
+- `npm run db:push` → aplica cambios al esquema de BD
+
+## Lo que NO debe modificar
+- Archivos en `src/generated/` (auto-generados)
+- `.env.local` (variables locales)
+```
+
+Claude Code leerá este archivo automáticamente en cada sesión.
+
+## Modo agente y automatización
+
+```bash
+# Modo sin confirmaciones (para pipelines CI o scripts)
+# PRECAUCIÓN: revisa bien la tarea antes de usar este flag
+claude --dangerously-skip-permissions -p "Actualiza todas las dependencias de npm y arregla los breaking changes"
+```
+
+Para automatización segura en CI:
+
+```yaml
+# .github/workflows/claude-review.yml
+- name: Claude Code Review
+  run: |
+    claude -p "Revisa los cambios en este PR y comenta posibles problemas de seguridad" \
+      --output-format json \
+      --max-turns 5
+```
+
+## Integración con MCP
+
+Model Context Protocol permite conectar Claude Code con fuentes de datos externas:
+
+```json
+// ~/.claude/mcp_settings.json
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/ruta/al/proyecto"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_TOKEN": "tu-token" }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/midb"]
+    }
+  }
+}
+```
+
+## Comparativa con Copilot y Cursor
+
+| Característica | Claude Code | GitHub Copilot | Cursor |
+|---|---|---|---|
+| Entorno principal | Terminal | VS Code/IDE | VS Code fork |
+| Edición multiarchivo | Excelente | Buena | Muy buena |
+| Contexto de codebase | Total | Parcial (workspace) | Muy bueno |
+| Ejecución de comandos | Sí (agente) | Limitado | Sí |
+| Precio | Pay-per-use | $10/mes | $20/mes |
+| Offline | No | No | No |
+
+> **Mejor caso de uso:** Tareas que cruzan múltiples archivos, refactorizaciones grandes, generación de tests en masa, o cuando quieres describir en lenguaje natural una tarea compleja y dejar que el agente la ejecute con supervisión.

@@ -1,0 +1,106 @@
+---
+name: Dark Reader
+description: Modo oscuro para todos los sitios web. Algoritmo inteligente que adapta colores sin destrozar el diseño.
+category: browser-extensions
+tags: [browser, dark-mode, accessibility, eye-strain, comfort]
+os: [cross]
+difficulty: beginner
+links:
+  website: https://darkreader.org/
+addedAt: 2025-02-22
+---
+
+Dark Reader aplica modo oscuro a cualquier sitio web que no lo tenga nativo. Su algoritmo analiza los colores de la página y los invierte o transforma de manera inteligente, manteniendo la legibilidad y respetando imágenes y vídeos. Es especialmente valioso para sitios de documentación, foros y blogs que no ofrecen modo oscuro.
+
+## Modos de filtro
+
+Dark Reader ofrece cuatro algoritmos distintos para aplicar el modo oscuro. Elegir el correcto para cada sitio marca la diferencia:
+
+```
+Filter          → inversión de colores simple. Rápido pero puede
+                  distorsionar imágenes y crear artefactos visuales.
+
+Filter+         → inversión con corrección de tono. Mejor que Filter
+                  pero sigue afectando a imágenes.
+
+Dynamic         → el mejor modo. Analiza la paleta de colores de la
+                  página y genera un tema oscuro coherente sin invertir
+                  imágenes ni vídeos. Más lento en páginas complejas.
+
+Static          → aplica un CSS oscuro predefinido. Muy rápido pero
+                  puede romperse en páginas con estilos complejos.
+```
+
+## Configuración recomendada por modo de uso
+
+```
+Para uso general:
+  Modo: Dynamic
+  Brillo: 100
+  Contraste: 90
+  Sepia: 10
+  Grano: 0
+
+Para lectura nocturna prolongada:
+  Modo: Dynamic
+  Brillo: 85
+  Contraste: 85
+  Sepia: 20    (tono cálido, reduce la luz azul)
+
+Para código y documentación técnica:
+  Modo: Static  (más rápido, sin distorsión en bloques de código)
+  Brillo: 100
+  Contraste: 100
+```
+
+## Atajo de teclado
+
+```
+Alt + Shift + D   → activar / desactivar Dark Reader en la pestaña actual
+```
+
+Puedes cambiar este atajo en la configuración de extensiones del navegador (`chrome://extensions/shortcuts` en Chrome).
+
+## Configuración por sitio
+
+Dark Reader permite ajustes individuales por dominio. Para páginas que ya tienen modo oscuro propio (GitHub, VS Code web, etc.), lo más limpio es añadirlas a la lista de sitios ignorados:
+
+```
+En el popup de Dark Reader:
+  → "Site" tab
+  → "Not using Dark Reader for" → añade el dominio actual
+
+O directamente en la lista de sitios ignorados de la configuración:
+  github.com
+  figma.com
+  notion.so
+  youtube.com    (las miniaturas se ven mejor sin modo oscuro)
+```
+
+## Inyección de CSS personalizado
+
+Dark Reader permite inyectar CSS propio por sitio, lo que lo convierte en una herramienta de personalización avanzada:
+
+```css
+/* CSS personalizado para dark.reader.app (en la sección "CSS for specific site") */
+
+/* Ajustar el fondo del sidebar en documentación */
+.sidebar {
+  background-color: #1a1a2e !important;
+}
+
+/* Aumentar contraste en código inline */
+code {
+  background-color: #2d2d2d !important;
+  color: #abb2bf !important;
+}
+
+/* Corregir colores de tablas */
+table tr:nth-child(even) {
+  background-color: #1e1e1e !important;
+}
+```
+
+## Impacto en rendimiento
+
+El modo Dynamic tiene el mayor impacto en rendimiento porque analiza el DOM de la página. En páginas con muchos elementos o estilos inline, puede añadir 100-300ms al tiempo de renderizado. Si notas lentitud en páginas específicas, cambia a Static o Filter para esas URLs. El modo Filter es el más ligero porque opera a nivel de CSS transform sin analizar el contenido.

@@ -1,0 +1,304 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CopyButton from '../../components/common/CopyButton';
+import { CATEGORY_CONFIG } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const category of Object.keys(CATEGORY_CONFIG)) {
+    let entries: any[] = [];
+    try {
+      entries = await getCollection(category as any);
+    } catch {
+      entries = [];
+    }
+    for (const entry of entries) {
+      paths.push({
+        params: { category, slug: entry.id },
+        props: { entry, category },
+      });
+    }
+  }
+  return paths;
+}
+
+const { entry, category } = Astro.props;
+const { Content } = await render(entry);
+const data = entry.data;
+
+const config = CATEGORY_CONFIG[category as keyof typeof CATEGORY_CONFIG];
+const accent = config?.accent ?? '#8caaee';
+
+const osBadgeConfig: Record<string, { label: string; color: string }> = {
+  windows: { label: 'Windows', color: 'bg-blue/20 text-blue border-blue/30' },
+  macos: { label: 'macOS', color: 'bg-mauve/20 text-mauve border-mauve/30' },
+  linux: { label: 'Linux', color: 'bg-peach/20 text-peach border-peach/30' },
+  cross: { label: 'Cross-platform', color: 'bg-green/20 text-green border-green/30' },
+};
+
+const difficultyConfig: Record<string, { label: string; color: string }> = {
+  beginner: { label: 'Principiante', color: 'text-green bg-green/10 border-green/30' },
+  intermediate: { label: 'Intermedio', color: 'text-yellow bg-yellow/10 border-yellow/30' },
+  advanced: { label: 'Avanzado', color: 'text-red bg-red/10 border-red/30' },
+};
+
+const installManagers = [
+  { key: 'winget', label: 'winget' },
+  { key: 'scoop', label: 'scoop' },
+  { key: 'choco', label: 'choco' },
+  { key: 'brew', label: 'brew' },
+  { key: 'apt', label: 'apt' },
+  { key: 'cargo', label: 'cargo' },
+  { key: 'npm', label: 'npm' },
+  { key: 'pnpm', label: 'pnpm' },
+  { key: 'pip', label: 'pip' },
+  { key: 'manual', label: 'manual' },
+];
+
+const availableInstalls = data.install
+  ? installManagers.filter((m) => data.install?.[m.key as keyof typeof data.install])
+  : [];
+
+const formatDate = (d: Date) =>
+  new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(d);
+---
+
+<BaseLayout title={data.name} description={data.description}>
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-subtext0 mb-6" aria-label="Ruta de navegación">
+    <a href="/" class="hover:text-text transition-colors">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href={`/${category}`} class="hover:text-text transition-colors">{config?.label}</a>
+    <span aria-hidden="true">/</span>
+    <span class="text-text" aria-current="page">{data.name}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-8">
+    <!-- Main content -->
+    <div>
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex items-start gap-4 mb-4">
+          <div
+            class="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0"
+            style={`background-color: ${accent}20; color: ${accent};`}
+            aria-hidden="true"
+          >
+            {data.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-3 flex-wrap mb-2">
+              <h1 class="text-3xl font-bold text-text">{data.name}</h1>
+              {data.featured && (
+                <span class="text-xs bg-blue/20 text-blue border border-blue/30 px-2 py-0.5 rounded-full">
+                  Destacado
+                </span>
+              )}
+            </div>
+            <p class="text-subtext1 text-base leading-relaxed">{data.description}</p>
+          </div>
+        </div>
+
+        <!-- Meta badges -->
+        <div class="flex flex-wrap items-center gap-2">
+          {data.os.map((o: string) => {
+            const cfg = osBadgeConfig[o];
+            return cfg ? (
+              <span class={`text-xs px-2.5 py-1 rounded-full border font-medium ${cfg.color}`}>
+                {cfg.label}
+              </span>
+            ) : null;
+          })}
+          {data.difficulty && difficultyConfig[data.difficulty] && (
+            <span class={`text-xs px-2.5 py-1 rounded-full border font-medium ${difficultyConfig[data.difficulty].color}`}>
+              {difficultyConfig[data.difficulty].label}
+            </span>
+          )}
+          {data.tags.slice(0, 6).map((tag: string) => (
+            <span class="text-xs px-2 py-0.5 rounded-full bg-surface1 text-subtext0 border border-surface1">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <!-- Install commands -->
+      {availableInstalls.length > 0 && (
+        <section class="mb-8" aria-labelledby="install-heading">
+          <h2 id="install-heading" class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            Instalación
+          </h2>
+          <div class="space-y-2">
+            {availableInstalls.map((m) => {
+              const cmd = data.install?.[m.key as keyof typeof data.install] as string;
+              return (
+                <div class="flex items-center gap-3 bg-crust rounded-lg px-4 py-2.5 border border-surface0">
+                  <span class="text-xs font-mono font-bold text-overlay2 w-14 flex-shrink-0">{m.label}</span>
+                  <code class="flex-1 text-sm text-sky font-mono truncate">{cmd}</code>
+                  <CopyButton client:visible text={cmd} label="Copiar" />
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      <!-- Commands -->
+      {data.commands && data.commands.length > 0 && (
+        <section class="mb-8" aria-labelledby="commands-heading">
+          <h2 id="commands-heading" class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            Comandos
+          </h2>
+          <div class="space-y-3">
+            {data.commands.map((cmd: { label: string; code: string; lang: string; description?: string }) => (
+              <div class="rounded-lg border border-surface0 overflow-hidden">
+                <div class="flex items-center justify-between px-4 py-2 bg-crust border-b border-surface0">
+                  <div>
+                    <span class="text-sm font-medium text-text">{cmd.label}</span>
+                    {cmd.description && (
+                      <span class="text-xs text-subtext0 ml-2">{cmd.description}</span>
+                    )}
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-subtext0 font-mono">{cmd.lang}</span>
+                    <CopyButton client:visible text={cmd.code} label="Copiar" />
+                  </div>
+                </div>
+                <pre class="bg-crust/50 p-4 overflow-x-auto"><code class={`language-${cmd.lang} text-sm text-text font-mono`}>{cmd.code}</code></pre>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Config file -->
+      {data.config && (
+        <section class="mb-8" aria-labelledby="config-heading">
+          <h2 id="config-heading" class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            Configuración
+          </h2>
+          <div class="rounded-lg border border-surface0 overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-2 bg-crust border-b border-surface0">
+              <span class="text-xs font-mono text-subtext0">{data.configLang ?? 'config'}</span>
+              <CopyButton client:visible text={data.config} label="Copiar config" />
+            </div>
+            <pre class="bg-crust/50 p-4 overflow-x-auto max-h-96"><code class="text-sm text-text font-mono">{data.config}</code></pre>
+          </div>
+        </section>
+      )}
+
+      <!-- MDX content -->
+      <div class="prose prose-invert prose-sm max-w-none
+        prose-headings:text-text prose-headings:font-semibold
+        prose-p:text-subtext1 prose-p:leading-relaxed
+        prose-a:text-blue prose-a:no-underline hover:prose-a:text-lavender
+        prose-code:text-sky prose-code:bg-surface0 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-['']
+        prose-pre:bg-crust prose-pre:border prose-pre:border-surface0 prose-pre:rounded-lg
+        prose-strong:text-text prose-strong:font-semibold
+        prose-ul:text-subtext1 prose-ol:text-subtext1
+        prose-li:marker:text-lavender
+        prose-blockquote:border-l-lavender prose-blockquote:text-subtext0
+        prose-hr:border-surface1
+        prose-th:text-text prose-td:text-subtext1">
+        <Content />
+      </div>
+    </div>
+
+    <!-- Sidebar info -->
+    <aside class="space-y-4">
+      <!-- Links -->
+      {data.links && Object.values(data.links).some(Boolean) && (
+        <div class="bg-surface0 rounded-xl border border-surface1 p-4">
+          <h3 class="text-sm font-semibold text-text mb-3">Enlaces</h3>
+          <div class="space-y-2">
+            {data.links.repo && (
+              <a href={data.links.repo} target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
+                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                Repositorio
+              </a>
+            )}
+            {data.links.docs && (
+              <a href={data.links.docs} target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+                Documentación
+              </a>
+            )}
+            {data.links.website && (
+              <a href={data.links.website} target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+                Sitio web
+              </a>
+            )}
+            {data.links.video && (
+              <a href={data.links.video} target="_blank" rel="noopener noreferrer"
+                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <polygon points="23 7 16 12 23 17 23 7"/>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                </svg>
+                Video tutorial
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
+      <!-- Metadata -->
+      <div class="bg-surface0 rounded-xl border border-surface1 p-4">
+        <h3 class="text-sm font-semibold text-text mb-3">Información</h3>
+        <dl class="space-y-2 text-xs">
+          <div class="flex justify-between">
+            <dt class="text-subtext0">Categoría</dt>
+            <dd class="text-subtext1 font-medium">
+              <a href={`/${category}`} class="hover:text-text transition-colors">{config?.label}</a>
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-subtext0">Añadido</dt>
+            <dd class="text-subtext1">{formatDate(data.addedAt)}</dd>
+          </div>
+          {data.updatedAt && (
+            <div class="flex justify-between">
+              <dt class="text-subtext0">Actualizado</dt>
+              <dd class="text-subtext1">{formatDate(data.updatedAt)}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+
+      <!-- Back link -->
+      <a
+        href={`/${category}`}
+        class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/>
+        </svg>
+        Volver a {config?.label}
+      </a>
+    </aside>
+  </div>
+</BaseLayout>

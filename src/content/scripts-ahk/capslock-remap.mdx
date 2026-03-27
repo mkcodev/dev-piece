@@ -1,0 +1,101 @@
+---
+name: "CapsLock → Esc/Ctrl (AHK)"
+description: Remapea CapsLock para que sea Escape al soltar y Ctrl al mantener. La mejora de teclado más impactante para cualquier dev.
+category: scripts-ahk
+tags: [ahk, keyboard, vim, productivity, windows, remap]
+os: [windows]
+featured: true
+difficulty: beginner
+addedAt: 2025-03-01
+---
+
+## ¿Por qué remapear CapsLock?
+
+CapsLock es la tecla más inútil del teclado para un desarrollador, pero ocupa una posición de oro: justo al lado del meñique izquierdo. Convertirla en **Escape cuando la tocas sola** y en **Ctrl cuando la mantienes pulsada** es probablemente el cambio de productividad más alto por esfuerzo mínimo que existe.
+
+Para usuarios de Vim, tener Escape tan accesible elimina el constante estiramiento hasta la esquina superior izquierda. Para cualquier dev, tener Ctrl en esa posición reduce la tensión de muñeca al hacer atajos.
+
+## Script AHK v2
+
+Primero instala [AutoHotkey v2](https://www.autohotkey.com/). Luego guarda este script como `capslock-remap.ahk`:
+
+```ahk
+; CapsLock → Esc (tap) / Ctrl (hold)
+; Requiere AutoHotkey v2
+
+#Requires AutoHotkey v2.0
+
+*CapsLock::
+{
+    startTime := A_TickCount
+    KeyWait "CapsLock"
+    elapsed := A_TickCount - startTime
+
+    if (elapsed < 200) {
+        Send "{Escape}"
+    }
+}
+
+*CapsLock up::
+{
+    ; No hace nada al soltar; el tap ya fue manejado arriba
+}
+
+; Cuando se mantiene CapsLock + otra tecla → Ctrl
+#HotIf GetKeyState("CapsLock", "P")
+a:: Send "^a"
+c:: Send "^c"
+v:: Send "^v"
+z:: Send "^z"
+s:: Send "^s"
+#HotIf
+```
+
+Para un comportamiento más robusto (CapsLock como modificador Ctrl real):
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; Desactiva CapsLock completamente
+SetCapsLockState "AlwaysOff"
+
+; CapsLock actúa como Ctrl cuando se combina con otras teclas
+CapsLock & a:: Send "^a"
+CapsLock & c:: Send "^c"
+CapsLock & v:: Send "^v"
+CapsLock & z:: Send "^z"
+CapsLock & s:: Send "^s"
+CapsLock & x:: Send "^x"
+CapsLock & f:: Send "^f"
+CapsLock & t:: Send "^t"
+CapsLock & w:: Send "^w"
+
+; CapsLock solo → Escape
+CapsLock::Send "{Escape}"
+```
+
+## Cómo ejecutar el script al inicio
+
+1. Presiona `Win + R`, escribe `shell:startup`
+2. Copia o crea un acceso directo al `.ahk` en esa carpeta
+3. El script arrancará automáticamente con Windows
+
+## Alternativa: PowerToys Keyboard Manager
+
+Si no quieres instalar AHK, **PowerToys** incluye un remapeador de teclas:
+
+1. Instala PowerToys: `winget install Microsoft.PowerToys`
+2. Abre PowerToys → **Keyboard Manager** → **Remap a key**
+3. Origen: `CapsLock` → Destino: `Escape`
+
+La limitación de PowerToys es que solo permite mapeos 1-a-1: no puedes hacer tap=Esc y hold=Ctrl simultáneamente. Para ese comportamiento dual, AHK es insustituible.
+
+## Instalación de AutoHotkey v2
+
+```powershell
+winget install AutoHotkey.AutoHotkey
+```
+
+O descarga el instalador desde [autohotkey.com](https://www.autohotkey.com/). Asegúrate de elegir la versión **v2.x**, ya que la sintaxis es diferente a la v1.
+
+> **Tip para Vim/Neovim:** Con este remap, salir del modo insert con la mano en home row se convierte en algo natural. Tus pulgares descansan en la barra espaciadora y tu meñique izquierdo tiene acceso instantáneo a Escape.

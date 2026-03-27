@@ -1,0 +1,182 @@
+---
+name: eza
+description: Reemplazo moderno de ls con iconos, colores, información de Git y vista en árbol. Fork mantenido de exa.
+category: cli-tools
+tags: [ls-replacement, icons, colors, git-status, tree]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install eza-community.eza
+  brew: brew install eza
+  cargo: cargo install eza
+links:
+  repo: https://github.com/eza-community/eza
+addedAt: 2025-01-23
+---
+
+## ¿Qué es eza?
+
+eza es el reemplazo moderno del comando `ls`. Es un fork mantenido de `exa` (que quedó abandonado en 2022), escrito en Rust. Añade iconos de Nerd Font, resaltado de colores por tipo de archivo, información de git integrada, vista en árbol, y soporte para atributos extendidos.
+
+La transición desde `ls` es instantánea: eza acepta los mismos flags que `ls` pero los extiende con opciones mucho más potentes.
+
+## Aliases recomendados
+
+```bash
+# ~/.bashrc o ~/.zshrc
+
+alias ls="eza --icons=always --color=always"
+alias ll="eza --icons=always --color=always -l --git"
+alias la="eza --icons=always --color=always -la --git"
+alias lt="eza --icons=always --color=always --tree --level=2"
+alias lta="eza --icons=always --color=always --tree --level=3 -la"
+alias l="eza --icons=always --color=always -1"   # Una columna
+
+# Con ordenado por modificación (más reciente primero)
+alias lr="eza --icons=always --color=always -l --sort=modified --reverse"
+
+# Solo directorios
+alias lsd="eza --icons=always --color=always -D"
+```
+
+```powershell
+# PowerShell ($PROFILE)
+Set-Alias ls eza
+function ll { eza --icons=always --color=always -l --git @args }
+function la { eza --icons=always --color=always -la --git @args }
+function lt { eza --icons=always --color=always --tree --level=2 @args }
+```
+
+## Información de Git integrada
+
+Con el flag `--git`, eza muestra el estado de cada archivo en el repositorio directamente en el listado:
+
+```bash
+ll --git
+# Columna de git:
+# N = nuevo (untracked)
+# M = modificado
+# A = añadido (staged)
+# D = eliminado
+# R = renombrado
+# ! = ignorado
+```
+
+También puedes ver el estado del repositorio completo con `--git-repos` para listar múltiples repos:
+
+```bash
+# Ver estado de git en subdirectorios (útil para monorepos)
+eza --icons -l --git-repos ~/projects/
+```
+
+## Vista en árbol
+
+```bash
+# Árbol básico (2 niveles)
+eza --tree --level=2
+
+# Árbol completo con detalles
+eza --tree --level=3 -l --git --icons
+
+# Árbol excluyendo directorios
+eza --tree --level=4 --ignore-glob="node_modules|.git|dist|.next"
+
+# Árbol de un directorio específico
+eza --tree --level=2 src/
+```
+
+## Opciones de columnas (modo -l)
+
+```bash
+# Columnas disponibles con --long
+eza -l --git --header --icons
+
+# Personalizar columnas con --fields
+eza -l --fields=permissions,size,modified,name
+
+# Tamaño en formato humano (por defecto)
+eza -l --bytes           # Bytes exactos
+eza -l --group           # Mostrar grupo propietario
+eza -l --no-permissions  # Ocultar permisos
+
+# Timestamps
+eza -l --modified        # Fecha de modificación (por defecto)
+eza -l --created         # Fecha de creación
+eza -l --accessed        # Último acceso
+eza -l --time-style=relative  # "hace 3 días"
+eza -l --time-style=long-iso  # "2025-01-23 14:30:00"
+```
+
+## Ordenación
+
+```bash
+# Ordenar por diferentes criterios
+eza -l --sort=size                 # Por tamaño
+eza -l --sort=modified             # Por fecha de modificación
+eza -l --sort=extension            # Por extensión
+eza -l --sort=name                 # Por nombre (defecto)
+eza -l --sort=created              # Por fecha de creación
+eza -l --sort=accessed             # Por último acceso
+
+# Invertir el orden
+eza -l --sort=size --reverse
+
+# Directorios primero (ya activado por defecto en muchas configs)
+eza -l --group-directories-first
+```
+
+## Requisito: Nerd Fonts
+
+Para ver los iconos necesitas una fuente Nerd Font en tu terminal:
+
+```bash
+# Instalar con Oh My Posh font manager
+oh-my-posh font install meslo
+
+# O descargar manualmente de https://www.nerdfonts.com
+# Fuentes recomendadas: JetBrainsMono, MesloLGS, CaskaydiaCove
+```
+
+Configura la fuente en tu terminal:
+- **Windows Terminal**: Settings > Perfil > Apariencia > Fuente
+- **Alacritty**: `font.normal.family = "JetBrainsMono Nerd Font"`
+- **iTerm2**: Preferences > Profiles > Text > Font
+
+## Combinaciones útiles
+
+```bash
+# Ver archivos grandes del proyecto
+eza -l --sort=size --reverse | head -20
+
+# Archivos modificados recientemente en todo el árbol
+eza --tree -l --sort=modified --reverse --level=3 | head -30
+
+# Solo mostrar archivos (no directorios)
+eza -l --files-only
+
+# Listar extensiones únicas en un directorio
+eza --no-icons -1 | sed 's/.*\.//' | sort -u
+
+# Combinar con fzf para abrir archivos
+eza --icons -1a | fzf --preview 'bat --color=always {}'
+```
+
+## Pro Tips
+
+**Variable de entorno `EZA_COLORS`:** Puedes personalizar los colores usando códigos ANSI, similar a `LS_COLORS`:
+
+```bash
+export EZA_COLORS="di=1;34:ln=1;36:so=1;35:pi=33:ex=1;32"
+```
+
+**`--hyperlink`:** Convierte los nombres de archivo en hipervínculos clicables en terminales que soportan OSC 8 (como WezTerm, Kitty e iTerm2):
+
+```bash
+eza -l --hyperlink
+```
+
+**Sin iconos en SSH:** Si te conectas por SSH a un servidor sin Nerd Fonts, crea un alias separado:
+
+```bash
+alias lls="eza --color=always -l --git"  # ls sin iconos para SSH
+```

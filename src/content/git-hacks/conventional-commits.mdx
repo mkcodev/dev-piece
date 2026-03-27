@@ -1,0 +1,146 @@
+---
+name: Conventional Commits
+description: Estándar para escribir mensajes de commit que generan changelogs automáticamente y facilitan el versionado semántico.
+category: git-hacks
+tags: [git, commits, standards, changelogs, semver, ci]
+os: [cross]
+difficulty: beginner
+addedAt: 2025-03-08
+---
+
+## El problema con los commits sin estándar
+
+`fix stuff`, `wip`, `updates`, `asdfgh`. Todo equipo tiene ese historial de Git ilegible. Conventional Commits define un formato simple que convierte los mensajes de commit en datos estructurados que las herramientas pueden procesar.
+
+## Especificación completa
+
+```
+<tipo>[ámbito opcional]: <descripción>
+
+[cuerpo opcional]
+
+[notas al pie opcionales]
+```
+
+### Tipos principales
+
+| Tipo | Cuándo usarlo | Efecto en SemVer |
+|------|---------------|------------------|
+| `feat` | Nueva funcionalidad | MINOR bump |
+| `fix` | Corrección de bug | PATCH bump |
+| `chore` | Tareas de mantenimiento | - |
+| `docs` | Solo documentación | - |
+| `style` | Formato, punto y coma, etc. | - |
+| `refactor` | Refactoring sin nueva funcionalidad ni bug fix | - |
+| `test` | Añadir o corregir tests | - |
+| `perf` | Mejora de rendimiento | PATCH bump |
+| `ci` | Cambios en CI/CD | - |
+| `build` | Sistema de build, dependencias | - |
+
+### Breaking changes → MAJOR bump
+
+```bash
+# Opción 1: Signo de exclamación
+feat!: remove deprecated API endpoints
+
+# Opción 2: Footer BREAKING CHANGE
+feat(auth): replace JWT with session tokens
+
+BREAKING CHANGE: JWT tokens no longer accepted.
+Clients must update to use session-based auth.
+```
+
+### Ejemplos reales
+
+```bash
+feat(auth): add OAuth2 login with Google
+fix(cart): correct item count when removing duplicates
+chore(deps): upgrade React to 18.3.0
+docs(api): add OpenAPI spec for /users endpoint
+refactor(db): extract query builder to separate module
+test(payment): add integration tests for Stripe webhook
+ci: add cache step to GitHub Actions workflow
+perf(images): lazy load product thumbnails
+```
+
+## Commitizen: commits interactivos
+
+Commitizen te guía con un wizard interactivo:
+
+```bash
+npm install -g commitizen cz-conventional-changelog
+
+# En el proyecto
+npm install --save-dev commitizen
+npx commitizen init cz-conventional-changelog --save-dev --save-exact
+```
+
+Añade a `package.json`:
+
+```json
+{
+  "scripts": {
+    "commit": "cz"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}
+```
+
+Ahora `npm run commit` (o `git cz`) lanza el wizard interactivo.
+
+## commitlint: enforcement automático
+
+```bash
+npm install --save-dev @commitlint/cli @commitlint/config-conventional
+```
+
+Crea `.commitlintrc.js`:
+
+```js
+// .commitlintrc.js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+  rules: {
+    // Longitud máxima del subject
+    'header-max-length': [2, 'always', 72],
+    // Tipos permitidos
+    'type-enum': [
+      2,
+      'always',
+      ['feat', 'fix', 'chore', 'docs', 'style',
+       'refactor', 'test', 'perf', 'ci', 'build', 'revert']
+    ],
+    // Subject en minúsculas
+    'subject-case': [2, 'always', 'lower-case'],
+  },
+}
+```
+
+Integra con Husky para enforcement en cada commit:
+
+```bash
+npm install --save-dev husky
+npx husky init
+echo "npx --no -- commitlint --edit \$1" > .husky/commit-msg
+```
+
+## Por qué importa para CI/CD
+
+Con commits convencionales, herramientas como `semantic-release` o `standard-version` pueden:
+
+1. **Determinar automáticamente** el siguiente número de versión (MAJOR/MINOR/PATCH)
+2. **Generar el CHANGELOG.md** agrupando por tipo de cambio
+3. **Crear el tag de Git** con la versión correcta
+4. **Publicar el paquete** a npm o crear un release en GitHub
+
+```bash
+# Con standard-version, todo el proceso de release en un comando:
+npx standard-release
+# → Analiza commits, bumpa versión, genera CHANGELOG, crea tag
+```
+
+> **Tip de equipo:** Más que el formato exacto, lo importante es la consistencia. Si el equipo decide usar `feat:` para features y `fix:` para bugs, las herramientas funcionarán. Configura commitlint desde el día 1 del proyecto.

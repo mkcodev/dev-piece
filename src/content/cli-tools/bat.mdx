@@ -1,0 +1,179 @@
+---
+name: bat
+description: Un cat con alas. Resaltado de sintaxis, integración con git y paginador. El reemplazo perfecto de cat.
+category: cli-tools
+tags: [cat-replacement, syntax-highlight, git-integration, pager]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install sharkdp.bat
+  brew: brew install bat
+  apt: sudo apt install bat
+links:
+  repo: https://github.com/sharkdp/bat
+addedAt: 2025-01-19
+---
+
+## ¿Qué es bat?
+
+bat es el reemplazo moderno de `cat` (de ahí su nombre: **b**at = mejor `cat`). Creado por David Peter en Rust, añade resaltado de sintaxis para más de 150 lenguajes, muestra los cambios de git en el margen izquierdo, incluye números de línea, y usa un paginador automático cuando el contenido es más largo que la pantalla.
+
+La experiencia de leer código en la terminal cambia radicalmente con bat: cada archivo tiene el mismo aspecto que en un editor de código.
+
+## Uso básico
+
+```bash
+# Ver un archivo con resaltado de sintaxis
+bat archivo.py
+bat src/main.rs
+bat ~/.config/nvim/init.lua
+
+# Múltiples archivos (muestra encabezado con nombre)
+bat src/*.ts
+
+# Stdin con lenguaje específico
+echo '{"key": "value"}' | bat -l json
+curl -s https://api.github.com/users/octocat | bat -l json
+
+# Sin paginador (para pipes)
+bat --paging=never archivo.txt
+
+# Solo el contenido sin decoraciones (para scripts)
+bat --plain archivo.txt
+# o equivalente:
+bat -p archivo.txt
+```
+
+## Opciones de estilo
+
+```bash
+# Ver todas las opciones de estilo disponibles
+bat --list-themes
+bat --list-languages
+
+# Controlar qué elementos mostrar
+bat --style=numbers,changes,header archivo.py   # Números + git + encabezado
+bat --style=full archivo.py                     # Todo
+bat --style=plain archivo.py                    # Sin nada (como cat)
+
+# Mostrar rango de líneas
+bat -r 10:50 archivo.py        # Líneas 10 a 50
+bat -r 10: archivo.py          # Desde línea 10 hasta el final
+bat -r :50 archivo.py          # Desde el inicio hasta la línea 50
+
+# Mostrar caracteres no imprimibles
+bat -A archivo.txt
+```
+
+## Tema Catppuccin Frappé
+
+bat soporta temas personalizados en formato `.tmTheme` o en formato bat nativo.
+
+```bash
+# Instalar el tema Catppuccin para bat
+mkdir -p "$(bat --config-dir)/themes"
+cd "$(bat --config-dir)/themes"
+
+# Descargar los temas de Catppuccin
+curl -LO https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Frappe.tmTheme
+curl -LO https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Macchiato.tmTheme
+curl -LO https://github.com/catppuccin/bat/raw/main/themes/Catppuccin%20Mocha.tmTheme
+
+# Reconstruir la caché de temas
+bat cache --build
+```
+
+## Archivo de configuración
+
+```bash
+# Crear el archivo de configuración
+mkdir -p "$(bat --config-dir)"
+bat --generate-config-file
+```
+
+```ini
+# ~/.config/bat/config (Linux/macOS)
+# %APPDATA%\bat\config (Windows)
+
+--theme="Catppuccin Frappe"
+--style="numbers,changes,header"
+--paging=auto
+--map-syntax="*.mdx:Markdown"
+--map-syntax="*.env:DotEnv"
+--map-syntax=".ignore:Git Ignore"
+--map-syntax="Makefile.*:Makefile"
+--italic-text=always
+```
+
+## bat como MANPAGER
+
+Una de las configuraciones más útiles: usar bat para colorear las páginas del manual:
+
+```bash
+# ~/.bashrc o ~/.zshrc
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+export MANROFFOPT="-c"
+
+# Ahora `man ls` tiene resaltado de sintaxis
+man git
+man curl
+```
+
+## Integración con fzf
+
+```bash
+# Preview de archivos en fzf con bat
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --color=always --style=numbers --line-range=:200 {}'
+  --preview-window 'right:60%'
+"
+
+# Función para abrir archivos con preview
+vf() {
+  local file
+  file=$(fzf --preview 'bat --color=always --style=numbers {}')
+  [[ -n "$file" ]] && nvim "$file"
+}
+```
+
+## Integración con delta
+
+bat potencia a `delta`, el paginador de git diff:
+
+```bash
+# .gitconfig
+[core]
+  pager = delta
+
+[delta]
+  syntax-theme = Catppuccin Frappe
+  line-numbers = true
+  side-by-side = true
+```
+
+## Alias recomendados
+
+```bash
+# ~/.bashrc o ~/.zshrc
+
+# Reemplazar cat con bat
+alias cat="bat --paging=never"
+
+# cat original para scripts donde bat no conviene
+alias catt="/bin/cat"
+
+# Ver archivos de configuración comunes
+alias batrc="bat ~/.bashrc"
+alias batvim="bat ~/.config/nvim/init.lua"
+
+# Buscar y previsualizar
+alias bf='fzf --preview "bat --color=always {}"'
+```
+
+## Pro Tips
+
+**Resaltado de sintaxis para extensiones desconocidas:** Usa `--map-syntax` para asociar extensiones raras con lenguajes que bat ya conoce. Por ejemplo, `*.mdx:Markdown` o `*.conf:Nginx`.
+
+**Integración con less:** Puedes usar bat como colorizer para `less` con `LESSOPEN="| bat --color=always %s"`.
+
+**En Windows:** bat se instala como `bat.exe` pero en algunas distros de Linux el comando puede ser `batcat` (en Debian/Ubuntu). Crea el alias: `alias bat=batcat`.

@@ -1,0 +1,176 @@
+---
+name: LSP Zero
+description: Configuración mínima de LSP para Neovim. Autocompletado, diagnósticos y hover docs en minutos con Mason.
+category: neovim
+tags: [neovim, lsp, autocomplete, diagnostics, mason]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  manual: Via lazy.nvim
+links:
+  repo: https://github.com/VonHeikemen/lsp-zero.nvim
+addedAt: 2025-02-09
+---
+
+Configurar LSP en Neovim desde cero puede ser intimidante: `nvim-lspconfig`, `mason`, `mason-lspconfig` y `nvim-cmp` con sus fuentes hay que conectarlos todos. `lsp-zero` hace ese trabajo de integración por ti, dejando solo los ajustes que quieres personalizar.
+
+## Instalación con lazy.nvim
+
+```lua
+-- lua/plugins/lsp.lua
+return {
+  -- Gestor de servidores LSP, linters y formatters
+  {
+    "williamboman/mason.nvim",
+    cmd = "Mason",
+    config = true,
+  },
+
+  -- Puente entre mason y lspconfig
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    opts = {
+      ensure_installed = {
+        "ts_ls",        -- TypeScript / JavaScript
+        "lua_ls",       -- Lua
+        "pyright",      -- Python
+        "rust_analyzer",-- Rust
+        "cssls",        -- CSS
+        "html",         -- HTML
+        "jsonls",       -- JSON
+        "tailwindcss",  -- Tailwind CSS
+      },
+      automatic_installation = true,
+    },
+  },
+
+  -- Motor principal de LSP Zero v3
+  {
+    "VonHeikemen/lsp-zero.nvim",
+    branch = "v3.x",
+    lazy = true,
+    config = false,
+  },
+
+  -- Configuraciones de servidores LSP
+  {
+    "neovim/nvim-lspconfig",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "VonHeikemen/lsp-zero.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp",
+    },
+    config = function()
+      local lsp_zero = require("lsp-zero")
+
+      lsp_zero.on_attach(function(_, bufnr)
+        -- Keymaps LSP estándar
+        lsp_zero.default_keymaps({ buffer = bufnr })
+
+        local map = vim.keymap.set
+        local opts = { buffer = bufnr, silent = true }
+
+        map("n", "gd",         vim.lsp.buf.definition,      vim.tbl_extend("force", opts, { desc = "Ir a definición" }))
+        map("n", "gr",         vim.lsp.buf.references,      vim.tbl_extend("force", opts, { desc = "Referencias" }))
+        map("n", "K",          vim.lsp.buf.hover,           vim.tbl_extend("force", opts, { desc = "Hover docs" }))
+        map("n", "<leader>rn", vim.lsp.buf.rename,          vim.tbl_extend("force", opts, { desc = "Renombrar símbolo" }))
+        map("n", "<leader>ca", vim.lsp.buf.code_action,     vim.tbl_extend("force", opts, { desc = "Code actions" }))
+        map("n", "<leader>f",  function() vim.lsp.buf.format({ async = true }) end,
+                                                             vim.tbl_extend("force", opts, { desc = "Formatear" }))
+      end)
+
+      -- Configurar lua_ls para entender el entorno de Neovim
+      require("lspconfig").lua_ls.setup(lsp_zero.nvim_lua_ls())
+
+      lsp_zero.setup()
+
+      -- Diagnósticos personalizados
+      vim.diagnostic.config({
+        virtual_text = true,
+        signs = true,
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+        float = {
+          border = "rounded",
+          source = "always",
+        },
+      })
+    end,
+  },
+
+  -- Motor de autocompletado
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "VonHeikemen/lsp-zero.nvim",
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+      "rafamadriz/friendly-snippets",
+    },
+    config = function()
+      local lsp_zero = require("lsp-zero")
+      lsp_zero.extend_cmp()
+
+      local cmp     = require("cmp")
+      local luasnip = require("luasnip")
+
+      require("luasnip.loaders.from_vscode").lazy_load()
+
+      cmp.setup({
+        formatting = lsp_zero.cmp_format({ details = true }),
+        snippet = {
+          expand = function(args) luasnip.lsp_expand(args.body) end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-k>"]   = cmp.mapping.select_prev_item(),
+          ["<C-j>"]   = cmp.mapping.select_next_item(),
+          ["<C-d>"]   = cmp.mapping.scroll_docs(4),
+          ["<C-u>"]   = cmp.mapping.scroll_docs(-4),
+          ["<C-Space>"]= cmp.mapping.complete(),
+          ["<CR>"]    = cmp.mapping.confirm({ select = false }),
+          ["<Tab>"]   = cmp.mapping(function(fallback)
+            if luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        }),
+        sources = cmp.config.sources({
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
+          { name = "buffer",  keyword_length = 3 },
+          { name = "path" },
+        }),
+      })
+    end,
+  },
+}
+```
+
+## Instalar servidores manualmente
+
+Desde Neovim, abre Mason con `:Mason` y usa `i` para instalar cualquier servidor. Para instalarlos desde la línea de comandos:
+
+```bash
+# Desde dentro de Neovim
+:MasonInstall typescript-language-server pyright rust-analyzer lua-language-server
+```
+
+## Keymaps LSP más usados
+
+| Keymap | Acción |
+|--------|--------|
+| `gd` | Ir a la definición |
+| `gr` | Ver referencias |
+| `K` | Hover con documentación |
+| `<leader>rn` | Renombrar símbolo |
+| `<leader>ca` | Code actions |
+| `[d` / `]d` | Diagnóstico anterior / siguiente |

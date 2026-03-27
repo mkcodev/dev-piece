@@ -1,0 +1,85 @@
+---
+name: Always on Top (AHK)
+description: Mantén cualquier ventana siempre visible con un atajo de teclado. Perfecto para tener documentación mientras programas.
+category: scripts-ahk
+tags: [ahk, window-management, productivity, windows, floating]
+os: [windows]
+difficulty: beginner
+addedAt: 2025-03-02
+---
+
+## El problema del alt-tab constante
+
+Programar con documentación abierta suele significar cambiar de ventana cada treinta segundos. Con "Always on Top" puedes fijar una ventana flotante —un PDF, una web, un terminal— y que permanezca visible mientras trabajas en otra aplicación.
+
+## Script AHK v2
+
+Guarda el siguiente script como `always-on-top.ahk`:
+
+```ahk
+#Requires AutoHotkey v2.0
+
+; Win + Space → Toggle always-on-top para la ventana activa
+#Space::
+{
+    hwnd := WinGetID("A")
+    topmost := WinGetExStyle("A") & 0x8  ; WS_EX_TOPMOST
+
+    if (topmost) {
+        WinSetAlwaysOnTop 0, "ahk_id " hwnd
+        TrayTip "Always on Top", "Ventana liberada", 1
+    } else {
+        WinSetAlwaysOnTop 1, "ahk_id " hwnd
+        TrayTip "Always on Top", "Ventana fijada encima", 1
+    }
+}
+```
+
+El script usa `Win + Space` como atajo. Si ese atajo entra en conflicto con otro programa, puedes cambiarlo por `^!t` (Ctrl+Alt+T) o cualquier combinación que prefieras.
+
+## Versión con indicador visual
+
+Esta versión cambia el título de la ventana para que sepas visualmente qué ventanas están fijadas:
+
+```ahk
+#Requires AutoHotkey v2.0
+
+#Space::
+{
+    hwnd := WinGetID("A")
+    title := WinGetTitle("A")
+    topmost := WinGetExStyle("A") & 0x8
+
+    if (topmost) {
+        WinSetAlwaysOnTop 0, "ahk_id " hwnd
+        ; Quita el prefijo [TOP] del título si existe
+        if (SubStr(title, 1, 6) = "[TOP] ")
+            WinSetTitle SubStr(title, 7), "ahk_id " hwnd
+    } else {
+        WinSetAlwaysOnTop 1, "ahk_id " hwnd
+        WinSetTitle "[TOP] " title, "ahk_id " hwnd
+    }
+}
+```
+
+## Alternativa: PowerToys Always on Top
+
+PowerToys incluye esta funcionalidad de forma nativa desde la versión 0.59:
+
+1. Instala PowerToys: `winget install Microsoft.PowerToys`
+2. Abre PowerToys → **Always on Top**
+3. El atajo por defecto es `Win + Ctrl + T`
+4. Las ventanas fijadas reciben un borde de color configurable
+
+La ventaja de PowerToys es el borde visual claro que indica el estado. La ventaja de AHK es la personalización total del atajo y el comportamiento.
+
+## Casos de uso para desarrolladores
+
+- **Documentación de API** mientras escribes código: fija una pestaña del navegador con la referencia
+- **Terminal de logs** mientras trabajas en el editor: mantén la salida de `npm run dev` visible
+- **Cheat sheet** de atajos de teclado al aprender una nueva herramienta
+- **Tickets de Jira/Linear** para no perder el contexto de la tarea mientras programas
+- **Calculadora o conversor** durante sesiones de estimación o análisis de datos
+- **Video tutorial** en una esquina de la pantalla mientras implementas algo paso a paso
+
+> **Tip:** Combina Always on Top con el redimensionado de ventanas (o FancyZones) para crear un layout donde la ventana flotante ocupe una esquina fija de la pantalla sin molestar el flujo principal de trabajo.

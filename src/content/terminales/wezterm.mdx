@@ -1,0 +1,167 @@
+---
+name: WezTerm
+description: Terminal emulador multiplexer GPU-acelerado con configuración en Lua. El más potente y customizable.
+category: terminales
+tags: [terminal, lua, gpu, multiplexer, cross-platform]
+os: [windows, macos, linux]
+difficulty: advanced
+install:
+  winget: winget install wez.wezterm
+  brew: brew install --cask wezterm
+links:
+  repo: https://github.com/wez/wezterm
+  docs: https://wezfurlong.org/wezterm/
+addedAt: 2025-01-12
+---
+
+## ¿Qué es WezTerm?
+
+WezTerm (escrito por Wez Furlong) es el terminal más completo y personalizable que existe. Combina aceleración GPU, multiplexación de sesiones integrada (como tmux pero nativa), soporte para imágenes inline, ligatures de fuentes, y una configuración completamente programable en **Lua**. Si Alacritty es el minimalista y Warp el moderno, WezTerm es el terminal para power users que quieren control total.
+
+Lo que lo diferencia de la competencia:
+
+- Multiplexer integrado: pestañas, paneles y workspaces sin tmux
+- Configuración en Lua: lógica condicional real, no solo pares clave-valor
+- Imágenes inline via protocolo iTerm2 y Kitty
+- SSH multiplexing nativo
+- Soporte completo para ligatures y variantes de fuentes
+
+## Configuración completa en Lua
+
+El archivo de configuración es `~/.config/wezterm/wezterm.lua` (en Windows: `%USERPROFILE%\.config\wezterm\wezterm.lua`).
+
+```lua
+-- ~/.config/wezterm/wezterm.lua
+local wezterm = require("wezterm")
+local config  = wezterm.config_builder()
+
+-- ─── Apariencia General ────────────────────────────────────────────────────
+
+config.font = wezterm.font_with_fallback({
+  { family = "JetBrainsMono Nerd Font", weight = "Regular" },
+  { family = "Symbols Nerd Font Mono" },
+})
+config.font_size            = 13.0
+config.line_height          = 1.1
+config.cell_width           = 1.0
+config.harfbuzz_features    = { "calt=1", "clig=1", "liga=1" }
+
+-- ─── Catppuccin Frappé ────────────────────────────────────────────────────
+
+config.color_scheme = "Catppuccin Frappe"
+
+config.colors = {
+  tab_bar = {
+    background         = "#232634",
+    active_tab         = { bg_color = "#8caaee", fg_color = "#232634", intensity = "Bold" },
+    inactive_tab       = { bg_color = "#303446", fg_color = "#838ba7" },
+    inactive_tab_hover = { bg_color = "#414559", fg_color = "#c6d0f5" },
+    new_tab            = { bg_color = "#303446", fg_color = "#626880" },
+    new_tab_hover      = { bg_color = "#414559", fg_color = "#c6d0f5" },
+  },
+}
+
+-- ─── Ventana ──────────────────────────────────────────────────────────────
+
+config.initial_cols          = 200
+config.initial_rows          = 50
+config.window_padding        = { left = 12, right = 12, top = 10, bottom = 10 }
+config.window_background_opacity = 0.95
+config.macos_window_background_blur = 20
+config.window_decorations    = "RESIZE"
+config.enable_scroll_bar     = false
+config.scrollback_lines      = 10000
+
+-- ─── Tab Bar ──────────────────────────────────────────────────────────────
+
+config.use_fancy_tab_bar          = false
+config.tab_bar_at_bottom          = true
+config.hide_tab_bar_if_only_one_tab = true
+config.tab_max_width              = 32
+config.show_tab_index_in_tab_bar  = false
+
+-- Tab title con icono
+wezterm.on("format-tab-title", function(tab, _, _, _, _, max_width)
+  local title = tab.active_pane.title
+  if tab.tab_title and #tab.tab_title > 0 then
+    title = tab.tab_title
+  end
+  return {
+    { Text = " " .. wezterm.truncate_right(title, max_width - 2) .. " " },
+  }
+end)
+
+-- ─── Teclas ───────────────────────────────────────────────────────────────
+
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+
+config.keys = {
+  -- Paneles (estilo tmux)
+  { key = "|",  mods = "LEADER",       action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+  { key = "-",  mods = "LEADER",       action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+  { key = "h",  mods = "LEADER",       action = wezterm.action.ActivatePaneDirection("Left") },
+  { key = "j",  mods = "LEADER",       action = wezterm.action.ActivatePaneDirection("Down") },
+  { key = "k",  mods = "LEADER",       action = wezterm.action.ActivatePaneDirection("Up") },
+  { key = "l",  mods = "LEADER",       action = wezterm.action.ActivatePaneDirection("Right") },
+  { key = "z",  mods = "LEADER",       action = wezterm.action.TogglePaneZoomState },
+  { key = "x",  mods = "LEADER",       action = wezterm.action.CloseCurrentPane({ confirm = false }) },
+  -- Pestañas
+  { key = "c",  mods = "LEADER",       action = wezterm.action.SpawnTab("CurrentPaneDomain") },
+  { key = "n",  mods = "LEADER",       action = wezterm.action.ActivateTabRelative(1) },
+  { key = "p",  mods = "LEADER",       action = wezterm.action.ActivateTabRelative(-1) },
+  { key = ",",  mods = "LEADER",       action = wezterm.action.PromptInputLine({
+    description = "Renombrar pestaña",
+    action = wezterm.action_callback(function(window, _, line)
+      if line then window:active_tab():set_title(line) end
+    end),
+  }) },
+  -- Copiar/pegar
+  { key = "c",  mods = "CTRL|SHIFT",   action = wezterm.action.CopyTo("Clipboard") },
+  { key = "v",  mods = "CTRL|SHIFT",   action = wezterm.action.PasteFrom("Clipboard") },
+  -- Zoom de fuente
+  { key = "=",  mods = "CTRL",         action = wezterm.action.IncreaseFontSize },
+  { key = "-",  mods = "CTRL",         action = wezterm.action.DecreaseFontSize },
+  { key = "0",  mods = "CTRL",         action = wezterm.action.ResetFontSize },
+  -- Modo copia
+  { key = "[",  mods = "LEADER",       action = wezterm.action.ActivateCopyMode },
+}
+
+-- ─── Mouse ────────────────────────────────────────────────────────────────
+
+config.mouse_bindings = {
+  { event = { Up = { streak = 1, button = "Left" } },
+    mods  = "NONE",
+    action = wezterm.action.CompleteSelection("PrimarySelection") },
+  { event = { Up = { streak = 1, button = "Left" } },
+    mods  = "CTRL",
+    action = wezterm.action.OpenLinkAtMouseCursor },
+}
+
+-- ─── Misc ─────────────────────────────────────────────────────────────────
+
+config.audible_bell              = "Disabled"
+config.visual_bell               = { fade_in_duration_ms = 75, fade_out_duration_ms = 75 }
+config.check_for_updates         = false
+config.automatically_reload_config = true
+
+return config
+```
+
+## Workspaces y multiplexación
+
+WezTerm tiene un sistema de workspaces que funciona sin necesidad de tmux:
+
+```lua
+-- Cambiar entre workspaces
+{ key = "s", mods = "LEADER", action = wezterm.action.ShowLauncherArgs({ flags = "WORKSPACES" }) },
+-- Crear workspace nuevo
+{ key = "S", mods = "LEADER", action = wezterm.action.SwitchToWorkspace({ name = "nuevo" }) },
+```
+
+## Pro Tips
+
+**Live reload:** WezTerm recarga la configuración automáticamente. Cualquier error de Lua aparece como notificación sin crashear el terminal.
+
+**Ligatures:** A diferencia de muchos terminales, WezTerm soporta completamente las ligatures de fuentes como JetBrains Mono o Fira Code. Actívalas con `harfbuzz_features`.
+
+**SSH nativo:** Puedes conectarte a servidores SSH directamente desde la configuración y WezTerm creará un multiplexer remoto automáticamente, manteniendo las pestañas y paneles incluso tras desconexiones.

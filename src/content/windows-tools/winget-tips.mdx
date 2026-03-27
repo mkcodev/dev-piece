@@ -1,0 +1,134 @@
+---
+name: "winget — Guía Completa"
+description: El gestor de paquetes oficial de Windows. Instala, actualiza y gestiona software desde la terminal como en Linux.
+category: windows-tools
+tags: [windows, package-manager, cli, updates, winget, software]
+os: [windows]
+difficulty: beginner
+commands:
+  - label: Buscar un paquete
+    code: winget search vscode
+    lang: powershell
+  - label: Instalar paquete
+    code: winget install Microsoft.VisualStudioCode
+    lang: powershell
+  - label: Actualizar todo
+    code: winget upgrade --all
+    lang: powershell
+  - label: Exportar lista
+    code: winget export -o packages.json
+    lang: powershell
+  - label: Importar lista
+    code: winget import -i packages.json
+    lang: powershell
+addedAt: 2025-03-15
+---
+
+## El apt-get de Windows
+
+`winget` es el gestor de paquetes oficial de Windows incluido desde Windows 11. Instala, actualiza y desinstala software desde la terminal, igual que `apt` en Ubuntu o `brew` en macOS.
+
+## Referencia completa de comandos
+
+### Buscar e instalar
+
+```powershell
+# Buscar paquetes por nombre
+winget search "visual studio code"
+winget search vscode --source winget
+
+# Instalar por ID exacto (recomendado para scripts)
+winget install Microsoft.VisualStudioCode
+winget install Git.Git
+winget install Neovim.Neovim
+
+# Instalar sin confirmaciones (ideal para scripts de setup)
+winget install Microsoft.PowerToys --silent --accept-package-agreements
+
+# Instalar versión específica
+winget install Microsoft.NodeJS --version 20.11.0
+```
+
+### Actualizar software
+
+```powershell
+# Ver qué paquetes tienen actualizaciones disponibles
+winget upgrade
+
+# Actualizar un paquete específico
+winget upgrade Microsoft.VisualStudioCode
+
+# Actualizar TODO el software instalado de una vez
+winget upgrade --all
+
+# Actualizar todo, aceptando acuerdos automáticamente
+winget upgrade --all --silent --accept-package-agreements
+```
+
+### Gestionar software instalado
+
+```powershell
+# Listar todo lo instalado (detecta software no instalado con winget también)
+winget list
+
+# Buscar en la lista de instalados
+winget list --name "node"
+
+# Desinstalar
+winget uninstall Microsoft.Teams
+
+# Ver detalles de un paquete
+winget show Neovim.Neovim
+```
+
+## Backup y restauración del sistema
+
+El flujo de exportar/importar es ideal para configurar una máquina nueva o hacer backup del software instalado:
+
+```powershell
+# Exportar lista completa de software instalado
+winget export -o C:\backup\packages.json
+
+# El archivo JSON generado:
+# {
+#   "$schema": "...",
+#   "WinGetVersion": "1.x.x",
+#   "Sources": [{
+#     "Packages": [
+#       {"PackageIdentifier": "Git.Git"},
+#       {"PackageIdentifier": "Microsoft.VisualStudioCode"},
+#       ...
+#     ]
+#   }]
+# }
+
+# En la máquina nueva, instalar todo de una vez:
+winget import -i C:\backup\packages.json --accept-package-agreements
+```
+
+## Flags útiles
+
+| Flag | Efecto |
+|------|--------|
+| `--silent` | Sin ventanas de instalador, modo silencioso |
+| `--accept-package-agreements` | Acepta licencias automáticamente |
+| `--accept-source-agreements` | Acepta acuerdos de fuente |
+| `--scope user` | Instala solo para el usuario actual |
+| `--scope machine` | Instala para todos los usuarios |
+| `--location <ruta>` | Especifica directorio de instalación |
+| `--force` | Fuerza reinstalación aunque ya esté instalado |
+
+## Comparativa: winget vs Scoop vs Chocolatey
+
+| Característica | winget | Scoop | Chocolatey |
+|---|---|---|---|
+| Oficial de Microsoft | Sí | No | No |
+| Sin admin requerido | No siempre | Sí | No |
+| Instala en `~/scoop` | No | Sí | No |
+| Paquetes de dev tools | Buena selección | Excelente | Buena |
+| GUI de gestión | No | No | Sí (Choco GUI) |
+| Scripts de setup | Sí | Sí | Sí |
+
+**Recomendación práctica:** Usa `winget` para software general (navegadores, editores, apps de escritorio) y **Scoop** para herramientas de desarrollo que prefieras tener en el path del usuario sin permisos de administrador (Node, Python, Go, ffmpeg, etc.).
+
+> **Script de setup para máquina nueva:** Mantén un script PowerShell con todos tus `winget install` y corre `winget upgrade --all` cada semana o dos para mantener el sistema al día sin esfuerzo.

@@ -1,0 +1,131 @@
+---
+name: Git Bisect
+description: Encuentra el commit exacto que introdujo un bug usando búsqueda binaria automática. Como tener una máquina del tiempo.
+category: git-hacks
+tags: [git, debugging, binary-search, bug-finding, bisect]
+os: [cross]
+difficulty: intermediate
+addedAt: 2025-03-06
+---
+
+## Búsqueda binaria aplicada a commits
+
+`git bisect` divide el historial de commits por la mitad sucesivamente hasta encontrar el commit exacto que introdujo un bug. Si tienes 1000 commits sospechosos, bisect lo encuentra en solo 10 pasos.
+
+## Flujo básico paso a paso
+
+```bash
+# 1. Inicia la sesión de bisect
+git bisect start
+
+# 2. Marca el estado actual como malo (tiene el bug)
+git bisect bad
+
+# 3. Marca un commit conocido como bueno (sin el bug)
+#    Puede ser un tag, hash, o referencia relativa
+git bisect good v1.4.0
+# o
+git bisect good abc1234
+
+# Git hace checkout automáticamente al commit del medio
+# Bisecting: 32 revisions left to test after this
+# [f3a8b21] feat: add user authentication
+
+# 4. Prueba si el bug existe en este commit
+# Si tiene el bug:
+git bisect bad
+# Si no tiene el bug:
+git bisect good
+
+# 5. Git sigue navegando hasta encontrar el culpable:
+# a3f9d12 is the first bad commit
+# feat: refactor database connection pool
+
+# 6. Cuando termines, vuelve al estado original
+git bisect reset
+```
+
+## Bisect automático con script
+
+La forma más potente: dale a Git un script que devuelva 0 si está bien y distinto de 0 si hay bug.
+
+```bash
+# Crea un script de prueba
+cat > /tmp/test-bug.sh << 'EOF'
+#!/bin/bash
+# El script debe retornar 0 = bueno, 1 = malo
+
+# Ejemplo: compilar y correr un test específico
+npm run build 2>/dev/null && \
+  npm test -- --testPathPattern="user-auth" --silent
+EOF
+chmod +x /tmp/test-bug.sh
+
+# Ejecuta bisect automático
+git bisect start
+git bisect bad HEAD
+git bisect good v1.0.0
+git bisect run /tmp/test-bug.sh
+```
+
+Git ejecutará el script en cada commit candidato y encontrará el culpable sin intervención manual.
+
+## Ejemplo práctico: encontrar una regresión de rendimiento
+
+```bash
+# La API tarda más de 500ms desde hace unas semanas
+git bisect start
+git bisect bad HEAD
+git bisect good 2025-01-15  # fecha conocida como rápida
+
+cat > /tmp/perf-test.sh << 'EOF'
+#!/bin/bash
+# Levanta el servidor en background, mide tiempo de respuesta
+npm run build --silent 2>/dev/null || exit 125  # skip si no compila
+
+timeout 30 npm start &
+SERVER_PID=$!
+sleep 3
+
+TIME=$(curl -o /dev/null -s -w "%{time_total}" http://localhost:3000/api/health)
+kill $SERVER_PID
+
+# Falla si tarda más de 0.5 segundos
+python3 -c "exit(0 if $TIME < 0.5 else 1)"
+EOF
+
+git bisect run /tmp/perf-test.sh
+```
+
+> **Código de salida 125:** Si tu script devuelve 125, Git saltará ese commit (útil cuando el código no compila en ciertos commits intermedios).
+
+## Comandos útiles durante bisect
+
+```bash
+# Ver cuántos commits quedan por revisar
+git bisect log
+
+# Marcar commit como no testeable (skip)
+git bisect skip
+
+# Saltar un rango de commits sospechosos
+git bisect skip v1.2.0..v1.3.0
+
+# Ver el log de la sesión actual
+git bisect log
+
+# Repetir la sesión desde el log guardado
+git bisect replay bisect.log
+```
+
+## Cerrar la sesión
+
+```bash
+# Siempre termina con reset para volver al estado anterior
+git bisect reset
+
+# O vuelve a un commit específico
+git bisect reset main
+```
+
+> **Tip:** Después de encontrar el commit culpable, usa `git show <hash>` para ver exactamente qué cambió. Con esa información, el fix suele ser obvio.

@@ -1,0 +1,88 @@
+---
+name: Git Aliases de Productividad
+description: Colección de aliases de Git que transformarán tu flujo de trabajo diario. Shortcuts para las operaciones más frecuentes.
+category: snippets
+tags: [git, aliases, productivity, workflow, config]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-02-01
+---
+
+Los aliases de Git son una de las optimizaciones más sencillas y con mayor retorno de inversión que puedes hacer. En lugar de escribir comandos largos repetidamente, defines atajos en tu `~/.gitconfig` y los usas para siempre.
+
+## Configuración completa
+
+Añade el siguiente bloque a tu `~/.gitconfig`:
+
+```ini
+[alias]
+  st      = status -sb
+  co      = checkout
+  cob     = checkout -b
+  cam     = commit -am
+  undo    = reset --soft HEAD~1
+  unstage = reset HEAD --
+  last    = log -1 HEAD --stat
+  lg      = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit
+  gone    = !git fetch -p && git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -D
+  whoami  = config user.email
+```
+
+O configúralos uno a uno desde la terminal:
+
+```bash
+git config --global alias.st "status -sb"
+git config --global alias.co "checkout"
+git config --global alias.cob "checkout -b"
+git config --global alias.cam "commit -am"
+git config --global alias.undo "reset --soft HEAD~1"
+git config --global alias.unstage "reset HEAD --"
+git config --global alias.last "log -1 HEAD --stat"
+git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%Creset' --abbrev-commit"
+git config --global alias.whoami "config user.email"
+```
+
+## Descripción de cada alias
+
+| Alias | Comando completo | Para qué sirve |
+|-------|-----------------|----------------|
+| `st` | `status -sb` | Estado compacto del repo: rama y cambios en formato corto |
+| `co` | `checkout` | Cambiar de rama o restaurar archivos |
+| `cob` | `checkout -b` | Crear y cambiar a una nueva rama en un paso |
+| `cam` | `commit -am` | Stage de todo + commit con mensaje en una sola línea |
+| `undo` | `reset --soft HEAD~1` | Deshace el último commit pero **mantiene los cambios** en staging |
+| `unstage` | `reset HEAD --` | Quita archivos del área de staging sin eliminar los cambios |
+| `last` | `log -1 HEAD --stat` | Muestra el último commit con el resumen de archivos modificados |
+| `lg` | log con graph y colores | Log visual con grafo de ramas, hash corto y tiempo relativo |
+| `gone` | fetch -p + branch cleanup | Borra todas las ramas locales cuya rama remota ya fue eliminada |
+| `whoami` | `config user.email` | Muestra el email configurado (útil en repos con identidades distintas) |
+
+## Casos de uso prácticos
+
+**Inicio de jornada típica:**
+
+```bash
+git st                  # ver estado rápido
+git co main             # cambiar a main
+git cob feature/login   # crear rama nueva
+# ... trabajas ...
+git cam "feat: add login form"   # commit express
+```
+
+**Limpiar ramas obsoletas después de un merge:**
+
+```bash
+git gone
+# Borra automáticamente todas las ramas locales
+# cuya contraparte en origin ya no existe
+```
+
+**Deshacer un commit apresurado:**
+
+```bash
+git undo
+# El commit desaparece pero todos tus cambios
+# siguen en staging, listos para rehacer el commit
+```
+
+El alias `lg` merece especial atención: convierte el log plano de Git en un grafo visual con colores que muestra la historia de ramas de un vistazo. Es uno de esos aliases que, una vez que los usas, no puedes trabajar sin él.

@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 — No encontrado">
+  <div class="flex flex-col items-center justify-center min-h-[60vh] text-center">
+    <div class="text-8xl font-black text-gradient mb-4" aria-hidden="true">404</div>
+    <h1 class="text-2xl font-bold text-text mb-2">Página no encontrada</h1>
+    <p class="text-subtext1 mb-8 max-w-md">
+      Esta herramienta no existe en el vault... todavía.
+      Prueba buscando lo que necesitas.
+    </p>
+
+    <div class="flex flex-wrap gap-3 justify-center">
+      <button
+        id="search-404"
+        class="flex items-center gap-2 bg-blue hover:bg-lavender text-crust font-semibold px-5 py-2.5 rounded-lg transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Buscar herramienta
+      </button>
+      <a
+        href="/"
+        class="flex items-center gap-2 bg-surface0 hover:bg-surface1 text-text border border-surface1 font-medium px-5 py-2.5 rounded-lg transition-colors"
+      >
+        Volver al inicio
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  document.getElementById('search-404')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-command-palette'));
+  });
+</script>

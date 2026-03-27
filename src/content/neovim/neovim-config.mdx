@@ -1,0 +1,131 @@
+---
+name: Neovim Config Essencial
+description: Configuración base de Neovim con las opciones, keymaps y estructura de ficheros recomendadas para empezar bien.
+category: neovim
+tags: [neovim, config, lua, keymaps, options, setup]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+addedAt: 2025-02-06
+---
+
+Una buena configuración base de Neovim es el cimiento sobre el que construyes todo lo demás. Este snippet cubre las opciones esenciales y los keymaps más útiles para tener un entorno sólido desde el primer día.
+
+## Estructura de directorios
+
+```
+~/.config/nvim/
+├── init.lua
+└── lua/
+    └── config/
+        ├── options.lua
+        └── keymaps.lua
+```
+
+En `init.lua` simplemente cargas los módulos:
+
+```lua
+-- ~/.config/nvim/init.lua
+require("config.options")
+require("config.keymaps")
+```
+
+## options.lua
+
+```lua
+-- ~/.config/nvim/lua/config/options.lua
+local opt = vim.opt
+
+-- ── Líneas y columnas ──────────────────────────────────────────
+opt.number         = true     -- números de línea absolutos
+opt.relativenumber = true     -- números relativos (moverse con 5j, 10k)
+opt.cursorline     = true     -- resaltar línea del cursor
+opt.colorcolumn    = "80"     -- guía visual en columna 80
+opt.scrolloff      = 8        -- margen de 8 líneas al desplazarse
+opt.sidescrolloff  = 8
+
+-- ── Indentación ────────────────────────────────────────────────
+opt.tabstop        = 2        -- ancho visual del tab
+opt.shiftwidth     = 2        -- indentación con >> y <<
+opt.softtabstop    = 2
+opt.expandtab      = true     -- convierte tabs en espacios
+opt.smartindent    = true     -- indentación inteligente
+
+-- ── Búsqueda ───────────────────────────────────────────────────
+opt.ignorecase     = true     -- búsqueda sin distinción mayúsculas
+opt.smartcase      = true     -- distingue si escribes mayúsculas
+opt.hlsearch       = false    -- no resalta tras pulsar Enter
+opt.incsearch      = true     -- resalta mientras escribes
+
+-- ── UI y experiencia ───────────────────────────────────────────
+opt.termguicolors  = true     -- colores de 24 bits
+opt.signcolumn     = "yes"    -- columna para signos LSP siempre visible
+opt.wrap           = false    -- sin salto de línea automático
+opt.showmode       = false    -- el modo ya lo muestra la statusline
+opt.pumheight      = 10       -- max 10 entradas en el menú de completado
+opt.completeopt    = "menuone,noselect"
+opt.updatetime     = 250      -- ms antes de actualizar signos y CursorHold
+opt.timeoutlen     = 300      -- ms para secuencias de teclas (which-key)
+
+-- ── Archivos y backups ─────────────────────────────────────────
+opt.swapfile       = false
+opt.backup         = false
+opt.undofile       = true     -- historial de undo persistente entre sesiones
+opt.undodir        = vim.fn.stdpath("data") .. "/undo"
+
+-- ── Splits ─────────────────────────────────────────────────────
+opt.splitright     = true     -- splits verticales abren a la derecha
+opt.splitbelow     = true     -- splits horizontales abren abajo
+
+-- ── Clipboard ─────────────────────────────────────────────────
+opt.clipboard      = "unnamedplus"  -- sincroniza con el portapapeles del sistema
+```
+
+## keymaps.lua
+
+```lua
+-- ~/.config/nvim/lua/config/keymaps.lua
+vim.g.mapleader      = " "    -- Espacio como leader
+vim.g.maplocalleader = " "
+
+local map = vim.keymap.set
+
+-- ── Modos normales ─────────────────────────────────────────────
+-- Salir de insert con jk (más cómodo que Esc)
+map("i", "jk", "<Esc>", { desc = "Salir de Insert" })
+
+-- Guardar rápido
+map("n", "<leader>w", "<cmd>w<cr>", { desc = "Guardar" })
+map("n", "<leader>q", "<cmd>q<cr>", { desc = "Cerrar" })
+map("n", "<leader>Q", "<cmd>qa!<cr>", { desc = "Cerrar todo" })
+
+-- ── Navegación entre ventanas (Ctrl + hjkl) ────────────────────
+map("n", "<C-h>", "<C-w>h", { desc = "Ventana izquierda" })
+map("n", "<C-j>", "<C-w>j", { desc = "Ventana abajo" })
+map("n", "<C-k>", "<C-w>k", { desc = "Ventana arriba" })
+map("n", "<C-l>", "<C-w>l", { desc = "Ventana derecha" })
+
+-- ── Gestión de buffers ─────────────────────────────────────────
+map("n", "<S-h>",       "<cmd>bprevious<cr>",   { desc = "Buffer anterior" })
+map("n", "<S-l>",       "<cmd>bnext<cr>",        { desc = "Buffer siguiente" })
+map("n", "<leader>bd",  "<cmd>bdelete<cr>",      { desc = "Cerrar buffer" })
+
+-- ── Indentación sin perder la selección ────────────────────────
+map("v", "<", "<gv", { desc = "Indentar izquierda" })
+map("v", ">", ">gv", { desc = "Indentar derecha" })
+
+-- ── Mover líneas seleccionadas ─────────────────────────────────
+map("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Mover selección abajo" })
+map("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Mover selección arriba" })
+
+-- ── Diagnósticos LSP ──────────────────────────────────────────
+map("n", "[d",          vim.diagnostic.goto_prev,  { desc = "Diagnóstico anterior" })
+map("n", "]d",          vim.diagnostic.goto_next,  { desc = "Diagnóstico siguiente" })
+map("n", "<leader>e",   vim.diagnostic.open_float, { desc = "Ver diagnóstico" })
+map("n", "<leader>dl",  vim.diagnostic.setloclist, { desc = "Lista de diagnósticos" })
+
+-- ── Limpiar búsqueda resaltada ─────────────────────────────────
+map("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "Limpiar resaltado" })
+```
+
+Con esta base tienes número relativo (imprescindible para moverse con `5j` / `10k`), undo persistente entre sesiones, y todos los keymaps esenciales para un flujo de trabajo eficiente sin depender del ratón.

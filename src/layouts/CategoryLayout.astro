@@ -1,0 +1,62 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ToolCard from '../components/tools/ToolCard.astro';
+import CategoryFilterIsland from '../components/search/CategoryFilterIsland';
+import { CATEGORY_CONFIG } from '../lib/utils';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  category: string;
+  entries: CollectionEntry<any>[];
+}
+
+const { category, entries } = Astro.props;
+const config = CATEGORY_CONFIG[category as keyof typeof CATEGORY_CONFIG];
+
+if (!config) throw new Error(`Unknown category: ${category}`);
+
+// Get all unique tags in this category
+const allTags = [...new Set(entries.flatMap((e) => e.data.tags))].sort();
+
+// Serialize entries for client-side filtering
+const serializedEntries = entries.map((e) => ({
+  slug: e.id,
+  name: e.data.name,
+  description: e.data.description,
+  tags: e.data.tags,
+  os: e.data.os,
+  featured: e.data.featured,
+  difficulty: e.data.difficulty,
+  install: e.data.install,
+  addedAt: e.data.addedAt.toISOString(),
+}));
+---
+
+<BaseLayout title={config.label} description={config.description}>
+  <!-- Hero header for category -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-3">
+      <div
+        class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-crust"
+        style={`background-color: ${config.accent};`}
+        aria-hidden="true"
+      >
+        {config.label.charAt(0)}
+      </div>
+      <div>
+        <h1 class="text-2xl font-bold text-text">{config.label}</h1>
+        <p class="text-sm text-subtext0">{entries.length} herramienta{entries.length !== 1 ? 's' : ''}</p>
+      </div>
+    </div>
+    <p class="text-subtext1 max-w-2xl">{config.description}</p>
+  </div>
+
+  <!-- Filter island + dynamic grid -->
+  <CategoryFilterIsland
+    client:load
+    tags={allTags}
+    entries={serializedEntries}
+    category={category}
+    accent={config.accent}
+  />
+</BaseLayout>

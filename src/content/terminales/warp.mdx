@@ -1,0 +1,89 @@
+---
+name: Warp
+description: Terminal moderno con IA integrada, bloques de salida editables y colaboración en equipo.
+category: terminales
+tags: [terminal, ai, blocks, modern, collaboration]
+os: [macos, linux]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install --cask warp
+  manual: https://www.warp.dev/
+links:
+  repo: https://github.com/warpdotdev/Warp
+  website: https://www.warp.dev/
+addedAt: 2025-01-11
+---
+
+## ¿Qué es Warp?
+
+Warp es un emulador de terminal radicalmente diferente a todo lo que existía antes. Construido con Rust y una interfaz gráfica propia (no usa WebView), reinventa el paradigma del terminal desde cero. En lugar de tratar la salida como un flujo de texto sin estructura, Warp organiza cada comando y su salida en **bloques** independientes y navegables.
+
+Disponible para macOS y Linux (con versión Windows en camino), Warp ha recibido más de 30 millones de dólares en financiación y se ha convertido en el terminal favorito de muchos desarrolladores que valoran la productividad sobre la pureza minimalista.
+
+## Bloques: el paradigma central
+
+La innovación más importante de Warp son los **bloques de comando**. Cada vez que ejecutas un comando, el terminal crea un bloque que contiene:
+
+- El comando exacto que escribiste
+- Toda la salida generada
+- El tiempo de ejecución
+- El código de salida (exit code)
+
+Puedes hacer clic en cualquier bloque para seleccionarlo, copiarlo completo, compartirlo como permalink, o buscar dentro de él. El scrollback se convierte en un historial navegable y organizado.
+
+```bash
+# Navegar entre bloques con teclado
+Cmd+Up   # Bloque anterior
+Cmd+Down # Bloque siguiente
+Cmd+A    # Seleccionar todo el bloque actual
+```
+
+## IA integrada: Warp AI
+
+Warp incluye IA directamente en el terminal. Puedes activarla con `Ctrl+\` y escribir en lenguaje natural:
+
+```
+# Ejemplos de consultas a Warp AI
+"find all files larger than 100MB modified in the last week"
+"docker command to run a postgres container with persistent volume"
+"explain what this regex does: ^(?=.*[A-Z])(?=.*\d).{8,}$"
+"why is my npm install failing with EACCES"
+```
+
+La IA entiende el contexto de tu directorio actual, el historial de comandos recientes y el sistema operativo. No solo genera el comando: lo inserta directamente en tu input para que puedas editarlo antes de ejecutar.
+
+## Warp Drive: workflows compartidos
+
+Warp Drive es el sistema de colaboración en equipo. Permite guardar y compartir:
+
+- **Workflows**: secuencias de comandos con parámetros editables
+- **Notebooks**: documentos que combinan markdown y bloques ejecutables
+- **Snippets**: comandos frecuentes con descripción y etiquetas
+
+```bash
+# Ejemplo de workflow parametrizado en Warp Drive
+# Nombre: Deploy a staging
+docker build -t {{IMAGE_NAME}}:{{TAG}} . && \
+docker push {{REGISTRY}}/{{IMAGE_NAME}}:{{TAG}} && \
+kubectl set image deployment/{{APP}} app={{REGISTRY}}/{{IMAGE_NAME}}:{{TAG}}
+```
+
+## Editor de input moderno
+
+El área de input de Warp no es una línea de texto simple: es un editor completo con:
+
+- Selección de texto con mouse y teclado
+- Historial de comandos con búsqueda fuzzy integrada (`Ctrl+R`)
+- Sugerencias de autocompletado contextuales
+- Edición multilínea natural (los saltos de línea no ejecutan el comando)
+
+## Pro Tips
+
+**Compartir un bloque:** Haz clic derecho en cualquier bloque y selecciona "Share" para obtener un permalink público con sintaxis highlighting.
+
+**Búsqueda en historial:** `Ctrl+R` abre una búsqueda fuzzy sobre todo tu historial de comandos, con preview de la salida anterior de cada comando.
+
+**Temas y fuentes:** Warp incluye soporte nativo para Catppuccin y docenas de temas populares. Ve a Settings > Appearance para configurarlo sin editar archivos de texto.
+
+**SSH nativo:** Warp mantiene la experiencia de bloques incluso en sesiones SSH remotas cuando el servidor tiene instalado el agente de Warp.

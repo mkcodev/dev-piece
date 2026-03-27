@@ -1,0 +1,128 @@
+---
+name: which-key.nvim
+description: Muestra los keymaps disponibles en un popup. Descubre atajos y documenta tu configuración de Neovim.
+category: neovim
+tags: [neovim, keymaps, discovery, documentation, which-key]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  manual: Via lazy.nvim
+links:
+  repo: https://github.com/folke/which-key.nvim
+addedAt: 2025-02-10
+---
+
+`which-key.nvim` convierte tu `<leader>` en un sistema de menús autodocumentado. Cuando pulsas `<Space>` y esperas un momento, aparece un popup con todos los keymaps disponibles agrupados por categoría. Es especialmente valioso cuando empiezas con Neovim o cuando vuelves a un keymap que no usas con frecuencia.
+
+## Instalación con lazy.nvim
+
+```lua
+-- lua/plugins/ui.lua
+return {
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",   -- carga después del inicio para no ralentizar
+    opts = {
+      preset  = "modern", -- "classic", "modern" o "helix"
+      delay   = 300,      -- ms de espera antes de mostrar el popup
+      plugins = {
+        marks      = true,
+        registers  = true,
+        spelling   = { enabled = true, suggestions = 20 },
+      },
+      icons = {
+        breadcrumb = "»",
+        separator  = "→",
+        group      = "+",
+      },
+      win = {
+        border   = "rounded",
+        padding  = { 1, 2 },
+      },
+      layout = {
+        width  = { min = 20 },
+        spacing = 3,
+      },
+    },
+    keys = {
+      {
+        "<leader>?",
+        function() require("which-key").show({ global = false }) end,
+        desc = "Keymaps del buffer",
+      },
+    },
+    config = function(_, opts)
+      local wk = require("which-key")
+      wk.setup(opts)
+
+      -- Registrar grupos de prefijos
+      wk.add({
+        -- Grupo Find (Telescope)
+        { "<leader>f",  group = "find" },
+        { "<leader>ff", desc  = "Buscar archivos" },
+        { "<leader>fg", desc  = "Buscar texto" },
+        { "<leader>fb", desc  = "Buscar buffers" },
+        { "<leader>fh", desc  = "Buscar ayuda" },
+        { "<leader>fr", desc  = "Archivos recientes" },
+
+        -- Grupo Git
+        { "<leader>g",  group = "git" },
+        { "<leader>gc", desc  = "Commits" },
+        { "<leader>gb", desc  = "Branches" },
+        { "<leader>gs", desc  = "Status" },
+
+        -- Grupo LSP / Code
+        { "<leader>c",  group = "code" },
+        { "<leader>ca", desc  = "Code actions" },
+        { "<leader>cr", desc  = "Renombrar" },
+        { "<leader>cf", desc  = "Formatear" },
+
+        -- Grupo Buffer
+        { "<leader>b",  group = "buffer" },
+        { "<leader>bd", desc  = "Cerrar buffer" },
+        { "<leader>bn", desc  = "Nuevo buffer" },
+
+        -- Grupo Debug
+        { "<leader>d",  group = "debug" },
+
+        -- Grupo Tests
+        { "<leader>t",  group = "test" },
+
+        -- Grupo UI
+        { "<leader>u",  group = "ui" },
+        { "<leader>un", desc  = "Notificaciones" },
+
+        -- Grupo Window
+        { "<leader>w",  group = "window",  proxy = "<c-w>" },
+      })
+    end,
+  },
+}
+```
+
+## Cómo mejora la descubribilidad
+
+Sin which-key, aprender los keymaps de Neovim requiere memorización bruta o consultar constantemente la documentación. Con which-key, el flujo es diferente:
+
+```
+1. Pulsas <leader>           → ves todos los grupos (f, g, c, b...)
+2. Pulsas <leader>f          → ves todos los keymaps de "find"
+3. Pulsas <leader>ff         → ejecuta Telescope find_files
+```
+
+Esto funciona con cualquier prefijo de tecla, no solo `<leader>`. Por ejemplo, `g` en modo normal muestra `gd`, `gr`, `gc`, `gg`, `G`, etc. con sus descripciones.
+
+## Mostrar todos los keymaps del buffer
+
+```vim
+:WhichKey          " todos los keymaps
+:WhichKey <leader> " solo los del leader
+```
+
+O con el keymap registrado:
+
+```
+<leader>?   → keymaps del buffer actual
+```
+
+La clave para sacar el máximo partido a which-key es añadir siempre el campo `desc = "..."` cuando defines un keymap. Esa descripción es exactamente lo que aparece en el popup, así que cuanto más descriptiva sea, más útil resulta el sistema.

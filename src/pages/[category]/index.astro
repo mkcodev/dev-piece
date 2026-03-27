@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import CategoryLayout from '../../layouts/CategoryLayout.astro';
+import { CATEGORY_CONFIG } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const category of Object.keys(CATEGORY_CONFIG)) {
+    let entries: any[] = [];
+    try {
+      entries = await getCollection(category as any);
+    } catch {
+      entries = [];
+    }
+    paths.push({ params: { category }, props: { entries } });
+  }
+  return paths;
+}
+
+const { category } = Astro.params;
+const { entries } = Astro.props;
+---
+
+<CategoryLayout category={category!} entries={entries} />

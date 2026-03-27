@@ -1,0 +1,123 @@
+---
+name: Harpoon 2
+description: Marcadores de archivos rápidos para Neovim de ThePrimeagen. Navega entre tus 4 archivos más importantes en nanosegundos.
+category: neovim
+tags: [neovim, navigation, marks, files, quick-access, harpoon]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  manual: Via lazy.nvim
+links:
+  repo: https://github.com/ThePrimeagen/harpoon
+addedAt: 2025-02-08
+---
+
+Harpoon resuelve un problema muy concreto: en cualquier tarea de programación, trabajas principalmente con 3-5 archivos. Telescope es genial para encontrar archivos nuevos, pero para los archivos en los que estás trabajando ahora mismo, Harpoon es insuperable. Cambias entre ellos sin escribir nada, sin fuzzy finding, instantáneamente.
+
+## Instalación con lazy.nvim
+
+```lua
+-- lua/plugins/editor.lua
+return {
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      {
+        "<leader>a",
+        function() require("harpoon"):list():add() end,
+        desc = "Harpoon: añadir archivo",
+      },
+      {
+        "<C-e>",
+        function() require("harpoon").ui:toggle_quick_menu(require("harpoon"):list()) end,
+        desc = "Harpoon: menú",
+      },
+      {
+        "<C-1>",
+        function() require("harpoon"):list():select(1) end,
+        desc = "Harpoon: ir a archivo 1",
+      },
+      {
+        "<C-2>",
+        function() require("harpoon"):list():select(2) end,
+        desc = "Harpoon: ir a archivo 2",
+      },
+      {
+        "<C-3>",
+        function() require("harpoon"):list():select(3) end,
+        desc = "Harpoon: ir a archivo 3",
+      },
+      {
+        "<C-4>",
+        function() require("harpoon"):list():select(4) end,
+        desc = "Harpoon: ir a archivo 4",
+      },
+      -- Navegar en orden anterior/siguiente
+      {
+        "<C-S-P>",
+        function() require("harpoon"):list():prev() end,
+        desc = "Harpoon: anterior",
+      },
+      {
+        "<C-S-N>",
+        function() require("harpoon"):list():next() end,
+        desc = "Harpoon: siguiente",
+      },
+    },
+    config = function()
+      require("harpoon"):setup({
+        settings = {
+          save_on_toggle = true,   -- guarda al cerrar el menú
+          sync_on_ui_close = true,
+        },
+      })
+    end,
+  },
+}
+```
+
+## Flujo de trabajo típico
+
+El flujo de Harpoon es muy simple pero extremadamente efectivo:
+
+```
+1. Abres el archivo que necesitas (con Telescope o :e)
+2. Pulsas <leader>a  → el archivo queda "harpooneado"
+3. Repites para los 2-4 archivos principales de la tarea
+4. Desde cualquier lugar: Ctrl+1, Ctrl+2, Ctrl+3, Ctrl+4
+   para saltar directamente al archivo correspondiente
+5. Ctrl+e abre el menú para reordenar o eliminar entradas
+```
+
+## Integración con Telescope
+
+Puedes ver tu lista de Harpoon desde Telescope para búsqueda fuzzy sobre los archivos marcados:
+
+```lua
+-- Añade en la configuración de telescope o en keymaps
+local harpoon = require("harpoon")
+local conf    = require("telescope.config").values
+
+local function toggle_telescope(harpoon_files)
+  local file_paths = {}
+  for _, item in ipairs(harpoon_files.items) do
+    table.insert(file_paths, item.value)
+  end
+  require("telescope.pickers").new({}, {
+    prompt_title = "Harpoon",
+    finder = require("telescope.finders").new_table({ results = file_paths }),
+    previewer = conf.file_previewer({}),
+    sorter = conf.generic_sorter({}),
+  }):find()
+end
+
+vim.keymap.set("n", "<C-e>", function()
+  toggle_telescope(harpoon:list())
+end, { desc = "Harpoon: menú con Telescope" })
+```
+
+## Por qué Harpoon en lugar de solo buffers
+
+Los buffers de Neovim acumulan archivos con el tiempo. Harpoon es intencional: solo tienes en la lista lo que tú decides, y los números del 1 al 4 son posiciones fijas que no cambian salvo que tú lo decidas. Esto convierte la navegación en un reflejo muscular: `Ctrl+1` es siempre el componente principal, `Ctrl+2` es siempre los tests, `Ctrl+3` es siempre el archivo de rutas. Sin pensar, sin buscar.

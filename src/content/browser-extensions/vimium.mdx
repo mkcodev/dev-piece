@@ -1,0 +1,105 @@
+---
+name: Vimium
+description: Navega el navegador con Vim keybindings. Keyboard-only browsing una vez que lo pruebas no puedes volver atrás.
+category: browser-extensions
+tags: [browser, vim, keyboard, navigation, productivity]
+os: [cross]
+featured: true
+difficulty: intermediate
+links:
+  website: https://vimium.github.io/
+addedAt: 2025-02-17
+---
+
+Vimium añade los keybindings de Vim al navegador. El resultado es que puedes navegar por páginas, abrir enlaces, cambiar de tab y gestionar el historial sin tocar el ratón. Una vez que lo integras en tu flujo, la idea de usar el ratón para navegar páginas se vuelve arcaica.
+
+## Cheatsheet de keybindings esenciales
+
+```
+── Navegación en la página ───────────────────────────────────────
+j / k          → scroll abajo / arriba (una línea)
+d / u          → scroll media página abajo / arriba
+gg / G         → ir al inicio / final de la página
+h / l          → scroll izquierda / derecha
+
+── Abrir enlaces (link hints) ────────────────────────────────────
+f              → activar hints en la pestaña actual (letras amarillas)
+F              → activar hints y abrir en nueva pestaña
+<Alt+f>        → activar hints para múltiples enlaces a la vez
+
+── Pestañas ──────────────────────────────────────────────────────
+J              → pestaña anterior (izquierda)
+K              → pestaña siguiente (derecha)
+t              → nueva pestaña
+x              → cerrar pestaña actual
+X              → restaurar última pestaña cerrada
+<Alt+p>        → fijar/desfijar pestaña
+
+── Navegación de URLs ────────────────────────────────────────────
+o              → abrir URL / búsqueda en la pestaña actual
+O              → abrir URL / búsqueda en nueva pestaña
+b              → abrir marcador en pestaña actual
+B              → abrir marcador en nueva pestaña
+T              → buscar entre las pestañas abiertas
+
+── Historial ─────────────────────────────────────────────────────
+H              → atrás en el historial
+L              → adelante en el historial
+
+── Copiar y navegar ──────────────────────────────────────────────
+yy             → copiar URL de la página actual
+yf             → copiar URL de un enlace (con hints)
+
+── Búsqueda en página ────────────────────────────────────────────
+/              → activar modo búsqueda (como en Vim)
+n / N          → siguiente / anterior resultado
+
+── Modo visual ───────────────────────────────────────────────────
+v              → entrar en modo visual (seleccionar texto)
+V              → seleccionar desde inicio de línea
+```
+
+## Personalización del mapa de teclas
+
+En las opciones de Vimium (icono de extensión → Options) puedes redefinir cualquier keybinding:
+
+```
+# Custom key mappings (sintaxis de Vimium)
+
+# Scroll más rápido
+map J scrollPageDown
+map K scrollPageUp
+
+# Abrir DevTools con <leader>d (no disponible por defecto)
+# map <leader>d openDevTools
+
+# Deshabilitar teclas que interfieren con Gmail
+unmapAll
+map f LinkHints.activateMode
+map F LinkHints.activateModeToOpenInNewTab
+map j scrollDown
+map k scrollUp
+```
+
+## Modo Find (búsqueda)
+
+Vimium reutiliza la mecánica de búsqueda de Vim: `/` activa el campo de búsqueda en la parte inferior, escribes el término, `Enter` o `n`/`N` navegan entre resultados y `Esc` cierra el modo sin mover el cursor.
+
+## Marcas (marks)
+
+```
+m{letra}     → crear marca en la posición actual
+`{letra}     → saltar a una marca guardada
+```
+
+Las marcas son globales entre pestañas si usas letras mayúsculas (`mA`, `mB`...), y locales a la página si usas minúsculas.
+
+## Blacklist: páginas donde Vimium no actúa
+
+En la configuración de Vimium, añade patrones de URL donde quieres desactivarlo (útil para Google Docs, Figma, editores online):
+
+```
+https://docs.google.com/*
+https://www.figma.com/*
+https://codepen.io/*
+```

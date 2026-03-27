@@ -1,0 +1,246 @@
+---
+name: btop++
+description: Monitor de recursos del sistema moderno y hermoso. CPU, memoria, disco, red y GPU en tiempo real.
+category: cli-tools
+tags: [system-monitor, resources, cpu, memory, gpu, tui]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install aristocratos.btop4win
+  brew: brew install btop
+  apt: sudo apt install btop
+links:
+  repo: https://github.com/aristocratos/btop
+addedAt: 2025-01-25
+---
+
+## ¿Qué es btop++?
+
+btop++ es el monitor de recursos del sistema más bonito y completo de la terminal. Creado por Aristocratos en C++, muestra en tiempo real el estado de CPU, memoria RAM, swap, discos, red y GPU en una interfaz TUI completamente interactiva.
+
+Es el sucesor espiritual de `htop` y `bpytop` (su predecesor en Python), pero mucho más rápido y con más funcionalidades. La diferencia visual con `top` o `htop` es abismal: btop usa bloques de caracteres para crear gráficas de barras y líneas fluidas en la terminal.
+
+## Lo que muestra btop
+
+- **CPU**: porcentaje por núcleo, frecuencia, temperatura, gráfica histórica
+- **Memoria**: RAM, swap, buffers, caché con gráfica
+- **Procesos**: lista interactiva con filtrado, árbol de procesos, información detallada
+- **Red**: velocidad de upload/download por interfaz con gráfica en tiempo real
+- **Disco**: I/O por dispositivo, espacio utilizado
+- **GPU** (con soporte opcional): temperatura, uso de VRAM, procesos en GPU
+
+## Atajos de teclado
+
+```
+# Navegación
+q / Ctrl+C  → Salir
+F1 / h      → Ayuda
+←/→         → Cambiar sección activa
+↑/↓         → Navegar en lista de procesos
+Page Up/Down → Desplazarse más rápido
+
+# Procesos
+f           → Filtrar procesos (escribir para buscar)
+T           → Árbol de procesos
+r           → Ordenar procesos al revés
+e           → Expandir proceso en árbol
+k           → Enviar señal (kill, SIGTERM, etc.)
+Enter       → Seleccionar proceso
+
+# Vista
+1           → CPU
+2           → Memoria
+3           → Red
+4           → Discos
++/-         → Ajustar tamaño del panel
+m           → Cambiar modo de memoria
+
+# Configuración
+Esc         → Abrir menú de opciones
+p           → Seleccionar preset
+t           → Cambiar tema
+```
+
+## Configuración: Catppuccin Frappé
+
+El archivo de configuración está en `~/.config/btop/btop.conf`:
+
+```ini
+# ~/.config/btop/btop.conf
+
+# Tema
+color_theme = "catppuccin_frappe"
+
+# Actualización cada 2 segundos
+update_ms = 2000
+
+# Mostrar segundos en el reloj
+clock_format = "%H:%M:%S"
+
+# Núcleos de CPU en una sola fila (false = columna)
+cpu_single_graph = False
+
+# Mostrar temperatura de CPU
+check_temp = True
+cpu_sensor = "Auto"
+
+# Unidades de red (b = bits, B = bytes)
+net_download = "10G"
+net_upload = "10G"
+net_auto = True
+net_sync = True
+
+# Procesos
+proc_update_mult = 2
+proc_sorting = "cpu lazy"
+proc_reversed = False
+proc_tree = False
+proc_colors = True
+proc_gradient = True
+proc_per_core = True
+proc_mem_bytes = True
+proc_cpu_graphs = True
+proc_info_smaps = False
+proc_left = False
+
+# Discos a monitorizar
+disks_filter = ""
+io_mode = False
+io_graph_combined = False
+io_graph_speeds = ""
+
+# Mostrar GPU
+gpu_mirror_graph = True
+nvml_measure_pcie_speeds = True
+gpu_warn_temp = 80
+draw_clock = "%H:%M"
+
+# Interfaz
+rounded_corners = True
+graph_symbol = "braille"  # braille | block | tty
+background_update = True
+custom_cpu_name = ""
+shown_boxes = "cpu mem net proc"
+presets = "cpu:1:default,proc:0:default cpu:0:default,mem:0:default,net:0:default cpu:0:block,net:0:tty"
+```
+
+### Instalar el tema Catppuccin
+
+```bash
+# Crear directorio de temas
+mkdir -p ~/.config/btop/themes
+
+# Descargar el tema Catppuccin Frappé
+curl -LO --output-dir ~/.config/btop/themes \
+  https://github.com/catppuccin/btop/raw/main/themes/catppuccin_frappe.theme
+
+# También disponibles: catppuccin_latte, catppuccin_macchiato, catppuccin_mocha
+```
+
+El archivo del tema tiene este formato:
+
+```ini
+# ~/.config/btop/themes/catppuccin_frappe.theme
+
+# Fondos y texto principal
+theme[main_bg]="#303446"
+theme[main_fg]="#c6d0f5"
+theme[title]="#c6d0f5"
+
+# Selección y destacado
+theme[hi_fg]="#8caaee"
+theme[selected_bg]="#414559"
+theme[selected_fg]="#c6d0f5"
+
+# CPU
+theme[graph_bg]="#303446"
+theme[meter_bg]="#414559"
+theme[proc_misc]="#c6d0f5"
+theme[cpu_box]="#626880"
+theme[download_box]="#626880"
+theme[upload_box]="#626880"
+theme[storage_box]="#626880"
+theme[mem_box]="#626880"
+theme[net_box]="#626880"
+theme[proc_box]="#626880"
+theme[div_line]="#626880"
+
+# Texto secundario
+theme[temp_start]="#a6d189"
+theme[temp_mid]="#e5c890"
+theme[temp_end]="#e78284"
+
+theme[cpu_start]="#a6d189"
+theme[cpu_mid]="#e5c890"
+theme[cpu_end]="#e78284"
+
+theme[free_start]="#8caaee"
+theme[free_mid]="#81c8be"
+theme[free_end]="#a6d189"
+
+theme[cached_start]="#ca9ee6"
+theme[cached_mid]="#f4b8e4"
+theme[cached_end]="#eebebe"
+
+theme[available_start]="#a6d189"
+theme[available_mid]="#e5c890"
+theme[available_end]="#e78284"
+
+theme[used_start]="#e78284"
+theme[used_mid]="#ea999c"
+theme[used_end]="#ef9f76"
+
+theme[download_start]="#8caaee"
+theme[download_mid]="#81c8be"
+theme[download_end]="#a6d189"
+
+theme[upload_start]="#ca9ee6"
+theme[upload_mid]="#f4b8e4"
+theme[upload_end]="#e78284"
+
+theme[process_start]="#8caaee"
+theme[process_mid]="#ca9ee6"
+theme[process_end]="#e78284"
+```
+
+## Monitoreo de GPU
+
+Para monitorizar la GPU necesitas:
+
+```bash
+# NVIDIA: instalar nvidia-ml (incluido con drivers NVIDIA)
+# La detección es automática en Linux y Windows
+
+# AMD: compilar btop con soporte ROCm
+# En Arch Linux:
+sudo pacman -S btop-git  # Incluye soporte AMD GPU
+
+# macOS: btop usa IOKit para información de GPU Apple Silicon
+# No hay soporte para GPUs discretas en macOS
+```
+
+```ini
+# Activar en btop.conf
+shown_boxes = "cpu mem net proc gpu"
+gpu_mirror_graph = True
+```
+
+## Comparación: btop vs htop vs top
+
+| Característica | top | htop | btop++ |
+|---|---|---|---|
+| Gráficas | No | Básicas | Avanzadas |
+| GPU | No | No | Si |
+| Temas | No | Limitado | Completo |
+| Red en tiempo real | No | No | Si |
+| Árbol de procesos | No | Si | Si |
+| Interfaz de ratón | No | Básica | Completa |
+| Lenguaje | C | C | C++ |
+
+## Pro Tips
+
+**Presets de vista:** Presiona `p` para alternar entre presets predefinidos de disposición. Btop incluye 3 presets por defecto y puedes crear los tuyos en el archivo de configuración.
+
+**Filtrar procesos:** Presiona `f` en el panel de procesos para filtrar por nombre en tiempo real. Muy útil para encontrar procesos que consumen recursos inesperadamente.
+
+**Vista de árbol de procesos:** Presiona `T` para alternar entre vista plana y árbol jerárquico de procesos padre/hijo. Esencial para diagnosticar qué proceso inició un proceso hijo problemático.

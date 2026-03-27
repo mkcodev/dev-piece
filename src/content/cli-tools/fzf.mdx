@@ -1,0 +1,157 @@
+---
+name: fzf
+description: El fuzzy finder interactivo de línea de comandos más famoso. Filtra cualquier lista con búsqueda difusa.
+category: cli-tools
+tags: [fuzzy-finder, search, interactive, shell-integration]
+os: [windows, macos, linux]
+featured: true
+difficulty: intermediate
+install:
+  winget: winget install junegunn.fzf
+  brew: brew install fzf
+  apt: sudo apt install fzf
+links:
+  repo: https://github.com/junegunn/fzf
+addedAt: 2025-01-17
+---
+
+## ¿Qué es fzf?
+
+fzf es el fuzzy finder más popular de la comunidad CLI. Creado por Junegunn Choi, toma cualquier lista de texto como entrada y permite filtrarla interactivamente con búsqueda difusa (fuzzy matching): no necesitas escribir el texto exacto, solo suficientes caracteres para que fzf encuentre lo que buscas.
+
+Es una de las herramientas más versátiles del ecosistema: busca archivos, historial de comandos, procesos, ramas de git, variables de entorno, puertos abiertos y cualquier otra cosa que puedas convertir en una lista de texto.
+
+## Atajos de teclado integrados en el shell
+
+Tras instalar fzf, ejecuta `$(fzf --zsh)` o `$(fzf --bash)` para activar los atajos. Los tres más importantes:
+
+```bash
+Ctrl+R   # Búsqueda fuzzy en historial de comandos
+Ctrl+T   # Fuzzy finder de archivos (inserta la ruta seleccionada)
+Alt+C    # Fuzzy finder de directorios (navega al seleccionado)
+```
+
+## Configuración en ~/.zshrc o ~/.bashrc
+
+```bash
+# Inicialización
+eval "$(fzf --zsh)"   # zsh
+# eval "$(fzf --bash)" # bash
+
+# Variables de entorno
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
+
+export FZF_DEFAULT_OPTS="
+  --height 50%
+  --layout=reverse
+  --border=rounded
+  --info=inline
+  --prompt='❯ '
+  --pointer='▶'
+  --marker='✓'
+  --bind 'ctrl-/:toggle-preview'
+  --bind 'ctrl-u:preview-half-page-up'
+  --bind 'ctrl-d:preview-half-page-down'
+  --color=bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284
+  --color=fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf
+  --color=marker:#f2d5cf,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284
+  --color=border:#626880,label:#a5adce
+"
+
+# Ctrl+T con preview usando bat
+export FZF_CTRL_T_OPTS="
+  --preview 'bat --color=always --style=numbers --line-range=:100 {}'
+  --preview-window 'right:60%:border-rounded'
+"
+
+# Alt+C con preview de árbol de directorios
+export FZF_ALT_C_OPTS="
+  --preview 'eza --tree --level=2 --color=always {}'
+  --preview-window 'right:50%:border-rounded'
+"
+
+# Ctrl+R con preview del comando completo
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}'
+  --preview-window 'down:3:wrap'
+  --bind 'ctrl-/:toggle-preview'
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort'
+  --color header:italic
+  --header 'Ctrl+Y para copiar al clipboard'
+"
+```
+
+## fzf con git
+
+```bash
+# Funciones útiles para git + fzf
+
+# Checkout de ramas con preview del log
+fgb() {
+  local branch
+  branch=$(git branch -a --color=always | grep -v '/HEAD\s' | sort |
+    fzf --ansi --height=50% --reverse --tac \
+        --preview 'git log --oneline --graph --color=always --abbrev-commit --date=relative $(echo {} | sed "s/.* //" | sed "s#remotes/[^/]*/##")' \
+        --preview-window 'right:60%' |
+    sed 's/.* //' | sed 's#remotes/[^/]*/##')
+  git checkout "$branch"
+}
+
+# Log de git interactivo
+fgl() {
+  git log --oneline --graph --color=always |
+    fzf --ansi --no-sort --reverse --tiebreak=index \
+        --preview 'git show --color=always $(echo {} | grep -o "[a-f0-9]\{7\}")' \
+        --preview-window 'right:60%' \
+        --bind 'enter:execute(git show --color=always $(echo {} | grep -o "[a-f0-9]\{7\}") | less -R)'
+}
+
+# Stash interactivo
+fgs() {
+  local out q k sha
+  while out=$(
+    git stash list --pretty="%C(yellow)%h %>(14)%Cgreen%cr %C(blue)%gs" |
+    fzf --ansi --no-sort --query="$q" --print-query \
+        --expect=ctrl-d,ctrl-p \
+        --preview 'git stash show --color=always -p $(echo {} | cut -d" " -f1)' \
+        --preview-window 'right:60%'
+  ); do
+    sha=$(tail -1 <<< "$out" | cut -d" " -f1)
+    [[ -z "$sha" ]] && break
+    git stash pop "$sha"
+  done
+}
+```
+
+## Uso básico con pipes
+
+```bash
+# Buscar en procesos y matar el seleccionado
+kill -9 $(ps aux | fzf | awk '{print $2}')
+
+# Abrir archivo en Neovim
+nvim $(fzf --preview 'bat --color=always {}')
+
+# Seleccionar variable de entorno
+printenv | fzf
+
+# Buscar en ramas remotas y hacer checkout
+git branch -r | fzf | xargs git checkout
+
+# Filtrar packages de npm instalados globalmente
+npm list -g --depth=0 | fzf
+```
+
+## Pro Tips
+
+**Multi-selección:** Usa `--multi` (o `-m`) para seleccionar múltiples entradas con `Tab`. Muy útil para staging de archivos en git:
+
+```bash
+git add $(git status -s | fzf -m --preview 'git diff --color=always {2}' | awk '{print $2}')
+```
+
+**Integración con Neovim:** El plugin `fzf-lua` o `telescope.nvim` llevan fzf dentro del editor para buscar archivos, buffers, grep y más.
+
+**fzf en scripts:** Usa `--exit-0` para que fzf salga limpiamente si no hay resultados, y `--select-1` para seleccionar automáticamente si solo hay una opción.

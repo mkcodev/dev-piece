@@ -1,0 +1,132 @@
+---
+name: Docker Power Commands
+description: "Los comandos de Docker más útiles para el día a día: limpieza, debug, inspección y automatización de containers."
+category: snippets
+tags: [docker, cleanup, compose, containers, volumes, devops]
+os: [windows, macos, linux]
+difficulty: intermediate
+addedAt: 2025-02-03
+---
+
+Docker acumula capas, imágenes y volúmenes muertos con rapidez. Saber limpiarlo, inspeccionarlo y automatizarlo es tan importante como saber usarlo. Esta colección cubre los comandos que usarás en cada jornada de trabajo.
+
+## Limpieza del sistema
+
+```bash
+# Limpieza total: containers parados, imágenes huérfanas, redes y build cache
+docker system prune -af --volumes
+
+# Solo imágenes "dangling" (sin nombre ni tag)
+docker image prune -f
+
+# Solo volúmenes sin usar
+docker volume prune -f
+
+# Solo redes sin usar
+docker network prune -f
+
+# Ver cuánto espacio ocupa Docker antes de limpiar
+docker system df
+docker system df -v   # detallado
+```
+
+## Acceso y debug de containers
+
+```bash
+# Shell interactiva en un container en ejecución
+docker exec -it <nombre_o_id> bash
+docker exec -it <nombre_o_id> sh    # si no tiene bash
+
+# Shell en una imagen sin levantar compose
+docker run --rm -it <imagen>:latest bash
+
+# Ver logs en tiempo real
+docker logs -f <container>
+docker logs -f --tail 100 <container>   # solo últimas 100 líneas
+
+# Logs con timestamps
+docker logs -t <container>
+```
+
+## Inspección rápida
+
+```bash
+# IP de un container
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <container>
+
+# Variables de entorno
+docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' <container>
+
+# Todos los puertos mapeados
+docker inspect -f '{{json .NetworkSettings.Ports}}' <container> | jq
+
+# Estadísticas en vivo de CPU/memoria
+docker stats
+docker stats --no-stream    # snapshot único, no interactivo
+```
+
+## Aliases y funciones útiles
+
+Añade esto a tu `.bashrc` / `.zshrc`:
+
+```bash
+alias d='docker'
+alias dc='docker compose'
+alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'
+alias dlog='docker logs -f'
+alias dprune='docker system prune -af --volumes'
+
+# Entrar al shell del primer container que coincida con el nombre
+dsh() {
+  docker exec -it "$(docker ps -qf name="$1" | head -1)" bash
+}
+
+# Detener y borrar todos los containers en ejecución
+docker-nuke() {
+  docker stop $(docker ps -aq) 2>/dev/null
+  docker rm   $(docker ps -aq) 2>/dev/null
+}
+
+# Alias para compose en proyectos
+alias cup='docker compose up -d'
+alias cdown='docker compose down'
+alias crestart='docker compose restart'
+alias cbuild='docker compose up -d --build'
+```
+
+## Multi-arch build (buildx)
+
+```bash
+# Crear un builder con soporte multi-plataforma
+docker buildx create --use --name multiarch
+
+# Build y push para amd64 y arm64
+docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  -t usuario/imagen:latest \
+  --push .
+
+# Ver builders disponibles
+docker buildx ls
+```
+
+## Docker Compose en el día a día
+
+```bash
+# Levantar servicios específicos
+docker compose up -d db redis
+
+# Rebuildar solo un servicio
+docker compose up -d --build api
+
+# Ver logs de todos los servicios a la vez
+docker compose logs -f
+
+# Ejecutar un comando en un servicio sin levantar container nuevo
+docker compose exec api sh
+
+# Escalar un servicio
+docker compose up -d --scale worker=3
+```
+
+El comando `docker system df` es especialmente valioso antes de limpiar: muestra exactamente cuántos GB ocupa cada categoría (imágenes, containers, volúmenes y build cache), para que sepas lo que vas a recuperar antes de ejecutar el prune.

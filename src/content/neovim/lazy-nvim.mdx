@@ -1,0 +1,131 @@
+---
+name: lazy.nvim
+description: El gestor de plugins más rápido para Neovim. Carga lazy por defecto, UI hermosa y gestión declarativa.
+category: neovim
+tags: [plugin-manager, fast, lazy-loading, lua, neovim]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  manual: Bootstrap automático en init.lua
+links:
+  repo: https://github.com/folke/lazy.nvim
+addedAt: 2025-02-05
+---
+
+`lazy.nvim` es el gestor de plugins estándar de facto para Neovim moderno. Su nombre resume su filosofía: los plugins se cargan de forma perezosa (*lazy*) por defecto, lo que mantiene el tiempo de inicio de Neovim por debajo de los 50ms incluso con decenas de plugins instalados.
+
+## Bootstrap en init.lua
+
+El bootstrap auto-instala `lazy.nvim` si no está presente. Pega esto en tu `~/.config/nvim/init.lua`:
+
+```lua
+-- ~/.config/nvim/init.lua
+
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "--branch=stable",
+    lazyrepo, lazypath,
+  })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Error clonando lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+    }, true, {})
+    os.exit(1)
+  end
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Cargar opciones y keymaps antes de plugins
+require("config.options")
+require("config.keymaps")
+
+-- Inicializar lazy.nvim
+require("lazy").setup({
+  spec = {
+    { import = "plugins" },   -- importa todos los archivos en lua/plugins/
+  },
+  defaults = { lazy = true }, -- todos los plugins son lazy por defecto
+  install = { colorscheme = { "catppuccin", "habamax" } },
+  checker = { enabled = true, notify = false }, -- auto-check updates
+  performance = {
+    rtp = {
+      disabled_plugins = {
+        "gzip", "matchit", "matchparen",
+        "netrwPlugin", "tarPlugin", "tohtml",
+        "tutor", "zipPlugin",
+      },
+    },
+  },
+})
+```
+
+## Estructura de directorios recomendada
+
+```
+~/.config/nvim/
+├── init.lua                  ← bootstrap + require("lazy").setup()
+└── lua/
+    ├── config/
+    │   ├── options.lua       ← vim.opt.*
+    │   ├── keymaps.lua       ← vim.keymap.set()
+    │   └── autocmds.lua      ← vim.api.nvim_create_autocmd()
+    └── plugins/
+        ├── colorscheme.lua   ← catppuccin, etc.
+        ├── editor.lua        ← telescope, harpoon, etc.
+        ├── lsp.lua           ← lsp-zero, mason, nvim-cmp
+        ├── treesitter.lua    ← nvim-treesitter
+        └── ui.lua            ← lualine, bufferline, etc.
+```
+
+Cada archivo en `lua/plugins/` devuelve una tabla con la especificación del plugin o una lista de especificaciones.
+
+## Cómo funciona la carga lazy
+
+```lua
+-- lua/plugins/editor.lua
+return {
+  -- Se carga solo al ejecutar el comando :Telescope
+  {
+    "nvim-telescope/telescope.nvim",
+    cmd = "Telescope",
+    keys = { { "<leader>ff", "<cmd>Telescope find_files<cr>" } },
+    dependencies = { "nvim-lua/plenary.nvim" },
+  },
+
+  -- Se carga cuando se abre un buffer con código
+  {
+    "nvim-treesitter/nvim-treesitter",
+    event = { "BufReadPre", "BufNewFile" },
+    build = ":TSUpdate",
+  },
+
+  -- Se carga inmediatamente (lazy = false)
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    lazy = false,
+    priority = 1000,   -- carga primero entre los no-lazy
+    config = function()
+      vim.cmd.colorscheme("catppuccin-mocha")
+    end,
+  },
+}
+```
+
+## Gestión del lockfile
+
+`lazy.nvim` genera `~/.config/nvim/lazy-lock.json` con las versiones exactas de cada plugin. Commitearlo en tu dotfiles garantiza reproducibilidad: cualquier máquina nueva tendrá exactamente los mismos commits de plugins.
+
+```bash
+# Comandos dentro de Neovim
+:Lazy          # abre la UI principal
+:Lazy update   # actualiza todos los plugins
+:Lazy sync     # instala/actualiza/limpia según el lockfile
+:Lazy restore  # restaura versiones del lockfile
+:Lazy profile  # muestra tiempo de carga de cada plugin
+```

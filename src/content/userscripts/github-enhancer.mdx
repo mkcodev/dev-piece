@@ -1,0 +1,158 @@
+---
+name: GitHub Enhancer UserScript
+description: Conjunto de mejoras para GitHub via Tampermonkey. Vista de código mejorada, shortcuts adicionales y más.
+category: userscripts
+tags: [userscripts, github, tampermonkey, browser, productivity, greasemonkey]
+os: [cross]
+difficulty: intermediate
+addedAt: 2025-03-20
+---
+
+## Userscripts: superpoderes para cualquier web
+
+Los userscripts son fragmentos de JavaScript que se inyectan en páginas web para modificar su comportamiento. Con Tampermonkey puedes mejorar GitHub (u cualquier web) sin esperar a que el equipo de GitHub implemente lo que necesitas.
+
+## Instalar Tampermonkey
+
+Tampermonkey es la extensión más usada para gestionar userscripts:
+
+- **Chrome / Edge:** [Tampermonkey en Chrome Web Store](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
+- **Firefox:** [Tampermonkey en Firefox Add-ons](https://addons.mozilla.org/es/firefox/addon/tampermonkey/)
+
+Alternativas: **Violentmonkey** (open source, recomendado) y **Greasemonkey** (Firefox, el original).
+
+## Script: GitHub Enhancer
+
+Guarda este script en Tampermonkey (Dashboard → New Script):
+
+```javascript
+// ==UserScript==
+// @name         GitHub Enhancer
+// @namespace    https://github.com/
+// @version      1.0.0
+// @description  Mejoras de productividad para GitHub
+// @author       Tu Nombre
+// @match        https://github.com/*
+// @grant        GM_addStyle
+// @grant        GM_setValue
+// @grant        GM_getValue
+// ==/UserScript==
+
+(function () {
+  'use strict';
+
+  // ── 1. Aumenta el ancho del contenido en repos ──────────────
+  GM_addStyle(`
+    .container-xl, .container-lg {
+      max-width: 1400px !important;
+    }
+    /* Fuente monoespaciada para visualizar código */
+    .blob-code-content, .highlight pre {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+      font-size: 13px !important;
+    }
+  `);
+
+  // ── 2. Añade botón "Copy path" a archivos ───────────────────
+  function addCopyPathButton() {
+    const breadcrumb = document.querySelector('.breadcrumb');
+    if (!breadcrumb || document.getElementById('ghx-copy-path')) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'ghx-copy-path';
+    btn.textContent = '📋 Copy path';
+    btn.style.cssText = `
+      margin-left: 8px; padding: 2px 8px;
+      font-size: 12px; cursor: pointer;
+      border: 1px solid #30363d; border-radius: 6px;
+      background: #21262d; color: #c9d1d9;
+    `;
+
+    btn.addEventListener('click', () => {
+      const path = window.location.pathname
+        .split('/').slice(3).join('/');  // Quita /owner/repo/blob/branch/
+      navigator.clipboard.writeText(path);
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => { btn.textContent = '📋 Copy path'; }, 1500);
+    });
+
+    breadcrumb.appendChild(btn);
+  }
+
+  // ── 3. Atajos de teclado adicionales ───────────────────────
+  document.addEventListener('keydown', (e) => {
+    // Solo si no estamos escribiendo en un input
+    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+    // 'r' → ir al root del repositorio
+    if (e.key === 'r' && !e.ctrlKey && !e.metaKey) {
+      const repoLink = document.querySelector('a[data-pjax="#repo-content-pjax-container"]');
+      const match = window.location.pathname.match(/^\/([^/]+\/[^/]+)/);
+      if (match) window.location.href = `https://github.com/${match[1]}`;
+    }
+
+    // 'p' → ir a la página de PRs
+    if (e.key === 'p' && !e.ctrlKey && !e.metaKey) {
+      const match = window.location.pathname.match(/^\/([^/]+\/[^/]+)/);
+      if (match) window.location.href = `https://github.com/${match[1]}/pulls`;
+    }
+  });
+
+  // ── 4. Muestra el número de líneas en archivos ──────────────
+  function addLineCount() {
+    const rawLines = document.querySelectorAll('.blob-num');
+    if (rawLines.length === 0) return;
+
+    const title = document.querySelector('.Box-header .text-mono');
+    if (title && !title.textContent.includes('lines')) {
+      title.textContent += ` · ${rawLines.length} lines`;
+    }
+  }
+
+  // Observa cambios de página (GitHub es SPA)
+  const observer = new MutationObserver(() => {
+    addCopyPathButton();
+    addLineCount();
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+  addCopyPathButton();
+  addLineCount();
+
+})();
+```
+
+## Cómo funciona la cabecera de userscripts
+
+```javascript
+// ==UserScript==
+// @name         Nombre del script
+// @namespace    URL de tu sitio (solo identificativo)
+// @version      1.0.0
+// @description  Descripción breve
+// @author       Tu nombre
+// @match        https://ejemplo.com/*    // En qué URLs se activa
+// @exclude      https://ejemplo.com/no  // Excepciones
+// @grant        GM_addStyle             // APIs de Tampermonkey a usar
+// @require      https://url/libreria.js // Cargar librerías externas
+// @run-at       document-idle           // Cuándo ejecutar
+// ==/UserScript==
+```
+
+## Repositorios de userscripts populares
+
+- **[Greasy Fork](https://greasyfork.org/)** — El repositorio más grande. Revisa el código antes de instalar.
+- **[OpenUserJS](https://openuserjs.org/)** — Alternativa open source a Greasy Fork.
+- **[GitHub Refined](https://github.com/refined-github/refined-github)** — Extensión (no userscript) con cientos de mejoras para GitHub.
+
+## Consideraciones de seguridad
+
+Los userscripts tienen acceso completo a la página donde corren. Antes de instalar un script de internet:
+
+1. **Lee el código completo** — especialmente las secciones `@grant` y las llamadas a `fetch` o `XMLHttpRequest`
+2. **Desconfía de scripts ofuscados** — código ilegible es señal de alerta
+3. **Verifica el autor y las reviews** en Greasy Fork
+4. **Evita `@grant unsafeWindow`** a menos que sea absolutamente necesario
+5. **Revisa las actualizaciones** — los scripts se actualizan automáticamente si no desactivas esa opción
+
+> **Tip de desarrollo:** Usa `GM_setValue` y `GM_getValue` para persistir configuración entre sesiones, y `GM_addStyle` en lugar de manipular directamente el DOM para CSS. La cabecera `@run-at document-idle` evita que el script interfiera con la carga inicial de la página.

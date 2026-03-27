@@ -1,0 +1,132 @@
+---
+name: Ollama
+description: Ejecuta LLMs localmente en tu máquina. Privacidad total, sin API keys, sin límites. El ChatGPT que se queda en casa.
+category: ai-tools
+tags: [ai, local-llm, privacy, offline, inference, llm]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install Ollama.Ollama
+  brew: brew install ollama
+  manual: https://ollama.com/
+links:
+  repo: https://github.com/ollama/ollama
+  website: https://ollama.com/
+addedAt: 2025-03-11
+---
+
+## IA completamente local
+
+Ollama descarga y ejecuta modelos de lenguaje directamente en tu máquina. Sin enviar datos a ningún servidor externo, sin API keys, sin límites de uso. Perfecto para código confidencial, datos sensibles o simplemente para experimentar sin coste.
+
+## Comandos esenciales
+
+```bash
+# Descargar y ejecutar un modelo directamente
+ollama run llama3.2
+
+# Solo descargar sin ejecutar
+ollama pull deepseek-r1:7b
+
+# Listar modelos descargados
+ollama list
+
+# Ver información de un modelo
+ollama show llama3.2
+
+# Eliminar un modelo
+ollama rm llama3.2:latest
+
+# Ver modelos ejecutándose actualmente
+ollama ps
+```
+
+## Modelos recomendados
+
+```bash
+# Uso general (conversación, resúmenes, análisis)
+ollama pull llama3.2          # Meta, 3B — muy rápido, para consultas rápidas
+ollama pull llama3.1:8b       # Meta, 8B — buen balance velocidad/calidad
+
+# Razonamiento y código (necesita más RAM/VRAM)
+ollama pull deepseek-r1:7b    # DeepSeek, razonamiento paso a paso
+ollama pull deepseek-r1:14b   # Mejor calidad, necesita 16GB+ RAM
+
+# Especializado en código
+ollama pull codellama:7b      # Meta, optimizado para código
+ollama pull qwen2.5-coder:7b  # Alibaba, excelente en múltiples lenguajes
+
+# Embeddings (para búsqueda semántica y RAG)
+ollama pull nomic-embed-text  # Ligero y efectivo para embeddings
+ollama pull mxbai-embed-large # Mayor calidad de embeddings
+```
+
+## Usar la API REST
+
+Ollama expone una API compatible con OpenAI en `http://localhost:11434`:
+
+```bash
+# Chat completion
+curl http://localhost:11434/api/chat -d '{
+  "model": "llama3.2",
+  "messages": [
+    {"role": "user", "content": "Explica qué es un closure en JavaScript"}
+  ],
+  "stream": false
+}'
+
+# Generación simple
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.2",
+  "prompt": "Escribe una función Python para ordenar una lista",
+  "stream": false
+}'
+```
+
+Con el endpoint compatible con OpenAI:
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama",  # Cualquier string; no se verifica
+)
+
+response = client.chat.completions.create(
+    model="llama3.2",
+    messages=[{"role": "user", "content": "Hola, ¿cómo estás?"}]
+)
+print(response.choices[0].message.content)
+```
+
+## Open WebUI: interfaz de chat visual
+
+Para tener una interfaz como ChatGPT apuntando a tu Ollama local:
+
+```bash
+# Con Docker (recomendado)
+docker run -d \
+  -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  ghcr.io/open-webui/open-webui:main
+
+# Accede en http://localhost:3000
+```
+
+Open WebUI detecta automáticamente los modelos de Ollama y ofrece historial de conversaciones, gestión de modelos, RAG con documentos propios y mucho más.
+
+## Requisitos de hardware
+
+| Modelo | RAM mínima | VRAM ideal | Velocidad (aprox.) |
+|--------|-----------|------------|---------------------|
+| 3B params | 4 GB | 4 GB GPU | Muy rápido |
+| 7B params | 8 GB | 8 GB GPU | Rápido |
+| 14B params | 16 GB | 12 GB GPU | Moderado |
+| 32B params | 32 GB | 24 GB GPU | Lento sin GPU |
+
+Sin GPU dedicada, los modelos funcionan en CPU pero son considerablemente más lentos. Con una GPU NVIDIA (CUDA) o AMD (ROCm), la inferencia es prácticamente en tiempo real para modelos de 7B.
+
+> **Tip:** Usa `nomic-embed-text` junto con una base de datos vectorial como ChromaDB o pgvector para construir un sistema RAG completamente local sobre tus documentos privados.

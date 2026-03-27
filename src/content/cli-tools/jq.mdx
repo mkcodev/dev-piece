@@ -1,0 +1,211 @@
+---
+name: jq
+description: Procesador de JSON desde la línea de comandos. Filtra, transforma y consulta JSON con una sintaxis poderosa.
+category: cli-tools
+tags: [json, cli, filter, transform, query]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install jqlang.jq
+  brew: brew install jq
+  apt: sudo apt install jq
+links:
+  repo: https://github.com/jqlang/jq
+  docs: https://jqlang.github.io/jq/manual/
+addedAt: 2025-01-28
+---
+
+## ¿Qué es jq?
+
+jq es el procesador de JSON de línea de comandos por excelencia. Funciona como `sed` para JSON: toma una entrada JSON, aplica un filtro/transformación y produce una salida. Es una herramienta indispensable para trabajar con APIs, logs en formato JSON, archivos de configuración y datos estructurados.
+
+Una de sus mejores características: formatea (pretty-print) JSON automáticamente con colores en el terminal, lo que por sí solo ya justifica su instalación.
+
+## Uso básico: filtros esenciales
+
+```bash
+# Pretty print (el uso más simple)
+echo '{"name":"Alice","age":30}' | jq '.'
+curl -s https://api.github.com/users/octocat | jq '.'
+
+# Acceder a una propiedad
+echo '{"name":"Alice","age":30}' | jq '.name'
+# "Alice"
+
+# Propiedad anidada
+curl -s https://api.github.com/repos/jqlang/jq | jq '.owner.login'
+# "jqlang"
+
+# Elemento de array
+echo '[1,2,3,4,5]' | jq '.[2]'
+# 3
+
+# Slice de array
+echo '[1,2,3,4,5]' | jq '.[1:3]'
+# [2,3]
+
+# Último elemento
+echo '[1,2,3,4,5]' | jq '.[-1]'
+# 5
+
+# Todas las claves
+echo '{"a":1,"b":2}' | jq 'keys'
+# ["a","b"]
+
+# Todos los valores
+echo '{"a":1,"b":2}' | jq 'values'
+# [1,2]
+```
+
+## Filtros avanzados
+
+```bash
+# Iterar sobre un array de objetos
+curl -s https://api.github.com/users/octocat/repos | jq '.[].name'
+
+# Construir un objeto nuevo
+curl -s https://api.github.com/users/octocat/repos | \
+  jq '.[] | {nombre: .name, estrellas: .stargazers_count, lenguaje: .language}'
+
+# Filtrar con select
+curl -s https://api.github.com/users/octocat/repos | \
+  jq '[.[] | select(.stargazers_count > 100)] | length'
+
+# select con múltiples condiciones
+cat repos.json | jq '.[] | select(.language == "TypeScript" and .archived == false)'
+
+# map: transformar cada elemento
+echo '[1,2,3,4,5]' | jq 'map(. * 2)'
+# [2,4,6,8,10]
+
+# map + select (equivalente a filter)
+echo '[1,2,3,4,5]' | jq 'map(select(. > 2))'
+# [3,4,5]
+
+# sort_by
+cat repos.json | jq 'sort_by(.stargazers_count) | reverse | .[0:5]'
+
+# group_by
+cat users.json | jq 'group_by(.department) | map({dept: .[0].department, count: length})'
+
+# unique_by
+cat events.json | jq 'unique_by(.user_id) | length'
+```
+
+## Procesando respuestas de APIs
+
+```bash
+# GitHub: repositorios con más estrellas
+curl -s "https://api.github.com/users/torvalds/repos?per_page=100" | \
+  jq 'sort_by(.stargazers_count) | reverse | .[:5] | .[] | "\(.stargazers_count) \(.name)"'
+
+# GitHub: listar pull requests abiertos
+gh api repos/owner/repo/pulls --paginate | \
+  jq '.[] | {numero: .number, titulo: .title, autor: .user.login, creado: .created_at}'
+
+# Docker: listar imágenes con su tamaño
+docker inspect $(docker images -q) | \
+  jq '.[] | {nombre: .RepoTags[0], tamaño: (.Size / 1048576 | floor | tostring + " MB")}'
+
+# npm: ver dependencias de producción
+cat package.json | jq '.dependencies | to_entries[] | "\(.key): \(.value)"'
+
+# Kubernetes: pods en estado Running
+kubectl get pods -o json | \
+  jq '.items[] | select(.status.phase == "Running") | .metadata.name'
+```
+
+## reduce y funciones avanzadas
+
+```bash
+# Suma de valores
+echo '[1,2,3,4,5]' | jq 'reduce .[] as $x (0; . + $x)'
+# 15
+
+# Contar ocurrencias
+cat logs.json | jq '[.[] | .level] | group_by(.) | map({(.[0]): length}) | add'
+
+# flatten
+echo '[[1,2],[3,[4,5]]]' | jq 'flatten'
+# [1,2,3,4,5]
+
+# any / all
+echo '[1,2,3,4,5]' | jq 'any(. > 4)'   # true
+echo '[1,2,3,4,5]' | jq 'all(. > 0)'   # true
+
+# String interpolation
+echo '{"name":"Alice","age":30}' | jq '"Nombre: \(.name), Edad: \(.age)"'
+# "Nombre: Alice, Edad: 30"
+
+# Convertir tipos
+echo '"42"' | jq 'tonumber'
+echo '42'   | jq 'tostring'
+
+# has() y in
+echo '{"a":1}' | jq 'has("a")'     # true
+echo '{"a":1}' | jq '"a" | in({"a":1})'  # true
+
+# env
+jq -n 'env.HOME'    # Acceder a variables de entorno
+```
+
+## Alias y snippets útiles
+
+```bash
+# ~/.bashrc o ~/.zshrc
+
+# Pretty print con colores (incluso si la salida va a less)
+alias jqp="jq -C . | less -R"
+
+# Extraer keys de un objeto JSON
+alias jqk="jq 'keys[]'"
+
+# Comprimir JSON (minificar)
+alias jqmin="jq -c ."
+
+# Validar JSON (exitcode 0 = válido)
+jqvalid() { jq empty "$1" && echo "✓ JSON válido" || echo "✗ JSON inválido"; }
+
+# Ver todos los paths de un JSON
+jqpaths() { jq '[path(..)] | map(map(tostring) | join(".")) | unique[]' "$1"; }
+```
+
+## Trabajar con JSON Lines (JSONL/NDJSON)
+
+```bash
+# Procesar un archivo con un JSON por línea
+cat access.log.jsonl | jq '.status'
+cat access.log.jsonl | jq 'select(.status >= 400) | .path'
+
+# Convertir array JSON a JSONL
+cat data.json | jq -c '.[]'
+
+# Convertir JSONL a array JSON
+cat data.jsonl | jq -s '.'
+```
+
+## Pro Tips
+
+**`--raw-output` (-r):** Por defecto jq devuelve strings con comillas. Usa `-r` para obtener strings sin comillas, esencial para usar la salida en scripts:
+
+```bash
+REPO=$(curl -s https://api.github.com/repos/jqlang/jq | jq -r '.full_name')
+echo "Repo: $REPO"  # Repo: jqlang/jq (sin comillas)
+```
+
+**`--arg` y `--argjson`:** Pasa variables de shell a los filtros de jq:
+
+```bash
+USER="alice"
+jq --arg u "$USER" '.[] | select(.name == $u)' users.json
+
+COUNT=5
+jq --argjson n $COUNT '.[:$n]' repos.json
+```
+
+**`jq` para generar JSON:** Usa `jq -n` para crear JSON desde cero:
+
+```bash
+jq -n --arg name "Alice" --argjson age 30 '{name: $name, age: $age}'
+# {"name":"Alice","age":30}
+```

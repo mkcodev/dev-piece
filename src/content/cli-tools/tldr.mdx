@@ -1,0 +1,207 @@
+---
+name: tldr-pages
+description: Páginas de manual simplificadas con ejemplos prácticos. Aprende cualquier comando en segundos.
+category: cli-tools
+tags: [help, man-replacement, examples, fast]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  npm: npm install -g tldr
+  brew: brew install tldr
+  pip: pip install tldr
+links:
+  repo: https://github.com/tldr-pages/tldr
+  website: https://tldr.sh/
+addedAt: 2025-01-27
+---
+
+## ¿Qué es tldr-pages?
+
+tldr (Too Long; Didn't Read) es una colección de páginas de manual simplificadas, orientadas a ejemplos prácticos. Mientras que `man` muestra toda la documentación técnica de un comando (a menudo decenas de páginas difíciles de leer), `tldr` muestra los 5-10 casos de uso más comunes con ejemplos concretos y ejecutables.
+
+El proyecto es mantenido por la comunidad con más de 50.000 páginas para comandos de todos los sistemas operativos. Existe un cliente oficial en Node.js, pero hay clientes alternativos en docenas de lenguajes.
+
+## man vs tldr: comparación
+
+```bash
+# man tar: muestra ~300 líneas de documentación técnica
+man tar
+
+# tldr tar: muestra los casos de uso más comunes
+tldr tar
+# Salida:
+# tar
+# Archiving utility.
+# ...
+# - Create an archive and write it to a file:
+#   tar cf target.tar file1 file2 file3
+#
+# - Create a gzipped archive:
+#   tar czf target.tar.gz file1 file2 file3
+#
+# - Extract an archive to a specific directory:
+#   tar xf source.tar --directory=directory
+```
+
+## Uso básico
+
+```bash
+# Ver la página de un comando
+tldr git
+tldr docker
+tldr ffmpeg
+tldr curl
+
+# Buscar páginas relacionadas con una palabra
+tldr --search "compress"
+tldr --search "network"
+
+# Especificar plataforma
+tldr --platform linux tar
+tldr --platform osx brew
+tldr --platform windows winget
+
+# Ver lista de páginas disponibles
+tldr --list | grep git
+
+# Actualizar la caché local
+tldr --update
+```
+
+## Clientes recomendados
+
+### tealdeer: el cliente más rápido (Rust)
+
+`tealdeer` (`tldr`) es el cliente oficial alternativo escrito en Rust. Es instantáneo incluso en primera ejecución y soporta todas las plataformas:
+
+```bash
+# Instalación
+cargo install tealdeer
+winget install dbrgn.tealdeer
+
+# Uso idéntico al cliente Node.js
+tldr tar
+tldr --update
+
+# Configuración de tealdeer
+# ~/.config/tealdeer/config.toml
+```
+
+```toml
+# ~/.config/tealdeer/config.toml
+
+[display]
+use_pager = false
+compact = false
+
+[updates]
+auto_update = true
+auto_update_interval_hours = 720  # 30 días
+
+[style.description]
+foreground = "white"
+
+[style.command_name]
+foreground = "ansi_cyan"
+bold = true
+
+[style.example_text]
+foreground = "white"
+italic = true
+
+[style.example_code]
+foreground = "ansi_green"
+
+[style.example_variable]
+foreground = "ansi_yellow"
+underline = true
+```
+
+### navi: tldr interactivo
+
+`navi` lleva los conceptos de tldr más lejos, permitiendo ejecutar directamente los ejemplos:
+
+```bash
+navi --tldr tar    # Ver ejemplos de tar en navi
+```
+
+## Páginas personalizadas
+
+Puedes crear tus propias páginas de tldr para comandos internos de tu empresa o scripts propios:
+
+```bash
+# Directorio para páginas personales
+mkdir -p ~/.config/tealdeer/tldr/pages/common
+
+# Crear una página personalizada
+cat > ~/.config/tealdeer/tldr/pages/common/mi-script.md << 'EOF'
+# mi-script
+
+> Script de deployment del proyecto.
+> More information: <https://wiki.empresa.com/mi-script>
+
+- Deploy a staging:
+
+`mi-script deploy --env staging`
+
+- Deploy a producción con confirmación:
+
+`mi-script deploy --env prod --confirm`
+
+- Ver logs del último deploy:
+
+`mi-script logs --tail 100`
+
+- Rollback al deploy anterior:
+
+`mi-script rollback --env {{staging|prod}}`
+EOF
+```
+
+## Caché offline
+
+```bash
+# Actualizar la caché para uso offline
+tldr --update
+
+# Verificar ubicación de la caché
+# tealdeer:
+tldr --show-paths
+
+# La caché se actualiza automáticamente si auto_update = true
+# También puedes forzarla antes de un viaje sin internet:
+tldr --update && echo "Caché actualizada para uso offline"
+```
+
+## Integración con fzf
+
+```bash
+# Buscar y ver páginas de tldr interactivamente
+tldr-fzf() {
+  tldr --list | fzf --preview 'tldr {}' \
+    --preview-window 'right:70%' \
+    --bind 'enter:execute(tldr {})' \
+    --prompt 'tldr> '
+}
+
+# Añadir a ~/.zshrc o ~/.bashrc
+alias tf='tldr-fzf'
+```
+
+## Pro Tips
+
+**Contribuir al proyecto:** tldr-pages acepta contribuciones fácilmente. Si encuentras un comando sin página, el formato es simple y puedes enviar un PR en minutos.
+
+**Múltiples idiomas:** tldr-pages está disponible en español, alemán, francés, portugués y más. Configura el idioma con la variable `LANG` o con `--language`:
+
+```bash
+tldr --language es git    # Página en español
+export LANG=es            # Español por defecto
+```
+
+**Comparar con cheat.sh:** Otra alternativa popular es `cheat.sh`, accesible directamente via curl:
+
+```bash
+curl cheat.sh/tar
+curl cheat.sh/git~commit
+```

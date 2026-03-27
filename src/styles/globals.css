@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #303446;
+    --foreground: #c6d0f5;
+    --card: #414559;
+    --card-foreground: #c6d0f5;
+    --popover: #292c3c;
+    --popover-foreground: #c6d0f5;
+    --primary: #8caaee;
+    --primary-foreground: #232634;
+    --secondary: #414559;
+    --secondary-foreground: #c6d0f5;
+    --muted: #51576d;
+    --muted-foreground: #a5adce;
+    --accent: #babbf1;
+    --accent-foreground: #232634;
+    --destructive: #e78284;
+    --destructive-foreground: #c6d0f5;
+    --border: #51576d;
+    --input: #414559;
+    --ring: #8caaee;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-surface1;
+  }
+
+  body {
+    @apply bg-base text-text font-sans antialiased;
+    scrollbar-width: thin;
+    scrollbar-color: #414559 #292c3c;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-mantle;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-surface0 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-surface1;
+  }
+
+  ::selection {
+    background: rgba(139, 170, 238, 0.3);
+    color: #c6d0f5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-text font-semibold;
+  }
+
+  code:not(pre code) {
+    @apply bg-surface0 text-sky px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  pre {
+    @apply rounded-lg overflow-x-auto;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-blue via-lavender to-mauve bg-clip-text text-transparent;
+  }
+
+  .card-glow:hover {
+    box-shadow: 0 0 20px rgba(186, 187, 241, 0.1);
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .sidebar-link-active {
+    @apply border-l-2 border-lavender bg-surface0/50 text-text;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

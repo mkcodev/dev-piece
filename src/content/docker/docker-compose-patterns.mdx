@@ -1,0 +1,211 @@
+---
+name: Docker Compose Patterns Esenciales
+description: Los patrones más útiles de Docker Compose para desarrollo local. Bases de datos, redes, volúmenes y override files.
+category: docker
+tags: [docker, compose, development, databases, networking, volumes]
+os: [windows, macos, linux]
+difficulty: intermediate
+addedAt: 2025-03-18
+---
+
+## Compose para desarrollo local
+
+Docker Compose es la herramienta estándar para orquestar múltiples servicios en desarrollo. Aquí están los patrones que resuelven los problemas más comunes.
+
+## Stack típico de desarrollo
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app                    # Hot reload: monta código fuente
+      - /app/node_modules         # Excluye node_modules del host
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - .env.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: devpassword
+      POSTGRES_DB: myapp_dev
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d myapp_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+## Patrón override para desarrollo local
+
+Separa la configuración base de las personalizaciones locales:
+
+```yaml
+# docker-compose.override.yml
+# Se aplica automáticamente sobre docker-compose.yml en desarrollo
+# NO lo añadas a .gitignore si es para todo el equipo
+# SÍ añádelo si contiene configuración personal
+
+services:
+  app:
+    environment:
+      - DEBUG=app:*
+      - LOG_LEVEL=debug
+    volumes:
+      # Monta tu .nvmrc o configuración personal
+      - ~/.gitconfig:/root/.gitconfig:ro
+
+  postgres:
+    ports:
+      - "5432:5432"   # Expone el puerto solo en local
+```
+
+Para producción o staging, usa un archivo específico:
+
+```bash
+# Desarrollo (usa docker-compose.yml + docker-compose.override.yml)
+docker compose up
+
+# CI/Staging (solo docker-compose.yml + archivo específico)
+docker compose -f docker-compose.yml -f docker-compose.staging.yml up
+```
+
+## Healthchecks
+
+Los healthchecks aseguran que los servicios estén realmente listos antes de que otros los usen:
+
+```yaml
+services:
+  postgres:
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 10s      # Tiempo entre checks
+      timeout: 5s        # Tiempo máximo por check
+      retries: 5         # Intentos antes de marcar como unhealthy
+      start_period: 30s  # Gracia inicial para que arranque el servicio
+
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy   # Espera al healthcheck
+```
+
+## Variables de entorno con env_file
+
+```bash
+# .env.local (no commitear)
+DATABASE_URL=postgresql://dev:devpassword@postgres:5432/myapp_dev
+REDIS_URL=redis://redis:6379
+JWT_SECRET=un-secreto-largo-para-desarrollo
+```
+
+```yaml
+services:
+  app:
+    env_file:
+      - .env.local          # Variables privadas (no en repo)
+      - .env.shared         # Variables compartidas (en repo, sin secretos)
+    environment:
+      - NODE_ENV=development # Sobreescribe env_file si hay conflicto
+```
+
+## Perfiles para servicios opcionales
+
+Los perfiles permiten activar servicios extra solo cuando se necesitan:
+
+```yaml
+services:
+  app:
+    # Sin perfil = siempre activo
+    build: .
+
+  mailhog:
+    image: mailhog/mailhog
+    profiles: ["mail"]      # Solo activo con --profile mail
+    ports:
+      - "8025:8025"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    profiles: ["admin"]     # Solo activo con --profile admin
+    ports:
+      - "5050:80"
+
+  minio:
+    image: minio/minio
+    profiles: ["storage"]
+    ports:
+      - "9000:9000"
+    command: server /data --console-address ":9001"
+```
+
+```bash
+# Solo servicios base
+docker compose up
+
+# Con herramienta de email para debug
+docker compose --profile mail up
+
+# Con múltiples perfiles
+docker compose --profile mail --profile admin up
+```
+
+## Comandos útiles de Compose
+
+```bash
+# Levantar en background
+docker compose up -d
+
+# Ver logs en tiempo real
+docker compose logs -f app
+
+# Ejecutar comando en servicio corriendo
+docker compose exec app sh
+docker compose exec postgres psql -U dev myapp_dev
+
+# Reconstruir imagen y levantar
+docker compose up --build app
+
+# Parar y borrar todo (incluyendo volúmenes)
+docker compose down -v
+
+# Ver el estado de los servicios
+docker compose ps
+```
+
+> **Tip de equipo:** Commitea siempre `docker-compose.yml` y `docker-compose.override.yml` si la override es para todo el equipo. Usa `.env.example` como plantilla sin valores reales que sí va al repo, y `.env.local` con los valores reales que va en `.gitignore`.

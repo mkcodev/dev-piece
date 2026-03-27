@@ -1,0 +1,45 @@
+---
+import MobileNav from './MobileNav.astro';
+---
+
+<header class="sticky top-0 z-30 bg-mantle/80 backdrop-blur-md border-b border-surface0 h-14 flex items-center px-4 md:px-6">
+  <!-- Mobile menu -->
+  <div class="lg:hidden mr-3">
+    <MobileNav />
+  </div>
+
+  <!-- Mobile logo -->
+  <a href="/" class="lg:hidden flex items-center gap-2 mr-auto">
+    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue to-lavender flex items-center justify-center text-crust font-bold text-xs">
+      DV
+    </div>
+    <span class="font-bold text-text text-sm">DevVault</span>
+  </a>
+
+  <!-- Spacer for desktop (sidebar takes the left) -->
+  <div class="hidden lg:block flex-1" />
+
+  <!-- Cmd+K trigger -->
+  <button
+    id="open-palette-btn"
+    class="flex items-center gap-2 px-3 py-1.5 bg-surface0 hover:bg-surface1 border border-surface1 hover:border-surface2 rounded-lg text-sm text-subtext1 hover:text-text transition-all duration-150 group"
+    aria-label="Abrir paleta de comandos"
+    aria-keyshortcuts="Control+k Meta+k"
+  >
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <span class="hidden sm:inline">Buscar herramientas...</span>
+    <span class="hidden sm:flex items-center gap-0.5 ml-2">
+      <kbd class="text-xs bg-surface1 text-overlay2 px-1 py-0.5 rounded font-mono">⌘</kbd>
+      <kbd class="text-xs bg-surface1 text-overlay2 px-1 py-0.5 rounded font-mono">K</kbd>
+    </span>
+  </button>
+</header>
+
+<script>
+  document.getElementById('open-palette-btn')?.addEventListener('click', () => {
+    window.dispatchEvent(new CustomEvent('open-command-palette'));
+  });
+</script>

@@ -1,0 +1,178 @@
+---
+name: Alacritty
+description: El emulador de terminal más rápido del mundo, acelerado por GPU y escrito en Rust.
+category: terminales
+tags: [terminal, gpu, rust, fast, cross-platform]
+os: [windows, macos, linux]
+featured: true
+difficulty: intermediate
+install:
+  winget: winget install Alacritty.Alacritty
+  brew: brew install --cask alacritty
+  manual: https://github.com/alacritty/alacritty/releases
+links:
+  repo: https://github.com/alacritty/alacritty
+  docs: https://alacritty.org/config-alacritty.html
+addedAt: 2025-01-10
+---
+
+## ¿Qué es Alacritty?
+
+Alacritty es un emulador de terminal de código abierto que utiliza la GPU para renderizar cada frame, lo que lo convierte en el terminal más rápido disponible en la actualidad. Está escrito completamente en Rust, lo que garantiza seguridad de memoria y un rendimiento excepcional sin sacrificar estabilidad.
+
+A diferencia de terminales como iTerm2, Kitty o Windows Terminal, Alacritty tiene una filosofía minimalista: hace una sola cosa y la hace perfectamente. No incluye multiplexación de sesiones (para eso existe tmux o WezTerm), ni pestañas nativas, ni paneles. Es un lienzo en blanco, extremadamente rápido.
+
+## ¿Por qué importa la aceleración por GPU?
+
+Los terminales tradicionales renderizan texto usando la CPU, lo que se convierte en un cuello de botella cuando se trabaja con salidas largas, animaciones de prompt, o herramientas como `btop` que actualizan frecuentemente la pantalla. Alacritty delega todo el renderizado a la GPU mediante OpenGL, lo que resulta en:
+
+- Latencia de input extremadamente baja (incluso en conexiones SSH lentas)
+- Scrollback suave sin tearing
+- Capacidad de manejar miles de líneas sin degradación de rendimiento
+
+## Configuración: Catppuccin Frappé
+
+El archivo de configuración principal vive en `~/.config/alacritty/alacritty.toml` (en Windows: `%APPDATA%\alacritty\alacritty.toml`).
+
+```toml
+# ~/.config/alacritty/alacritty.toml
+
+[window]
+padding = { x = 12, y = 10 }
+decorations = "buttonless"
+opacity = 0.95
+blur = true
+startup_mode = "Maximized"
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold   = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
+size   = 13.0
+
+[font.offset]
+x = 0
+y = 1
+
+# Catppuccin Frappé
+[colors.primary]
+background = "#303446"
+foreground = "#c6d0f5"
+dim_foreground = "#838ba7"
+bright_foreground = "#c6d0f5"
+
+[colors.cursor]
+text   = "#303446"
+cursor = "#f2d5cf"
+
+[colors.vi_mode_cursor]
+text   = "#303446"
+cursor = "#babbf1"
+
+[colors.search.matches]
+foreground = "#303446"
+background = "#a5adce"
+
+[colors.search.focused_match]
+foreground = "#303446"
+background = "#a6d189"
+
+[colors.footer_bar]
+background = "#292c3c"
+foreground = "#c6d0f5"
+
+[colors.hints.start]
+foreground = "#303446"
+background = "#e5c890"
+
+[colors.hints.end]
+foreground = "#303446"
+background = "#a5adce"
+
+[colors.selection]
+text       = "#303446"
+background = "#babbf1"
+
+[colors.normal]
+black   = "#51576d"
+red     = "#e78284"
+green   = "#a6d189"
+yellow  = "#e5c890"
+blue    = "#8caaee"
+magenta = "#f4b8e4"
+cyan    = "#81c8be"
+white   = "#b5bfe2"
+
+[colors.bright]
+black   = "#626880"
+red     = "#e78284"
+green   = "#a6d189"
+yellow  = "#e5c890"
+blue    = "#8caaee"
+magenta = "#f4b8e4"
+cyan    = "#81c8be"
+white   = "#a5adce"
+
+[colors.dim]
+black   = "#51576d"
+red     = "#e78284"
+green   = "#a6d189"
+yellow  = "#e5c890"
+blue    = "#8caaee"
+magenta = "#f4b8e4"
+cyan    = "#81c8be"
+white   = "#b5bfe2"
+
+[scrolling]
+history    = 10000
+multiplier = 3
+
+[selection]
+save_to_clipboard = true
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval  = 500
+unfocused_hollow = true
+
+[terminal]
+shell = { program = "/usr/bin/zsh", args = ["-l"] }
+
+[keyboard]
+bindings = [
+  # Copiar y pegar
+  { key = "C", mods = "Control|Shift", action = "Copy" },
+  { key = "V", mods = "Control|Shift", action = "Paste" },
+  # Nueva ventana
+  { key = "N", mods = "Control|Shift", action = "SpawnNewInstance" },
+  # Zoom de fuente
+  { key = "Plus",  mods = "Control", action = "IncreaseFontSize" },
+  { key = "Minus", mods = "Control", action = "DecreaseFontSize" },
+  { key = "Key0",  mods = "Control", action = "ResetFontSize" },
+  # Scroll
+  { key = "PageUp",   mods = "Shift", action = "ScrollPageUp" },
+  { key = "PageDown", mods = "Shift", action = "ScrollPageDown" },
+  { key = "Home",     mods = "Shift", action = "ScrollToTop" },
+  { key = "End",      mods = "Shift", action = "ScrollToBottom" },
+]
+```
+
+## Pro Tips
+
+**Usar con tmux:** Alacritty no tiene pestañas nativas, pero combinado con tmux obtienes un setup profesional:
+
+```bash
+# Añade a tu ~/.zshrc o ~/.bashrc
+alias t="tmux new-session -A -s main"
+```
+
+**Configuración modular:** Puedes separar el tema en un archivo aparte e importarlo:
+
+```toml
+# alacritty.toml
+import = ["~/.config/alacritty/themes/catppuccin-frappe.toml"]
+```
+
+**Live reload:** Alacritty recarga la configuración automáticamente al guardar el archivo. No necesitas reiniciar el terminal para ver los cambios.
+
+**Hints para URLs:** Alacritty incluye un sistema de hints que permite abrir URLs con el teclado sin usar el ratón. Presiona la tecla configurada y aparecerán letras sobre cada URL para seleccionarlas.

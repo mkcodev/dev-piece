@@ -1,0 +1,113 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { buildSearchIndex } from '../lib/content';
+
+const items = await buildSearchIndex();
+---
+
+<BaseLayout title="Buscar" description="Busca entre todas las herramientas de DevVault">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold text-text mb-6">Buscar herramientas</h1>
+
+    <div class="relative mb-8">
+      <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-subtext0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input
+        id="search-input"
+        type="text"
+        placeholder="Buscar entre todas las herramientas..."
+        class="w-full pl-12 pr-4 py-3 bg-surface0 border border-surface1 rounded-xl text-text placeholder:text-subtext0 outline-none focus:border-blue/50 transition-colors text-base"
+        autofocus
+        aria-label="Buscar herramientas"
+      />
+    </div>
+
+    <div id="search-results" class="space-y-3" role="region" aria-live="polite" aria-label="Resultados de búsqueda">
+      <p class="text-subtext0 text-sm text-center py-8">
+        Escribe para buscar entre <strong class="text-subtext1">{items.length}</strong> herramientas
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script define:vars={{ items }}>
+  let fuse = null;
+
+  async function initSearch() {
+    const { default: Fuse } = await import('/node_modules/fuse.js/dist/fuse.esm.min.js').catch(() =>
+      import('https://cdn.jsdelivr.net/npm/fuse.js@7/dist/fuse.esm.min.js')
+    );
+    fuse = new Fuse(items, {
+      keys: [
+        { name: 'name', weight: 3 },
+        { name: 'description', weight: 2 },
+        { name: 'tags', weight: 1.5 },
+        { name: 'categoryLabel', weight: 1 },
+      ],
+      threshold: 0.4,
+      includeScore: true,
+    });
+  }
+
+  function renderResults(results) {
+    const container = document.getElementById('search-results');
+    if (!container) return;
+
+    if (!results.length) {
+      container.innerHTML = '<p class="text-subtext0 text-sm text-center py-8">No se encontraron resultados</p>';
+      return;
+    }
+
+    container.innerHTML = results.map(item => `
+      <a href="${item.href}" class="flex items-start gap-3 p-4 bg-surface0 rounded-xl border border-surface1 hover:border-lavender/40 transition-all group">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="font-semibold text-text text-sm group-hover:text-blue transition-colors">${item.name}</span>
+            <span class="text-xs bg-surface1 text-subtext0 px-2 py-0.5 rounded-full">${item.categoryLabel}</span>
+            ${item.featured ? '<span class="text-xs bg-blue/20 text-blue px-1.5 py-0.5 rounded-full">Destacado</span>' : ''}
+          </div>
+          <p class="text-xs text-subtext1 line-clamp-2">${item.description}</p>
+          <div class="flex gap-1 mt-2">
+            ${item.tags.slice(0, 4).map(t => `<span class="text-xs text-subtext0">#${t}</span>`).join(' ')}
+          </div>
+        </div>
+        <svg class="w-4 h-4 text-subtext0 group-hover:text-blue transition-colors flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/>
+        </svg>
+      </a>
+    `).join('');
+  }
+
+  const input = document.getElementById('search-input');
+  let timeout;
+
+  input?.addEventListener('input', (e) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      const q = e.target.value.trim();
+      if (!q) {
+        document.getElementById('search-results').innerHTML =
+          `<p class="text-subtext0 text-sm text-center py-8">Escribe para buscar entre <strong class="text-subtext1">${items.length}</strong> herramientas</p>`;
+        return;
+      }
+      if (fuse) {
+        renderResults(fuse.search(q).slice(0, 20).map(r => r.item));
+      }
+    }, 150);
+  });
+
+  // Check URL params
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get('q');
+  if (q && input) {
+    input.value = q;
+  }
+
+  initSearch().then(() => {
+    if (q) {
+      renderResults(fuse.search(q).slice(0, 20).map(r => r.item));
+    }
+  });
+</script>

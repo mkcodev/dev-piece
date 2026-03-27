@@ -1,0 +1,114 @@
+---
+name: Shell Aliases Esenciales
+description: Los aliases de shell que todo desarrollador debería tener. Navegación, utilidades de sistema y shortcuts de dev.
+category: snippets
+tags: [bash, zsh, aliases, navigation, productivity]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-02-02
+---
+
+Tu `~/.bashrc` o `~/.zshrc` es tu cuartel general de productividad. Con los aliases correctos ahorras cientos de pulsaciones al día y reduces la fricción mental de recordar flags y rutas largas.
+
+## Bloque completo para .bashrc / .zshrc
+
+Pega este bloque al final de tu archivo de configuración y ejecuta `source ~/.bashrc` (o `~/.zshrc`) para aplicarlo:
+
+```bash
+# ── Navegación ─────────────────────────────────────────────────
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias ~='cd ~'
+alias -- -='cd -'          # volver al directorio anterior
+
+# ── Sistema ────────────────────────────────────────────────────
+alias c='clear'
+alias x='exit'
+alias ll='ls -lahF --color=auto'
+alias la='ls -A'
+alias mkdir='mkdir -pv'    # crea directorios padre y muestra lo creado
+alias df='df -h'           # disk free legible por humanos
+alias du='du -sh'          # disk usage del directorio actual
+
+# ── Dev shortcuts ──────────────────────────────────────────────
+alias g='git'
+alias pn='pnpm'
+alias d='docker'
+alias dc='docker compose'
+alias k='kubectl'
+alias tf='terraform'
+alias py='python3'
+alias pip='pip3'
+
+# ── Red / IP ───────────────────────────────────────────────────
+alias myip='curl -s https://ipinfo.io/ip && echo'
+alias localip="ipconfig getifaddr en0 2>/dev/null || hostname -I | awk '{print $1}'"
+alias ports='ss -tulnp'    # puertos en escucha (Linux)
+
+# ── Git shortcuts adicionales ──────────────────────────────────
+alias gs='git status -sb'
+alias gp='git push'
+alias gl='git pull'
+alias glog='git log --oneline --graph --decorate --all'
+
+# ── Función mkcd: crear directorio y entrar en él ──────────────
+mkcd() {
+  mkdir -p "$1" && cd "$1"
+}
+
+# ── Función cdls: cd + ls automático ──────────────────────────
+cdls() {
+  cd "$1" && ll
+}
+
+# ── Función extract: descomprimir cualquier archivo ────────────
+extract() {
+  case "$1" in
+    *.tar.bz2)  tar xjf "$1"   ;;
+    *.tar.gz)   tar xzf "$1"   ;;
+    *.tar.xz)   tar xJf "$1"   ;;
+    *.zip)      unzip "$1"     ;;
+    *.7z)       7z x "$1"      ;;
+    *.gz)       gunzip "$1"    ;;
+    *.rar)      unrar x "$1"   ;;
+    *)          echo "Formato no soportado: $1" ;;
+  esac
+}
+```
+
+## Aliases de navegación
+
+Los aliases de puntos (`..`, `...`, `....`) son los más usados del día a día. Subir varios niveles de directorio con dos o tres teclas en lugar de escribir `cd ../../..` es uno de esos pequeños ahorros que suman.
+
+```bash
+# Sin alias:
+cd ../../../src/components/ui
+
+# Con alias:
+....
+cd src/components/ui
+```
+
+## Función mkcd
+
+Crear un directorio y entrar en él es una operación tan común que merece su propia función:
+
+```bash
+mkcd my-new-project
+# equivale a:
+# mkdir -p my-new-project && cd my-new-project
+```
+
+También funciona con rutas anidadas: `mkcd projects/2025/client-app` crea toda la estructura y te deja dentro de `client-app`.
+
+## Aliases de dev
+
+El alias `pn=pnpm` puede parecer trivial, pero si usas pnpm decenas de veces al día, el ahorro acumulado es significativo. Lo mismo aplica para `g=git`, `d=docker` y `k=kubectl`. La consistencia de estos shortcuts entre proyectos y máquinas es lo que los hace valiosos.
+
+Recarga la configuración sin cerrar la terminal con:
+
+```bash
+source ~/.bashrc   # Bash
+source ~/.zshrc    # Zsh
+```

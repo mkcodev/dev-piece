@@ -1,0 +1,231 @@
+---
+name: navi
+description: Cheatsheet interactivo para la terminal integrado con fzf. Accede a cualquier comando con Ctrl+G.
+category: cli-tools
+tags: [cheatsheet, interactive, shell, fzf, cli]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install navi
+  cargo: cargo install navi
+links:
+  repo: https://github.com/denisidoro/navi
+addedAt: 2025-01-30
+---
+
+## ¿Qué es navi?
+
+navi es un cheatsheet interactivo para la terminal que integra fuzzy finding (vía fzf o skim) con colecciones de comandos anotados. Presionas `Ctrl+G` desde cualquier punto de tu shell, buscas el comando que necesitas por palabras clave, rellenas los parámetros y lo ejecutas directamente.
+
+Es la diferencia entre recordar la sintaxis exacta de `ffmpeg` o `openssl` y simplemente escribir "compress video" o "generate ssl cert" y dejar que navi complete el resto.
+
+## Activar el atajo Ctrl+G
+
+```bash
+# Añadir a ~/.bashrc o ~/.zshrc
+eval "$(navi widget zsh)"    # zsh
+eval "$(navi widget bash)"   # bash
+
+# fish (~/.config/fish/config.fish)
+navi widget fish | source
+
+# Ahora Ctrl+G abre navi desde cualquier prompt
+```
+
+## Formato de archivos .cheat
+
+Los cheatsheets se escriben en archivos `.cheat` con un formato especial:
+
+```
+% sección, etiquetas
+
+# Descripción del comando
+comando con <parámetro1> y <parámetro2>
+
+$ parámetro1: echo "valor1\nvalor2\nvalor3"
+$ parámetro2: ls /directorio
+```
+
+Cada bloque tiene:
+- `%` - etiquetas/sección para el agrupamiento
+- `#` - descripción que aparece en la búsqueda
+- La línea del comando (con `<placeholders>`)
+- `$` - cómo generar los valores para cada placeholder
+
+## Ejemplo de cheatsheet personalizado
+
+```bash
+# Crear directorio personal de cheatsheets
+mkdir -p ~/.local/share/navi/cheats
+```
+
+```
+% git, versión control
+
+# Crear rama y hacer checkout en un paso
+git checkout -b <nombre-rama>
+
+# Eliminar rama local y remota
+git branch -d <nombre-rama> && git push origin --delete <nombre-rama>
+
+# Ver commits entre dos ramas
+git log <rama-base>..<rama-feature> --oneline
+
+# Cherry-pick de commits específicos
+git cherry-pick <commit-hash>
+
+# Resetear al commit anterior manteniendo cambios staged
+git reset --soft HEAD~<numero>
+
+$ nombre-rama: git branch --format='%(refname:short)' | grep -v HEAD
+$ rama-base: git branch --format='%(refname:short)'
+$ rama-feature: git branch --format='%(refname:short)'
+$ commit-hash: git log --oneline | awk '{print $1}'
+$ numero: echo "1\n2\n3\n5\n10"
+
+% docker, contenedores
+
+# Ejecutar contenedor interactivo y eliminarlo al salir
+docker run -it --rm <imagen> <shell>
+
+# Ver logs en tiempo real de un contenedor
+docker logs -f <contenedor>
+
+# Copiar archivo desde contenedor al host
+docker cp <contenedor>:<ruta-origen> <ruta-destino>
+
+# Ejecutar comando en contenedor corriendo
+docker exec -it <contenedor> <comando>
+
+# Limpiar todo: contenedores parados, imágenes sin usar, volúmenes
+docker system prune --volumes -f
+
+$ imagen: docker images --format '{{.Repository}}:{{.Tag}}'
+$ contenedor: docker ps --format '{{.Names}}'
+$ shell: echo "bash\nsh\n/bin/bash\n/bin/sh"
+$ ruta-origen: echo "/"
+$ ruta-destino: echo "./"
+$ comando: echo "bash\nsh\nenv\nls -la"
+
+% ffmpeg, video, audio
+
+# Convertir video a MP4 H.264
+ffmpeg -i <archivo-entrada> -c:v libx264 -crf 23 -c:a aac <archivo-salida>.mp4
+
+# Extraer audio de video
+ffmpeg -i <archivo-video> -vn -c:a copy <archivo-salida>.mp3
+
+# Comprimir video manteniendo calidad
+ffmpeg -i <archivo-entrada> -c:v libx265 -crf 28 -preset slow <archivo-salida>.mp4
+
+# Crear GIF desde video
+ffmpeg -i <archivo-video> -vf "fps=15,scale=640:-1" -t <duracion> <salida>.gif
+
+# Cortar video por tiempo
+ffmpeg -i <archivo-entrada> -ss <inicio> -t <duracion> -c copy <archivo-salida>.mp4
+
+$ archivo-entrada: fd -e mp4 -e mkv -e avi -e mov
+$ archivo-video: fd -e mp4 -e mkv -e avi -e mov
+$ archivo-salida: echo "output"
+$ duracion: echo "10\n30\n60\n120"
+$ inicio: echo "00:00:00\n00:01:00\n00:05:00"
+
+% ssh, red, servidores
+
+# Crear tunnel SSH local
+ssh -L <puerto-local>:localhost:<puerto-remoto> <usuario>@<host>
+
+# Copiar archivos con rsync via SSH
+rsync -avz --progress <origen>/ <usuario>@<host>:<destino>/
+
+# Montar directorio remoto con sshfs
+sshfs <usuario>@<host>:<ruta-remota> <punto-montaje>
+
+# Generar par de claves SSH
+ssh-keygen -t ed25519 -C "<email>" -f ~/.ssh/<nombre-clave>
+
+# Copiar clave pública al servidor
+ssh-copy-id -i ~/.ssh/<nombre-clave>.pub <usuario>@<host>
+
+$ puerto-local: echo "8080\n3000\n5432\n6379\n27017"
+$ puerto-remoto: echo "80\n443\n3000\n5432\n6379"
+$ usuario: echo "$USER"
+$ host: cat ~/.ssh/config | grep "Host " | grep -v "*" | awk '{print $2}'
+$ nombre-clave: echo "id_ed25519\nid_rsa\ngithub\nwork"
+$ email: git config user.email
+```
+
+## Cheatsheets de la comunidad
+
+navi puede descargar cheatsheets de repos de GitHub:
+
+```bash
+# Añadir cheatsheets de la comunidad
+navi repo add https://github.com/denisidoro/cheats
+navi repo add https://github.com/nicknisi/dotfiles
+
+# Ver todos los repos añadidos
+navi repo browse
+
+# Actualizar los repos descargados
+navi repo update
+```
+
+## Configuración de navi
+
+```bash
+# Ubicación: ~/.config/navi/config.yaml
+```
+
+```yaml
+# ~/.config/navi/config.yaml
+
+finder:
+  command: fzf   # fzf o skim
+
+cheats:
+  paths:
+    - ~/.local/share/navi/cheats          # Tus cheatsheets personales
+    - ~/.local/share/navi/cheats/comunidad # Cheatsheets descargados
+
+style:
+  tag:
+    color: cyan
+    width_percentage: 26
+    min_width: 20
+  comment:
+    color: green
+    width_percentage: 42
+    min_width: 45
+  snippet:
+    color: white
+
+shell:
+  command: zsh
+
+# Fzf options heredadas
+fzf_overrides: "--height 50% --border=rounded --preview-window=hidden"
+fzf_overrides_var: "--height 30%"
+```
+
+## Pro Tips
+
+**Variables con comandos dinámicos:** Los placeholders `$var: comando` se ejecutan en tiempo real. Puedes hacer que muestren datos reales de tu sistema:
+
+```
+$ proceso: ps aux | awk 'NR>1 {print $11}' | sort -u
+$ puerto: ss -tlnp | awk 'NR>1 {print $4}' | grep -o '[0-9]*$'
+```
+
+**Modo no-interactivo para scripts:** Usa navi en scripts con `--query` para buscar y `--best-match` para ejecutar sin interacción:
+
+```bash
+navi --query "docker logs" --best-match
+```
+
+**Integración con tldr:** Puedes usar los cheatsheets de tldr dentro de navi:
+
+```bash
+navi --tldr tar        # Cheatsheet de tar desde tldr
+navi --cheatsh git     # Desde cheat.sh
+```

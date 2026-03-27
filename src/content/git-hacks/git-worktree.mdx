@@ -1,0 +1,98 @@
+---
+name: Git Worktrees
+description: Trabaja en múltiples branches al mismo tiempo sin stashing. Un directorio de trabajo por branch, un solo repositorio.
+category: git-hacks
+tags: [git, workflow, parallel, branches, worktree, productivity]
+os: [cross]
+featured: true
+difficulty: intermediate
+addedAt: 2025-03-05
+---
+
+## El problema del cambio de contexto en Git
+
+Estás a mitad de una feature cuando llega un bug crítico. Tienes que hacer `git stash`, cambiar de branch, arreglar el bug, volver, hacer `git stash pop`... y rezar para que no haya conflictos. Git Worktrees elimina ese baile.
+
+Un worktree es un directorio de trabajo adicional vinculado al mismo repositorio. Cada worktree tiene su propio branch checked out, sus propios archivos modificados, y puede existir en paralelo con otros worktrees.
+
+## Comandos esenciales
+
+```bash
+# Crear un nuevo worktree para una branch existente
+git worktree add ../mi-repo-hotfix hotfix/bug-critico
+
+# Crear worktree con una branch nueva
+git worktree add -b feature/nueva-feature ../mi-repo-feature
+
+# Listar todos los worktrees activos
+git worktree list
+
+# Eliminar un worktree cuando terminas
+git worktree remove ../mi-repo-hotfix
+
+# Limpiar referencias a worktrees borrados manualmente
+git worktree prune
+```
+
+Salida de `git worktree list`:
+
+```
+/home/user/mi-repo            abc1234 [main]
+/home/user/mi-repo-hotfix     def5678 [hotfix/bug-critico]
+/home/user/mi-repo-feature    ghi9012 [feature/nueva-feature]
+```
+
+## Worktrees vs git stash
+
+| Situación | Worktree | Stash |
+|---|---|---|
+| Cambio de contexto rápido | Mejor | Bien |
+| Trabajo paralelo largo | Mejor | Malo |
+| Comparar código entre branches | Mejor | No sirve |
+| Ejecutar tests en paralelo | Mejor | No sirve |
+| Sin overhead de disco | Peor | Mejor |
+
+## Tip para monorepos
+
+En monorepos, los worktrees son especialmente valiosos porque puedes tener `packages/api` en una branch y `packages/web` en otra sin duplicar todo el repositorio:
+
+```bash
+# Estructura recomendada para monorepos
+git worktree add ../mi-mono-feat-api feature/api-v2
+git worktree add ../mi-mono-feat-web feature/web-redesign
+```
+
+## Shell function para crear worktrees rápido
+
+Añade esta función a tu `.bashrc` o `.zshrc`:
+
+```bash
+# gwt <nombre-branch> → crea worktree en directorio hermano
+gwt() {
+    local branch="$1"
+    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    local worktree_dir="../${repo_name}-${branch//\//-}"
+
+    git worktree add -b "$branch" "$worktree_dir"
+    echo "Worktree creado en: $worktree_dir"
+    cd "$worktree_dir"
+}
+
+# gwtl → listar worktrees de forma compacta
+alias gwtl="git worktree list"
+
+# gwtrm <directorio> → eliminar worktree y su branch local
+gwtrm() {
+    git worktree remove "$1"
+    git branch -d "$(basename $1)"
+}
+```
+
+Uso:
+
+```bash
+gwt feature/login-refactor
+# Crea ../mi-repo-feature-login-refactor y hace cd ahí
+```
+
+> **Nota:** No puedes tener la misma branch en dos worktrees simultáneamente. Si necesitas comparar versiones de la misma branch, usa `git diff` o crea una branch temporal.

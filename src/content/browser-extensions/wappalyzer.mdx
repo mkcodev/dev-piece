@@ -1,0 +1,94 @@
+---
+name: Wappalyzer
+description: Detecta las tecnologías usadas en cualquier sitio web. Stack técnico, frameworks, CMS y más al instante.
+category: browser-extensions
+tags: [browser, tech-stack, detection, research, development]
+os: [cross]
+difficulty: beginner
+links:
+  website: https://www.wappalyzer.com/
+addedAt: 2025-02-20
+---
+
+Wappalyzer detecta las tecnologías que hay detrás de cualquier sitio web con solo visitar la página. Framework frontend, servidor web, CDN, CMS, analytics, pasarela de pago, herramienta de chat... todo aparece categorizado en un popup al hacer clic en el icono de la extensión.
+
+## Casos de uso prácticos
+
+**Para developers:**
+- Analizar el stack de un proyecto que te gusta antes de replicar su arquitectura
+- Investigar qué tecnologías usa la competencia
+- Verificar que una web está usando la versión correcta de una librería
+- Encontrar inspiración para tooling (¿qué CDN usa esta web tan rápida?)
+
+**Para freelancers y agencias:**
+- Identificar el CMS de un cliente potencial antes de la reunión
+- Detectar tecnologías obsoletas en una auditoría
+- Conocer el stack antes de proponer una migración
+
+**Para el aprendizaje:**
+- Descubrir tecnologías que no conocías viendo cómo las usan sitios reales
+- Asociar características de rendimiento o diseño con decisiones tecnológicas
+
+## Cómo funciona la detección
+
+```
+Wappalyzer analiza múltiples señales de la página:
+
+1. Headers HTTP
+   → X-Powered-By: Express
+   → Server: nginx/1.24.0
+
+2. Cookies
+   → wp_session → WordPress
+   → __utma    → Google Analytics (legacy)
+
+3. HTML y meta tags
+   → <meta name="generator" content="WordPress 6.4">
+   → Clases CSS específicas de frameworks
+
+4. JavaScript global variables
+   → window.React, window.Vue, window.__NEXT_DATA__
+
+5. Nombres de archivos y rutas
+   → /wp-content/, /_next/static/, /rails/
+```
+
+## Limitaciones y privacidad
+
+Wappalyzer envía datos de las páginas visitadas a sus servidores para mejorar la base de detección. Si esto es una preocupación, considera las alternativas locales.
+
+```
+Consideraciones de privacidad:
+- La extensión gratuita tiene acceso de lectura a todas las páginas que visitas
+- Los datos se usan para estadísticas de uso de tecnologías
+- La versión de pago ofrece APIs para búsqueda masiva de tecnologías
+```
+
+## Alternativas a considerar
+
+| Herramienta | Tipo | Privacidad | Offline |
+|-------------|------|:----------:|:-------:|
+| **Wappalyzer** | Extensión + API | Media | No |
+| **BuiltWith** | Web + Extensión | Baja | No |
+| **WhatRuns** | Extensión | Media | No |
+| **webtech** | CLI npm | Alta | Si |
+| **whatweb** | CLI Ruby | Alta | Si |
+
+Para uso en auditorías donde la privacidad importa, `whatweb` es una alternativa CLI que funciona completamente offline:
+
+```bash
+# Instalar whatweb (Linux/macOS)
+sudo apt install whatweb   # Debian/Ubuntu
+brew install whatweb       # macOS
+
+# Uso básico
+whatweb https://ejemplo.com
+
+# Modo verbose con todos los detalles
+whatweb -v https://ejemplo.com
+
+# Escanear múltiples URLs
+whatweb -i lista-urls.txt --log-json resultados.json
+```
+
+Wappalyzer sigue siendo la opción más cómoda para el uso diario en el navegador gracias a su interfaz visual y la categorización por tipo de tecnología, pero es importante ser consciente de lo que envía a sus servidores antes de usarla en entornos sensibles.
