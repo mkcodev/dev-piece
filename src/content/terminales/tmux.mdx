@@ -1,0 +1,122 @@
+---
+name: tmux
+description: Multiplexor de terminal clásico. Sesiones persistentes, múltiples paneles y ventanas en una sola conexión SSH. El estándar en servidores remotos.
+category: terminales
+tags: [terminal, multiplexer, sessions, ssh, remote, panels]
+os: [macos, linux]
+featured: true
+difficulty: intermediate
+install:
+  brew: brew install tmux
+  apt: sudo apt install tmux
+links:
+  repo: https://github.com/tmux/tmux
+  docs: https://github.com/tmux/tmux/wiki
+addedAt: 2025-03-20
+---
+
+## El estándar para trabajo en servidores remotos
+
+tmux es un multiplexor de terminal: permite tener múltiples ventanas y paneles en una terminal, y sobre todo mantener sesiones que siguen corriendo aunque cierres la conexión. Indispensable para SSH y trabajo en servidores.
+
+El prefijo por defecto es `Ctrl+B` (cambiable a `Ctrl+A` en la config).
+
+## Sesiones — el concepto clave
+
+```bash
+# Crear sesión nueva con nombre
+tmux new -s trabajo
+
+# Listar sesiones activas
+tmux ls
+
+# Reconectar a una sesión (aunque hayas cerrado el terminal)
+tmux attach -t trabajo
+
+# Desde dentro: desvincular sesión (sigue corriendo)
+Ctrl+B, D
+
+# Matar sesión
+tmux kill-session -t trabajo
+```
+
+## Ventanas (Tabs)
+
+```
+Ctrl+B, C     Nueva ventana
+Ctrl+B, N     Siguiente ventana
+Ctrl+B, P     Ventana anterior
+Ctrl+B, 0-9   Ir a ventana N
+Ctrl+B, ,     Renombrar ventana
+Ctrl+B, &     Cerrar ventana
+```
+
+## Paneles (Splits)
+
+```
+Ctrl+B, %     Dividir horizontalmente
+Ctrl+B, "     Dividir verticalmente
+Ctrl+B, ←→↑↓  Mover foco entre paneles
+Ctrl+B, Z     Zoom (pantalla completa) en panel actual
+Ctrl+B, X     Cerrar panel
+Ctrl+B, Alt+↑↓ Redimensionar panel
+```
+
+## .tmux.conf recomendado
+
+```bash
+# ~/.tmux.conf
+
+# Cambiar prefijo de Ctrl+B a Ctrl+A (como screen)
+set -g prefix C-a
+unbind C-b
+bind C-a send-prefix
+
+# Numeración desde 1 (más intuitivo con teclado)
+set -g base-index 1
+setw -g pane-base-index 1
+
+# Recargar config con prefix+r
+bind r source-file ~/.tmux.conf \; display "Config recargada"
+
+# Splits más intuitivos
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+
+# Navegación estilo vim
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# Mouse habilitado
+set -g mouse on
+
+# Colores
+set -g default-terminal "screen-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+
+# Historia larga
+set -g history-limit 50000
+
+# Status bar
+set -g status-bg colour235
+set -g status-fg colour136
+```
+
+## Plugin manager (TPM)
+
+```bash
+# Instalar TPM
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# Añadir al .tmux.conf
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'   # defaults sensatos
+set -g @plugin 'tmux-plugins/tmux-resurrect'  # guarda/restaura sesiones
+set -g @plugin 'catppuccin/tmux'              # tema Catppuccin
+
+run '~/.tmux/plugins/tpm/tpm'
+
+# Dentro de tmux: Ctrl+A, I para instalar plugins
+```

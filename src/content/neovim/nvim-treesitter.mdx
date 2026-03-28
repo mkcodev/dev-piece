@@ -1,0 +1,138 @@
+---
+name: nvim-treesitter
+description: Análisis sintáctico avanzado para Neovim. Syntax highlighting preciso, indentación inteligente y navegación por nodos del AST para 100+ lenguajes.
+category: neovim
+tags: [neovim, treesitter, syntax, highlighting, parsing, ast]
+os: [windows, macos, linux]
+featured: true
+difficulty: intermediate
+links:
+  repo: https://github.com/nvim-treesitter/nvim-treesitter
+addedAt: 2025-03-20
+---
+
+## Syntax highlighting que entiende el código
+
+El resaltado de sintaxis tradicional de Vim usa expresiones regulares — funciona, pero tiene límites. nvim-treesitter usa **parsers** reales de Tree-sitter para construir el AST del código, lo que permite highlighting semánticamente correcto, indentación precisa y navegación por la estructura del código.
+
+## Instalación con lazy.nvim
+
+```lua
+-- lua/plugins/treesitter.lua
+return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    event = { "BufReadPost", "BufNewFile" },
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        -- Parsers a instalar automáticamente
+        ensure_installed = {
+          "lua", "vim", "vimdoc",
+          "javascript", "typescript", "tsx",
+          "python", "rust", "go",
+          "html", "css", "json", "yaml", "toml",
+          "markdown", "markdown_inline",
+          "bash", "dockerfile",
+          "sql", "graphql",
+        },
+        auto_install = true,
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = false,
+        },
+        indent = {
+          enable = true,
+        },
+      })
+    end,
+  },
+}
+```
+
+## Gestionar parsers
+
+```vim
+" Instalar parser
+:TSInstall python
+
+" Instalar todos los mantenidos
+:TSInstall all
+
+" Ver estado de los parsers
+:TSInstallInfo
+
+" Actualizar parsers
+:TSUpdate
+```
+
+## Módulos adicionales
+
+### Textobjects (navegar por el código)
+
+```lua
+{
+  "nvim-treesitter/nvim-treesitter-textobjects",
+  dependencies = "nvim-treesitter/nvim-treesitter",
+  config = function()
+    require("nvim-treesitter.configs").setup({
+      textobjects = {
+        select = {
+          enable = true,
+          lookahead = true,
+          keymaps = {
+            ["af"] = "@function.outer",  -- función completa
+            ["if"] = "@function.inner",  -- cuerpo de función
+            ["ac"] = "@class.outer",
+            ["ic"] = "@class.inner",
+            ["aa"] = "@parameter.outer", -- argumento
+            ["ia"] = "@parameter.inner",
+          },
+        },
+        move = {
+          enable = true,
+          goto_next_start = {
+            ["]m"] = "@function.outer",
+            ["]c"] = "@class.outer",
+          },
+          goto_previous_start = {
+            ["[m"] = "@function.outer",
+            ["[c"] = "@class.outer",
+          },
+        },
+      },
+    })
+  end,
+}
+```
+
+### Uso en modo normal
+
+```vim
+" Seleccionar función completa (outer)
+vaf
+
+" Seleccionar cuerpo de función (inner)
+vif
+
+" Ir a siguiente función
+]m
+
+" Ir a función anterior
+[m
+```
+
+## Context — encabezado de contexto
+
+```lua
+{
+  "nvim-treesitter/nvim-treesitter-context",
+  config = function()
+    require("treesitter-context").setup({
+      max_lines = 3,  -- líneas del encabezado de contexto
+    })
+  end,
+}
+```
+
+Muestra el nombre de la función/clase en la que estás aunque hayas scrolleado lejos del encabezado.

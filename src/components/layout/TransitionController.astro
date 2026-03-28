@@ -1,0 +1,239 @@
+---
+// TransitionController.astro
+// Centralized manager for all View Transition logic:
+// - Progress bar
+// - Sidebar direction detection (up/down)
+// - Card expand from click
+// - Dynamic view-transition-name assignment
+// - Accent color morphing
+// - Sidebar sliding pill
+import { CATEGORY_CONFIG } from '../../lib/utils';
+
+// Category order matches sidebar order
+const CATEGORY_ORDER = Object.keys(CATEGORY_CONFIG);
+const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
+  Object.entries(CATEGORY_CONFIG).map(([k, v]) => [k, v.accent])
+);
+---
+
+<!-- Progress bar -->
+<div id="dv-progress-bar" aria-hidden="true">
+  <div id="dv-progress-inner"></div>
+</div>
+
+<script define:vars={{ CATEGORY_ORDER, CATEGORY_ACCENTS }}>
+  /* -------------------------------------------------- */
+  /*  Helpers                                           */
+  /* -------------------------------------------------- */
+  function getCategoryFromPath(path) {
+    const parts = path.replace(/^\//, '').split('/');
+    return CATEGORY_ORDER.includes(parts[0]) ? parts[0] : null;
+  }
+
+  function isToolPath(path) {
+    const parts = path.replace(/^\//, '').split('/');
+    return parts.length === 2 && CATEGORY_ORDER.includes(parts[0]);
+  }
+
+  /* -------------------------------------------------- */
+  /*  Progress bar                                       */
+  /* -------------------------------------------------- */
+  const bar   = () => document.getElementById('dv-progress-bar');
+  const inner = () => document.getElementById('dv-progress-inner');
+  let progressTimer = null;
+
+  function progressStart() {
+    const b = bar(); const i = inner();
+    if (!b || !i) return;
+    b.classList.add('visible');
+    i.style.width = '18%';
+    clearTimeout(progressTimer);
+    progressTimer = setTimeout(() => { i.style.width = '55%'; }, 120);
+    progressTimer = setTimeout(() => { i.style.width = '78%'; }, 400);
+  }
+
+  function progressFinish() {
+    const i = inner();
+    if (!i) return;
+    clearTimeout(progressTimer);
+    i.style.width = '100%';
+  }
+
+  function progressHide() {
+    const b = bar(); const i = inner();
+    if (!b || !i) return;
+    setTimeout(() => {
+      b.classList.remove('visible');
+      setTimeout(() => { i.style.width = '0%'; }, 220);
+    }, 120);
+  }
+
+  /* -------------------------------------------------- */
+  /*  Sidebar direction detection                        */
+  /* -------------------------------------------------- */
+  function detectNavDirection(from, to) {
+    const fromCat = getCategoryFromPath(from);
+    const toCat   = getCategoryFromPath(to);
+    if (!fromCat || !toCat || fromCat === toCat) return null;
+
+    const fromIdx = CATEGORY_ORDER.indexOf(fromCat);
+    const toIdx   = CATEGORY_ORDER.indexOf(toCat);
+    if (fromIdx === -1 || toIdx === -1) return null;
+
+    return toIdx > fromIdx ? 'down' : 'up';
+  }
+
+  /* -------------------------------------------------- */
+  /*  Accent color CSS variable                          */
+  /* -------------------------------------------------- */
+  function applyAccent(cat) {
+    const accent = cat ? CATEGORY_ACCENTS[cat] : '#8caaee';
+    if (accent) {
+      document.documentElement.style.setProperty('--page-accent', accent);
+    }
+  }
+
+  /* -------------------------------------------------- */
+  /*  Sidebar sliding pill                               */
+  /* -------------------------------------------------- */
+  function updateSidebarPill() {
+    const nav = document.querySelector('.sidebar-pill-track');
+    if (!nav) return;
+
+    let pill = document.getElementById('sidebar-pill');
+    if (!pill) {
+      pill = document.createElement('div');
+      pill.id = 'sidebar-pill';
+      pill.className = 'sidebar-pill-indicator';
+      nav.appendChild(pill);
+    }
+
+    const activeLink = nav.querySelector('.sidebar-link-active');
+    if (!activeLink) {
+      pill.style.opacity = '0';
+      return;
+    }
+
+    const navRect  = nav.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+
+    pill.style.top    = `${linkRect.top - navRect.top + nav.scrollTop}px`;
+    pill.style.height = `${linkRect.height}px`;
+    pill.style.opacity = '1';
+  }
+
+  /* -------------------------------------------------- */
+  /*  Dynamic view-transition-name on click              */
+  /* -------------------------------------------------- */
+  function clearTransitionNames() {
+    document.querySelectorAll('[data-vt-assigned]').forEach((el) => {
+      el.style.viewTransitionName = '';
+      delete el.dataset.vtAssigned;
+    });
+  }
+
+  function assignName(el, name) {
+    if (!el) return;
+    el.style.viewTransitionName = name;
+    el.dataset.vtAssigned = '1';
+  }
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    if (!href || !href.startsWith('/')) return;
+
+    clearTransitionNames();
+
+    /* Tool card → detail page */
+    const article = link.closest('article[data-fav-slug]');
+    if (article && isToolPath(href)) {
+      const iconEl  = article.querySelector('.card-icon-wrap');
+      const titleEl = article.querySelector('.card-title-el');
+      assignName(iconEl,  'tool-icon-active');
+      assignName(titleEl, 'tool-title-active');
+
+      /* Expand from click */
+      const vp = { w: window.innerWidth, h: window.innerHeight };
+      const r  = article.getBoundingClientRect();
+      document.documentElement.style.setProperty('--card-top',    `${r.top}px`);
+      document.documentElement.style.setProperty('--card-right',  `${vp.w - r.right}px`);
+      document.documentElement.style.setProperty('--card-bottom', `${vp.h - r.bottom}px`);
+      document.documentElement.style.setProperty('--card-left',   `${r.left}px`);
+      document.documentElement.dataset.transitionType = 'card-expand';
+      return;
+    }
+
+    /* Featured category icon → category header */
+    const catLink = link.closest('[data-cat-slug]');
+    if (catLink) {
+      const iconEl = catLink.querySelector('.cat-icon-el');
+      assignName(iconEl, 'cat-icon-active');
+    }
+
+    /* Reset expand type for non-card navigations */
+    delete document.documentElement.dataset.transitionType;
+  }, true);
+
+  /* -------------------------------------------------- */
+  /*  astro:before-preparation — fires before navigation */
+  /* -------------------------------------------------- */
+  document.addEventListener('astro:before-preparation', (e) => {
+    progressStart();
+
+    const from = window.location.pathname;
+    const to   = new URL(e.to).pathname;
+
+    /* Sidebar direction */
+    delete document.documentElement.dataset.navDir;
+    const dir = detectNavDirection(from, to);
+    if (dir) {
+      document.documentElement.dataset.navDir = dir;
+    }
+  });
+
+  /* -------------------------------------------------- */
+  /*  astro:after-swap — new DOM is in place             */
+  /* -------------------------------------------------- */
+  document.addEventListener('astro:after-swap', () => {
+    progressFinish();
+
+    /* Apply accent color */
+    const cat = getCategoryFromPath(window.location.pathname);
+    applyAccent(cat);
+
+    /* Clean up expand type (keep it for the animation to complete) */
+    setTimeout(() => {
+      delete document.documentElement.dataset.transitionType;
+      delete document.documentElement.dataset.navDir;
+    }, 500);
+  });
+
+  /* -------------------------------------------------- */
+  /*  astro:page-load — every page including first load  */
+  /* -------------------------------------------------- */
+  document.addEventListener('astro:page-load', () => {
+    progressHide();
+    updateSidebarPill();
+    clearTransitionNames();
+
+    /* Trigger stagger animations */
+    document.querySelectorAll('.stagger-in').forEach((el) => {
+      /* Reset so animation replays on navigation */
+      el.style.animation = 'none';
+      el.getBoundingClientRect(); /* force reflow */
+      el.style.animation = '';
+    });
+
+    /* Init initial accent */
+    const cat = getCategoryFromPath(window.location.pathname);
+    applyAccent(cat);
+  });
+
+  /* Initial load */
+  updateSidebarPill();
+  const initCat = getCategoryFromPath(window.location.pathname);
+  applyAccent(initCat);
+</script>

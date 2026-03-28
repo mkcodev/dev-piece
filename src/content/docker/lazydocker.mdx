@@ -1,0 +1,78 @@
+---
+name: lazydocker
+description: TUI para Docker y Docker Compose. Gestiona contenedores, imágenes, volúmenes y logs desde la terminal con una interfaz visual.
+category: docker
+tags: [docker, tui, containers, devops, visual]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install jesseduffield/lazydocker/lazydocker
+  scoop: scoop install lazydocker
+  manual: curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+links:
+  repo: https://github.com/jesseduffield/lazydocker
+addedAt: 2025-03-20
+---
+
+## Docker sin memorizar 50 comandos
+
+lazydocker es para Docker lo que lazygit es para Git: una TUI que pone todo en pantalla de forma clara. Contenedores, imágenes, volúmenes, redes y logs, navegables con el teclado.
+
+Del mismo autor (Jesse Duffield), mismo concepto: visual, rápido, sin mouse.
+
+## Interfaz: los 5 paneles
+
+```
+┌──────────────────┬──────────────────────────────┐
+│ 🐳 Projects      │                               │
+│ 📦 Containers    │     Panel de detalle          │
+│ 🖼  Services     │     (logs, stats, env...)     │
+│ 🗃  Images       │                               │
+│ 💾 Volumes       │                               │
+└──────────────────┴──────────────────────────────┘
+```
+
+Navega entre paneles con `←→` y entre items con `↑↓`.
+
+## Atajos esenciales
+
+| Tecla | Acción |
+|-------|--------|
+| `e` | Abrir shell en el contenedor |
+| `d` | Eliminar contenedor/imagen |
+| `s` | Detener contenedor |
+| `r` | Reiniciar contenedor |
+| `u` | Up (docker compose up) |
+| `l` | Ver logs |
+| `[` / `]` | Timestamps en logs |
+| `?` | Ayuda completa |
+
+## Cosas que hacen la vida más fácil
+
+**Logs en tiempo real** — selecciona un contenedor y pulsa `l`. Scroll con rueda del ratón o teclado. Filtra con `/`.
+
+**Shell instantáneo** — `e` abre `/bin/sh` (o bash si existe) en el contenedor activo. Perfecto para debuggear.
+
+**Stats de CPU/memoria** — el panel de detalle muestra gráficos de uso en tiempo real.
+
+**Contextos de Docker Compose** — detecta automáticamente los archivos `docker-compose.yml` del directorio actual.
+
+## Alias recomendado
+
+```bash
+alias lzd='lazydocker'
+```
+
+## Configuración
+
+```yaml
+# ~/.config/lazydocker/config.yml
+gui:
+  theme:
+    activeBorderColor:
+      - green
+      - bold
+  returnImmediately: false
+  wrapMainPanel: true
+```

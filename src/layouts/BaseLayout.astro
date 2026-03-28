@@ -1,9 +1,12 @@
 ---
 import '../styles/globals.css';
+import '../styles/transitions.css';
 import Header from '../components/layout/Header.astro';
 import Sidebar from '../components/layout/Sidebar.astro';
 import Footer from '../components/layout/Footer.astro';
 import CommandPalette from '../components/search/CommandPalette';
+import TransitionController from '../components/layout/TransitionController.astro';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title: string;
@@ -14,7 +17,7 @@ interface Props {
 
 const {
   title,
-  description = 'DevVault — El hub definitivo de productividad para desarrolladores. CLI tools, configs, scripts, y más.',
+  description = 'DevPiece — El hub definitivo de productividad para desarrolladores. CLI tools, configs, scripts, y más.',
   ogImage = '/og-image.png',
   canonical,
 } = Astro.props;
@@ -29,7 +32,7 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <title>{title} | DevVault</title>
+    <title>{title} | DevPiece</title>
 
     <!-- Canonical -->
     <link rel="canonical" href={canonicalUrl} />
@@ -50,6 +53,9 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
 
+    <!-- View Transitions (Astro 6 ClientRouter) -->
+    <ClientRouter />
+
     <!-- JSON-LD -->
     <script type="application/ld+json" set:html={JSON.stringify({
       '@context': 'https://schema.org',
@@ -60,19 +66,30 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
     })} />
   </head>
   <body class="min-h-screen bg-base text-text">
+    <!-- Transition manager + progress bar -->
+    <TransitionController />
+
     <!-- Skip to content -->
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue text-crust px-4 py-2 rounded-lg z-50 font-semibold">
       Saltar al contenido
     </a>
 
     <div class="flex min-h-screen">
-      <!-- Sidebar (desktop) -->
-      <Sidebar />
+      <!-- Sidebar persists across navigations (no re-render flash) -->
+      <Sidebar transition:persist="sidebar" />
 
       <!-- Main area -->
       <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
-        <Header />
-        <main id="main-content" class="flex-1 p-4 md:p-6 lg:p-8 max-w-content mx-auto w-full">
+        <!-- Header persists too -->
+        <Header transition:persist="header" />
+
+        <!-- Main content — named for view transitions -->
+        <main
+          id="main-content"
+          class="flex-1 p-4 md:p-6 lg:p-8 max-w-content mx-auto w-full"
+          transition:name="page-main"
+          transition:animate="none"
+        >
           <slot />
         </main>
         <Footer />

@@ -1,0 +1,94 @@
+---
+name: dust
+description: Alternativa a du con visualización de árbol de directorios y porcentajes. Ve de un vistazo qué está ocupando espacio en tu disco.
+category: cli-tools
+tags: [disk, storage, du, files, analysis, rust]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  brew: brew install dust
+  cargo: cargo install du-dust
+  scoop: scoop install dust
+  apt: sudo apt install du-dust
+links:
+  repo: https://github.com/bootandy/dust
+addedAt: 2025-03-20
+---
+
+## du con visualización de árbol
+
+`du` (disk usage) es el comando clásico para ver cuánto espacio ocupa cada directorio. `dust` lo mejora con un árbol visual y porcentajes, para entender la distribución de espacio de un vistazo.
+
+```bash
+# Antes (du)
+du -sh * | sort -h
+# 4.0K  package.json
+# 156M  node_modules
+# 2.4G  .next
+
+# Con dust
+dust
+# 2.4G ┌── .next             ████████████████ 58%
+# 156M │ ┌── node_modules    ███             4%
+#  48M │ │  ├── @types       █               1%
+#  ...
+```
+
+## Comandos básicos
+
+```bash
+# Ver uso del directorio actual
+dust
+
+# Ver directorio específico
+dust ~/Projects
+
+# Solo el primer nivel (menos profundidad)
+dust -d 1
+
+# Los 20 directorios más grandes
+dust -n 20
+
+# Ignorar directorios
+dust --ignore-directory node_modules
+
+# Orden por tamaño (defecto) o por nombre
+dust -s  # size (defecto)
+dust -b  # nombre
+
+# Mostrar en bytes, no unidades humanas
+dust --bytes
+```
+
+## Flags útiles para devs
+
+```bash
+# Ver qué hay dentro de node_modules
+dust node_modules -d 2
+
+# Ver tamaño de imágenes Docker
+dust ~/.docker
+
+# Analizar builds
+dust dist/ .next/ out/ -d 1
+```
+
+## Integración con aliases
+
+```bash
+# .zshrc / .bashrc
+alias ds='dust'
+alias dsd='dust -d 1'   # solo primer nivel
+alias dsl='dust -n 20'  # top 20 más grandes
+```
+
+## Comparativa con alternativas
+
+| Herramienta | Árbol visual | Porcentajes | Velocidad |
+|-------------|-------------|-------------|-----------|
+| `du` | ✗ | ✗ | Rápido |
+| `ncdu` | ✓ (TUI) | ✓ | Rápido |
+| `dust` | ✓ (texto) | ✓ | Muy rápido |
+| `duf` | Tabla | ✓ | Rápido |
+
+`duf` es para particiones/discos; `dust` para subdirectorios dentro de un filesystem.

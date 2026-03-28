@@ -1,0 +1,136 @@
+---
+name: REST Client
+description: Envía peticiones HTTP directamente desde VS Code con archivos .http. Alternativa a Postman que vive en tu repositorio junto al código.
+category: vscode
+tags: [vscode, http, api, rest, testing, debugging]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  manual: ext install humao.rest-client
+links:
+  repo: https://github.com/Huachao/vscode-restclient
+addedAt: 2025-03-20
+---
+
+## Postman dentro de VS Code, versionable en Git
+
+REST Client te permite escribir peticiones HTTP en archivos `.http` o `.rest` y ejecutarlas con un clic. A diferencia de Postman, los archivos viven en el repositorio junto al código.
+
+## Instalación
+
+```
+Ctrl+Shift+X → buscar "REST Client" → Instalar (humao.rest-client)
+```
+
+## Sintaxis básica
+
+```http
+### GET básico
+GET https://api.example.com/users
+Accept: application/json
+
+###
+
+### POST con JSON
+POST https://api.example.com/users
+Content-Type: application/json
+
+{
+  "name": "Juan",
+  "email": "juan@example.com"
+}
+
+###
+
+### Con headers de autenticación
+GET https://api.example.com/profile
+Authorization: Bearer {{token}}
+```
+
+Haz clic en **Send Request** que aparece sobre cada petición, o `Ctrl+Alt+R`.
+
+## Variables y entornos
+
+```json
+// .vscode/settings.json
+{
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "v1"
+    },
+    "local": {
+      "baseUrl": "http://localhost:3000",
+      "token": "dev-token-local"
+    },
+    "staging": {
+      "baseUrl": "https://staging.api.example.com",
+      "token": "staging-token"
+    },
+    "production": {
+      "baseUrl": "https://api.example.com",
+      "token": "prod-token"
+    }
+  }
+}
+```
+
+```http
+# requests/users.http
+
+@baseUrl = {{$dotenv BASE_URL}}
+
+### Listar usuarios
+GET {{baseUrl}}/{{version}}/users
+Authorization: Bearer {{token}}
+
+### Crear usuario
+POST {{baseUrl}}/{{version}}/users
+Content-Type: application/json
+
+{
+  "name": "Test User"
+}
+```
+
+Cambia de entorno con `Ctrl+Alt+E`.
+
+## Variables dinámicas
+
+```http
+### Login y guardar token
+# @name loginRequest
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "password"
+}
+
+###
+
+### Usar token de la respuesta anterior
+GET {{baseUrl}}/profile
+Authorization: Bearer {{loginRequest.response.body.token}}
+```
+
+## Para el repositorio: archivo de ejemplo
+
+```http
+# .http.example — sin secretos reales, commitable
+@baseUrl = http://localhost:3000
+@token = YOUR_TOKEN_HERE
+
+### Health check
+GET {{baseUrl}}/health
+
+### Get all users
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{token}}
+```
+
+Y en `.gitignore`:
+```gitignore
+*.http
+!*.http.example
+```

@@ -1,0 +1,101 @@
+---
+name: GlazeWM
+description: Tiling window manager para Windows inspirado en i3. Organiza ventanas automáticamente en tiles con atajos de teclado, sin mouse necesario.
+category: windows-tools
+tags: [windows, tiling, wm, productivity, keyboard, layouts]
+os: [windows]
+featured: true
+difficulty: intermediate
+install:
+  winget: winget install glzr-io.glazewm
+  scoop: scoop install glazewm
+links:
+  repo: https://github.com/glzr-io/glazewm
+  docs: https://github.com/glzr-io/glazewm/blob/main/README.md
+addedAt: 2025-03-20
+---
+
+## Tiling window manager en Windows
+
+En Linux, gestores como i3 o Sway organizan las ventanas automáticamente en tiles sin superposición. GlazeWM lleva ese concepto a Windows: las ventanas se dividen el espacio de la pantalla y se navegan con teclado.
+
+Si usas múltiples ventanas simultáneamente y odias tener que buscarlas con Alt+Tab, un tiling WM cambia la forma de trabajar radicalmente.
+
+## Conceptos básicos
+
+- **Tile**: cada ventana ocupa una porción de la pantalla sin superponerse
+- **Workspace**: escritorios virtuales (1-9) para agrupar ventanas por contexto
+- **Container**: las ventanas se organizan en árbol; pueden ser horizontal o vertical
+- **Focus**: la ventana activa; se cambia con teclado
+
+## Instalación y primer inicio
+
+```bash
+winget install glzr-io.glazewm
+```
+
+GlazeWM se inicia con Windows automáticamente y lee su configuración en `%USERPROFILE%\.glzr\glazewm\config.yaml`.
+
+## Atajos de teclado por defecto
+
+```
+Alt+H/J/K/L          Mover foco: izquierda/abajo/arriba/derecha
+Alt+Shift+H/J/K/L    Mover ventana en la dirección
+Alt+1 a Alt+9        Ir al workspace N
+Alt+Shift+1-9        Mover ventana al workspace N
+Alt+F                Pantalla completa (mantiene tile al salir)
+Alt+Shift+F          Modo flotante (ventana libre, no tile)
+Alt+D                Abrir launcher (Zebar o similar)
+Alt+Shift+Q          Cerrar ventana activa
+Alt+T                Cambiar split horizontal/vertical
+```
+
+## Configuración básica
+
+```yaml
+# ~/.glzr/glazewm/config.yaml
+general:
+  focus_follows_cursor: false
+  toggle_workspace_on_refocus: false
+  cursor_jump:
+    enabled: true
+    trigger: monitor_focus
+
+gaps:
+  inner_gap: 8
+  outer_gap: 8
+
+workspaces:
+  - name: "1"
+    display_name: "Terminal"
+  - name: "2"
+    display_name: "Editor"
+  - name: "3"
+    display_name: "Browser"
+  - name: "4"
+    display_name: "Chat"
+```
+
+## Reglas por aplicación
+
+```yaml
+window_rules:
+  # Chromium en workspace 3 siempre
+  - command: "move --workspace 3"
+    match:
+      - window_process: { equals: "chrome" }
+
+  # Terminals en workspace 1
+  - command: "move --workspace 1"
+    match:
+      - window_process: { equals: "WindowsTerminal" }
+
+  # Teams siempre flotante
+  - command: "set-floating"
+    match:
+      - window_process: { equals: "Teams" }
+```
+
+## GlazeWM + Zebar
+
+**Zebar** es la barra de estado companion de GlazeWM con workspaces, reloj, CPU, RAM y widgets personalizables. Se instala junto con GlazeWM desde el mismo repositorio.

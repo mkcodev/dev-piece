@@ -1,0 +1,329 @@
+/* ==========================================================
+   DevVault — View Transitions & Micro-animations
+   ========================================================== */
+
+/* ----------------------------------------------------------
+   1. SLIDE KEYFRAMES — forward / back / up / down
+   ---------------------------------------------------------- */
+@keyframes slide-from-right {
+  from { transform: translateX(56px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slide-to-left {
+  from { transform: translateX(0);     opacity: 1; }
+  to   { transform: translateX(-56px); opacity: 0; }
+}
+@keyframes slide-from-left {
+  from { transform: translateX(-56px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+@keyframes slide-to-right {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(56px); opacity: 0; }
+}
+@keyframes slide-from-bottom {
+  from { transform: translateY(44px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes slide-to-top {
+  from { transform: translateY(0);     opacity: 1; }
+  to   { transform: translateY(-44px); opacity: 0; }
+}
+@keyframes slide-from-top {
+  from { transform: translateY(-44px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+@keyframes slide-to-bottom {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(44px); opacity: 0; }
+}
+
+/* ----------------------------------------------------------
+   2. MAIN CONTENT — page transition by direction
+   page-main is the view-transition-name on <main>
+   ---------------------------------------------------------- */
+
+/* Forward: Index → Category → Tool */
+html[data-astro-transition="forward"] ::view-transition-old(page-main) {
+  animation: slide-to-left 260ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+html[data-astro-transition="forward"] ::view-transition-new(page-main) {
+  animation: slide-from-right 340ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Back: Tool → Category → Index */
+html[data-astro-transition="back"] ::view-transition-old(page-main) {
+  animation: slide-to-right 260ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+html[data-astro-transition="back"] ::view-transition-new(page-main) {
+  animation: slide-from-left 340ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Sidebar DOWN: navigating to a category further down the list */
+html[data-nav-dir="down"] ::view-transition-old(page-main) {
+  animation: slide-to-top 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+html[data-nav-dir="down"] ::view-transition-new(page-main) {
+  animation: slide-from-bottom 300ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Sidebar UP: navigating to a category further up the list */
+html[data-nav-dir="up"] ::view-transition-old(page-main) {
+  animation: slide-to-bottom 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+html[data-nav-dir="up"] ::view-transition-new(page-main) {
+  animation: slide-from-top 300ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* ----------------------------------------------------------
+   3. EXPAND FROM CLICK — card → detail page
+   ---------------------------------------------------------- */
+@keyframes expand-from-card {
+  from {
+    clip-path: inset(
+      var(--card-top, 40%)
+      var(--card-right, 30%)
+      var(--card-bottom, 40%)
+      var(--card-left, 30%)
+      round 12px
+    );
+    opacity: 0.85;
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0px);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out-soft {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+html[data-transition-type="card-expand"] ::view-transition-new(page-main) {
+  animation: expand-from-card 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+html[data-transition-type="card-expand"] ::view-transition-old(page-main) {
+  animation: fade-out-soft 240ms ease both;
+}
+
+/* ----------------------------------------------------------
+   4. MORPHING ELEMENTS — icon, title, card container
+   View-transition-name set dynamically by JS on click
+   ---------------------------------------------------------- */
+::view-transition-group(tool-icon-active) {
+  animation-duration: 380ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-group(tool-title-active) {
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-group(cat-icon-active) {
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth cross-fade during morph */
+::view-transition-old(tool-icon-active),
+::view-transition-old(tool-title-active),
+::view-transition-old(cat-icon-active) {
+  animation: fade-out-soft 200ms ease both;
+}
+::view-transition-new(tool-icon-active),
+::view-transition-new(tool-title-active),
+::view-transition-new(cat-icon-active) {
+  animation: morph-fade-in 280ms ease both;
+}
+
+@keyframes morph-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ----------------------------------------------------------
+   5. STAGGER CONTENT ENTRY — detail pages & category pages
+   ---------------------------------------------------------- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-in {
+  opacity: 0;
+  animation: fade-up 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 75ms);
+}
+
+/* ----------------------------------------------------------
+   6. HOVER MICRO-ANIMATIONS — tool cards
+   ---------------------------------------------------------- */
+.tool-card {
+  transition:
+    border-color 180ms ease,
+    transform 280ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    box-shadow 220ms ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% -10%,
+    rgba(186, 187, 241, 0.06) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 280ms ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.tool-card:hover {
+  transform: translateY(-3px) scale(1.008);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(186, 187, 241, 0.14),
+    0 0 24px rgba(140, 170, 238, 0.07);
+  border-color: rgba(186, 187, 241, 0.35);
+}
+
+.tool-card:hover::before {
+  opacity: 1;
+}
+
+/* Icon bounce */
+.card-icon-wrap {
+  transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tool-card:hover .card-icon-wrap {
+  transform: scale(1.14) rotate(-4deg);
+}
+
+/* Top accent bar glow */
+.card-accent-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--card-accent, #8caaee), rgba(186,187,241,0.6), var(--card-accent, #8caaee));
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 320ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 1;
+}
+
+.tool-card:hover .card-accent-bar {
+  transform: scaleX(1);
+}
+
+/* Card featured bar (permanent for featured tools) */
+.card-featured-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #8caaee, #babbf1, #ca9ee6);
+  z-index: 1;
+}
+
+/* Favorite button pulse */
+.fav-btn-active {
+  animation: fav-pulse 400ms cubic-bezier(0.34, 1.7, 0.64, 1);
+}
+@keyframes fav-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+/* ----------------------------------------------------------
+   7. SCROLL-DRIVEN ANIMATIONS — category grid cards
+   Chrome 115+, silent fallback in others
+   ---------------------------------------------------------- */
+@supports (animation-timeline: scroll()) {
+  @keyframes card-scroll-in {
+    from { opacity: 0; transform: translateY(22px) scale(0.98); filter: blur(2px); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+  }
+
+  .scroll-reveal {
+    animation: card-scroll-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 28%;
+  }
+}
+
+/* ----------------------------------------------------------
+   8. ACCENT COLOR MORPHING — sidebar + UI elements
+   ---------------------------------------------------------- */
+.accent-morph {
+  transition:
+    background-color 380ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color     380ms cubic-bezier(0.4, 0, 0.2, 1),
+    color            380ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow       380ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ----------------------------------------------------------
+   9. SIDEBAR SLIDING PILL
+   ---------------------------------------------------------- */
+.sidebar-pill-track {
+  position: relative;
+}
+
+.sidebar-pill-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-radius: 0.5rem;
+  background-color: rgba(65, 69, 89, 0.5); /* surface0/50 */
+  border-left: 2px solid #babbf1;          /* lavender */
+  pointer-events: none;
+  transition:
+    top    320ms cubic-bezier(0.34, 1.3, 0.64, 1),
+    height 200ms ease,
+    opacity 150ms ease;
+  z-index: 0;
+}
+
+/* ----------------------------------------------------------
+   10. PROGRESS BAR
+   ---------------------------------------------------------- */
+#dv-progress-bar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+#dv-progress-bar.visible {
+  opacity: 1;
+}
+
+#dv-progress-inner {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #8caaee 0%, #babbf1 50%, #ca9ee6 100%);
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 8px rgba(140, 170, 238, 0.65), 0 0 16px rgba(186, 187, 241, 0.3);
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ----------------------------------------------------------
+   11. FIREFOX FALLBACK — CSS animation when VT not supported
+   ---------------------------------------------------------- */
+@supports not (view-transition-name: foo) {
+  #main-content {
+    animation: firefox-page-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes firefox-page-enter {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+}

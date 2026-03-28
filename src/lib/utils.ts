@@ -110,4 +110,16 @@ export const CATEGORY_CONFIG: Record<string, {
     accent: '#99d1db',
     icon: 'monitor',
   },
+  learning: {
+    label: 'Aprendiendo',
+    description: 'Cursos, libros, canales de YouTube y documentación esencial para desarrolladores',
+    accent: '#a6d189',
+    icon: 'book-open',
+  },
+  'web-resources': {
+    label: 'Web Dev Resources',
+    description: 'Sitios, herramientas online y referencias imprescindibles para desarrollo web',
+    accent: '#81c8be',
+    icon: 'globe-2',
+  },
 };

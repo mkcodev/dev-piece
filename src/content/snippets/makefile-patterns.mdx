@@ -1,0 +1,126 @@
+---
+name: Makefile para proyectos modernos
+description: Patrones de Makefile para proyectos web y backend. Un único punto de entrada para build, test, lint, deploy y más, independiente del stack.
+category: snippets
+tags: [makefile, make, build, automation, devops, scripts]
+os: [macos, linux]
+difficulty: intermediate
+addedAt: 2025-03-20
+---
+
+## Makefile: el task runner que ya tienes instalado
+
+Makefile no es solo para proyectos C/C++. Es un runner de tareas con caché incorporada (no reejecutas lo que no cambió), dependencias entre tareas y soporte universal. No necesita instalar nada — `make` viene con casi todos los sistemas.
+
+## Estructura básica
+
+```makefile
+# Makefile
+
+# Variables
+APP_NAME := mi-app
+PORT := 3000
+
+# .PHONY: targets que no son archivos reales
+.PHONY: dev build test lint clean install help
+
+# Target por defecto (se ejecuta con solo `make`)
+.DEFAULT_GOAL := help
+
+help: ## Muestra esta ayuda
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+install: ## Instala dependencias
+	npm install
+
+dev: install ## Inicia servidor de desarrollo
+	npm run dev
+
+build: ## Build de producción
+	npm run build
+
+test: ## Ejecuta tests
+	npm test
+
+lint: ## Ejecuta linter
+	npm run lint
+
+clean: ## Limpia archivos generados
+	rm -rf dist .next out node_modules/.cache
+```
+
+## Makefile para proyectos full-stack (Node + Docker)
+
+```makefile
+.PHONY: up down build logs shell-api shell-db migrate seed
+
+COMPOSE := docker compose
+
+up: ## Levanta todos los servicios
+	$(COMPOSE) up -d
+
+down: ## Para y elimina contenedores
+	$(COMPOSE) down
+
+build: ## Reconstruye las imágenes
+	$(COMPOSE) build --no-cache
+
+logs: ## Logs en tiempo real
+	$(COMPOSE) logs -f
+
+shell-api: ## Shell en el contenedor de la API
+	$(COMPOSE) exec api sh
+
+shell-db: ## PostgreSQL REPL
+	$(COMPOSE) exec db psql -U postgres -d mydb
+
+migrate: ## Ejecuta migraciones de base de datos
+	$(COMPOSE) exec api npm run db:migrate
+
+seed: ## Pobla la base de datos con datos de prueba
+	$(COMPOSE) exec api npm run db:seed
+
+test: ## Tests dentro del contenedor
+	$(COMPOSE) exec api npm test
+
+fresh: down build up migrate seed ## Setup desde cero completo
+```
+
+## Makefile con variables de entorno
+
+```makefile
+# Carga .env si existe
+-include .env
+export
+
+ENV ?= development
+API_URL ?= http://localhost:3000
+
+deploy: ## Deploy al entorno (ENV=production make deploy)
+	@echo "Desplegando en $(ENV)..."
+	@if [ "$(ENV)" = "production" ]; then \
+		echo "⚠️  Deploy a PRODUCCIÓN. Continuar? [y/N]" && read ans && [ "$${ans:-N}" = y ]; \
+	fi
+	./scripts/deploy.sh $(ENV)
+```
+
+## Targets con dependencias
+
+```makefile
+# build depende de lint y test — no se ejecuta si alguno falla
+build: lint test
+	npm run build
+
+release: build ## Crea release completo
+	npm version patch
+	git push --follow-tags
+	npm publish
+```
+
+## Tips
+
+- Usa `$$(variable)` cuando la variable es del shell, no de make
+- El `@` al inicio de un comando suprime el echo del comando
+- `-` al inicio ignora errores de ese comando
+- La indentación DEBE ser con TABs, no espacios

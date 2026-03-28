@@ -1,0 +1,93 @@
+---
+name: Nerd Fonts
+description: Colección de fuentes monoespaciadas con miles de iconos añadidos. Necesaria para Starship, oh-my-posh, Neovim con iconos y herramientas CLI modernas.
+category: fonts
+tags: [font, icons, terminal, nerd-fonts, patched]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install --cask font-jetbrains-mono-nerd-font
+  scoop: scoop install nerd-fonts-JetBrainsMono
+  manual: https://www.nerdfonts.com/font-downloads
+links:
+  website: https://www.nerdfonts.com/
+  repo: https://github.com/ryanoasis/nerd-fonts
+addedAt: 2025-03-20
+---
+
+## Por qué las herramientas modernas necesitan Nerd Fonts
+
+Si usas Starship, oh-my-posh, lazygit, yazi, nvim con lualine o cualquier herramienta CLI moderna, necesitas una Nerd Font. Sin ella, verás rectángulos o `?` en lugar de iconos de carpetas, lenguajes de programación, ramas de git, etc.
+
+Nerd Fonts es un proyecto que toma fuentes monoespaciadas populares y les añade más de **10,000 iconos** de Font Awesome, Devicons, Powerline Symbols y otros.
+
+## Las fuentes más populares
+
+| Nombre Nerd Font | Fuente base |
+|------------------|-------------|
+| `JetBrainsMono Nerd Font` | JetBrains Mono |
+| `FiraCode Nerd Font` | Fira Code (con ligaduras) |
+| `CaskaydiaCove Nerd Font` | Cascadia Code |
+| `Hack Nerd Font` | Hack |
+| `MesloLGS NF` | Menlo (popular para zsh) |
+| `Iosevka Nerd Font` | Iosevka |
+| `FantasqueSansMono Nerd Font` | Fantasque Sans |
+
+## Instalación rápida (recomendada)
+
+```bash
+# macOS — instala JetBrainsMono Nerd Font
+brew install --cask font-jetbrains-mono-nerd-font
+
+# Instalar varias fuentes a la vez
+brew install --cask \
+  font-jetbrains-mono-nerd-font \
+  font-fira-code-nerd-font \
+  font-hack-nerd-font
+
+# Windows con scoop
+scoop bucket add nerd-fonts
+scoop install nerd-fonts-JetBrainsMono
+```
+
+## Configuración en Windows Terminal
+
+```json
+{
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "JetBrainsMono Nerd Font",
+        "size": 12
+      }
+    }
+  }
+}
+```
+
+## Configuración en Alacritty
+
+```toml
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold   = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+italic = { family = "JetBrainsMono Nerd Font", style = "Italic" }
+size = 14.0
+```
+
+## Verificar que los iconos funcionan
+
+```bash
+# Si ves los iconos correctamente, la fuente está bien instalada
+echo -e "\uf09b \uf121 \uf17c \ue0b0 \ue0b2 \uf292"
+# GitHub  Code  Linux  Arrow  Arrow  Git
+```
+
+## Mono vs no-Mono
+
+Cada Nerd Font tiene una variante `Mono`:
+- **Sin Mono**: los iconos pueden ocupar 2 caracteres de ancho (mejor visualización)
+- **Con Mono**: los iconos ocupan exactamente 1 carácter (mejor alineación en tablas)
+
+Para terminales y editores, generalmente la versión sin `Mono` se ve mejor.

@@ -66,7 +66,7 @@ const formatDate = (d: Date) =>
 
 <BaseLayout title={data.name} description={data.description}>
   <!-- Breadcrumb -->
-  <nav class="flex items-center gap-2 text-sm text-subtext0 mb-6" aria-label="Ruta de navegación">
+  <nav class="flex items-center gap-2 text-sm text-subtext0 mb-6 stagger-in" style="--i: 0" aria-label="Ruta de navegación">
     <a href="/" class="hover:text-text transition-colors">Inicio</a>
     <span aria-hidden="true">/</span>
     <a href={`/${category}`} class="hover:text-text transition-colors">{config?.label}</a>
@@ -77,22 +77,29 @@ const formatDate = (d: Date) =>
   <div class="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-8">
     <!-- Main content -->
     <div>
-      <!-- Header -->
-      <div class="mb-8">
-        <div class="flex items-start gap-4 mb-4">
+      <!-- Hero header — morphing target from card -->
+      <div class="mb-8 stagger-in" style="--i: 1">
+        <div class="flex items-start gap-5 mb-5">
+          <!-- Icon — view-transition-name matches the clicked card's card-icon-wrap -->
           <div
-            class="w-14 h-14 rounded-xl flex items-center justify-center font-bold text-xl flex-shrink-0"
-            style={`background-color: ${accent}20; color: ${accent};`}
+            class="card-icon-wrap w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl"
+            style={`background-color: ${accent}25; box-shadow: 0 0 32px ${accent}35; view-transition-name: tool-icon-active;`}
             aria-hidden="true"
           >
             {data.name.charAt(0).toUpperCase()}
           </div>
-          <div class="flex-1 min-w-0">
+          <div class="flex-1 min-w-0 pt-1">
             <div class="flex items-center gap-3 flex-wrap mb-2">
-              <h1 class="text-3xl font-bold text-text">{data.name}</h1>
+              <!-- Title — view-transition-name matches card-title-el -->
+              <h1
+                class="card-title-el text-3xl font-black text-text leading-tight"
+                style="view-transition-name: tool-title-active;"
+              >
+                {data.name}
+              </h1>
               {data.featured && (
-                <span class="text-xs bg-blue/20 text-blue border border-blue/30 px-2 py-0.5 rounded-full">
-                  Destacado
+                <span class="text-xs bg-blue/20 text-blue border border-blue/30 px-2 py-0.5 rounded-full font-medium">
+                  ★ Destacado
                 </span>
               )}
             </div>
@@ -121,11 +128,18 @@ const formatDate = (d: Date) =>
             </span>
           ))}
         </div>
+
+        <!-- Accent divider -->
+        <div
+          class="mt-5 h-px rounded-full opacity-25"
+          style={`background: linear-gradient(90deg, ${accent}, transparent);`}
+          aria-hidden="true"
+        />
       </div>
 
       <!-- Install commands -->
       {availableInstalls.length > 0 && (
-        <section class="mb-8" aria-labelledby="install-heading">
+        <section class="mb-8 stagger-in" style="--i: 2" aria-labelledby="install-heading">
           <h2 id="install-heading" class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
             <svg class="w-4 h-4 text-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -149,7 +163,7 @@ const formatDate = (d: Date) =>
 
       <!-- Commands -->
       {data.commands && data.commands.length > 0 && (
-        <section class="mb-8" aria-labelledby="commands-heading">
+        <section class="mb-8 stagger-in" style="--i: 3" aria-labelledby="commands-heading">
           <h2 id="commands-heading" class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
             <svg class="w-4 h-4 text-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <polyline points="4 17 10 11 4 5"/>
@@ -181,7 +195,7 @@ const formatDate = (d: Date) =>
 
       <!-- Config file -->
       {data.config && (
-        <section class="mb-8" aria-labelledby="config-heading">
+        <section class="mb-8 stagger-in" style="--i: 3" aria-labelledby="config-heading">
           <h2 id="config-heading" class="text-lg font-semibold text-text mb-3 flex items-center gap-2">
             <svg class="w-4 h-4 text-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="12" r="3"/>
@@ -200,18 +214,7 @@ const formatDate = (d: Date) =>
       )}
 
       <!-- MDX content -->
-      <div class="prose prose-invert prose-sm max-w-none
-        prose-headings:text-text prose-headings:font-semibold
-        prose-p:text-subtext1 prose-p:leading-relaxed
-        prose-a:text-blue prose-a:no-underline hover:prose-a:text-lavender
-        prose-code:text-sky prose-code:bg-surface0 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-['']
-        prose-pre:bg-crust prose-pre:border prose-pre:border-surface0 prose-pre:rounded-lg
-        prose-strong:text-text prose-strong:font-semibold
-        prose-ul:text-subtext1 prose-ol:text-subtext1
-        prose-li:marker:text-lavender
-        prose-blockquote:border-l-lavender prose-blockquote:text-subtext0
-        prose-hr:border-surface1
-        prose-th:text-text prose-td:text-subtext1">
+      <div class="stagger-in prose prose-invert prose-sm max-w-none prose-headings:text-text prose-headings:font-semibold prose-p:text-subtext1 prose-p:leading-relaxed prose-a:text-blue prose-a:no-underline hover:prose-a:text-lavender prose-code:text-sky prose-code:bg-surface0 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-[''] prose-pre:bg-crust prose-pre:border prose-pre:border-surface0 prose-pre:rounded-lg prose-strong:text-text prose-strong:font-semibold prose-ul:text-subtext1 prose-ol:text-subtext1 prose-li:marker:text-lavender prose-blockquote:border-l-lavender prose-blockquote:text-subtext0 prose-hr:border-surface1 prose-th:text-text prose-td:text-subtext1" style="--i: 4">
         <Content />
       </div>
     </div>
@@ -225,41 +228,73 @@ const formatDate = (d: Date) =>
           <div class="space-y-2">
             {data.links.repo && (
               <a href={data.links.repo} target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
-                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                class="bg-crust hover:bg-surface1 border border-surface1 rounded-xl p-3 flex items-center gap-3 transition-all group">
+                <div class="w-8 h-8 rounded-lg bg-overlay0/30 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-text group-hover:translate-x-0.5 transition-transform" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-text font-medium text-sm leading-tight">GitHub</p>
+                  <p class="text-subtext0 text-xs">Repositorio</p>
+                </div>
+                <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
-                Repositorio
               </a>
             )}
             {data.links.docs && (
               <a href={data.links.docs} target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                class="bg-surface0 hover:bg-surface1 border border-surface1 rounded-xl p-3 flex items-center gap-3 transition-all group">
+                <div class="w-8 h-8 rounded-lg bg-blue/15 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-blue group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-text font-medium text-sm leading-tight">Documentación oficial</p>
+                  <p class="text-subtext0 text-xs">Guías y referencia</p>
+                </div>
+                <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
-                Documentación
               </a>
             )}
             {data.links.website && (
               <a href={data.links.website} target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                class="bg-surface0 hover:bg-surface1 border border-surface1 rounded-xl p-3 flex items-center gap-3 transition-all group">
+                <div class="w-8 h-8 rounded-lg bg-teal/15 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-teal group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-text font-medium text-sm leading-tight">Sitio web</p>
+                  <p class="text-subtext0 text-xs">Página oficial</p>
+                </div>
+                <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
-                Sitio web
               </a>
             )}
             {data.links.video && (
               <a href={data.links.video} target="_blank" rel="noopener noreferrer"
-                class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors">
-                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <polygon points="23 7 16 12 23 17 23 7"/>
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                class="bg-surface0 hover:bg-surface1 border border-surface1 rounded-xl p-3 flex items-center gap-3 transition-all group">
+                <div class="w-8 h-8 rounded-lg bg-red/15 flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-red group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <polygon points="23 7 16 12 23 17 23 7"/>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-text font-medium text-sm leading-tight">Video tutorial</p>
+                  <p class="text-subtext0 text-xs">Ver en video</p>
+                </div>
+                <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
-                Video tutorial
               </a>
             )}
           </div>
@@ -299,6 +334,44 @@ const formatDate = (d: Date) =>
         </svg>
         Volver a {config?.label}
       </a>
+
+      <!-- Feedback -->
+      <div class="bg-surface0 rounded-xl border border-surface1 p-4 text-center" id="feedback-widget">
+        <p class="text-xs text-subtext0 mb-3" id="feedback-question">¿Te ha sido útil?</p>
+        <div class="flex items-center justify-center gap-2" id="feedback-buttons">
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green/10 text-green border border-green/20 hover:bg-green/20 hover:border-green/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
+            aria-label="Sí, me ha sido útil"
+            data-feedback="yes"
+          >
+            👍 <span class="text-xs">Sí</span>
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red/10 text-red border border-red/20 hover:bg-red/20 hover:border-red/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
+            aria-label="No, no me ha sido útil"
+            data-feedback="no"
+          >
+            👎 <span class="text-xs">No</span>
+          </button>
+        </div>
+        <div id="feedback-thanks" class="hidden">
+          <p class="text-sm font-semibold text-text">¡Gracias por tu feedback!</p>
+          <p class="text-xs text-subtext0 mt-0.5">Nos ayuda a mejorar DevVault</p>
+        </div>
+      </div>
+
+      <script>
+        const btn = document.querySelectorAll<HTMLButtonElement>('[data-feedback]');
+        btn.forEach((b) => {
+          b.addEventListener('click', () => {
+            document.getElementById('feedback-buttons')?.classList.add('hidden');
+            document.getElementById('feedback-question')?.classList.add('hidden');
+            document.getElementById('feedback-thanks')?.classList.remove('hidden');
+          });
+        });
+      </script>
     </aside>
   </div>
 </BaseLayout>

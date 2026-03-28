@@ -1,0 +1,136 @@
+---
+name: TypeScript utility types
+description: Colección de tipos utilitarios de TypeScript para el día a día. Tipos genéricos, helpers para APIs, narrowing seguro y patrones comunes.
+category: snippets
+tags: [typescript, types, generics, utilities, patterns]
+os: [windows, macos, linux]
+difficulty: intermediate
+addedAt: 2025-03-20
+---
+
+## Tipos que deberías conocer (y reusar)
+
+Una colección de tipos TypeScript para copiar en tu proyecto. Cada uno resuelve un problema concreto que aparece constantemente en proyectos reales.
+
+## Tipos utilitarios de la stdlib de TS
+
+```typescript
+// Built-in — ya los tienes sin importar nada
+
+// Hacer todas las propiedades opcionales
+type Partial<T>                         // { a?: T['a'], b?: T['b'] }
+
+// Hacer todas las propiedades requeridas
+type Required<T>                        // { a: T['a'], b: T['b'] }
+
+// Hacer todas las propiedades readonly
+type Readonly<T>
+
+// Seleccionar un subconjunto de propiedades
+type Pick<T, K extends keyof T>         // Pick<User, 'id' | 'name'>
+
+// Omitir propiedades
+type Omit<T, K extends keyof T>         // Omit<User, 'password'>
+
+// Tipos excluidos
+type Exclude<T, U>                      // Exclude<'a'|'b'|'c', 'a'> → 'b'|'c'
+
+// Solo los tipos comunes
+type Extract<T, U>                      // Extract<'a'|'b'|'c', 'a'|'d'> → 'a'
+
+// Resultado de función
+type ReturnType<T extends Function>     // ReturnType<typeof getUser> → User
+
+// Parámetros de función
+type Parameters<T extends Function>     // Parameters<typeof fn> → [string, number]
+```
+
+## Helpers personalizados útiles
+
+```typescript
+// Nullable — añade null e undefined a un tipo
+type Nullable<T> = T | null | undefined;
+
+// Optional — hace una propiedad opcional profundamente
+type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P];
+};
+
+// Array o elemento único
+type OneOrMany<T> = T | T[];
+
+// Sin propiedades undefined
+type NonNullableProperties<T> = {
+  [K in keyof T]-?: NonNullable<T[K]>;
+};
+
+// Exactamente un tipo de una unión
+type Exclusive<T, U> =
+  | (T & { [K in keyof U]?: never })
+  | (U & { [K in keyof T]?: never });
+```
+
+## Tipos para APIs REST
+
+```typescript
+// Respuesta paginada genérica
+interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    perPage: number;
+    totalPages: number;
+  };
+}
+
+// Respuesta de API con estado
+type ApiResponse<T> =
+  | { status: 'success'; data: T }
+  | { status: 'error'; error: string; code: number };
+
+// Usar:
+type UsersResponse = ApiResponse<User[]>;
+type UserResponse  = ApiResponse<User>;
+```
+
+## Type guards personalizados
+
+```typescript
+// Verificar que un valor es definido (narrow fuera de undefined)
+function isDefined<T>(value: T | undefined | null): value is T {
+  return value !== undefined && value !== null;
+}
+
+// Uso:
+const users = [user1, undefined, user3, null].filter(isDefined);
+// Type: User[] — correcto, sin undefined/null
+
+// Verificar que un error es de tipo Error
+function isError(value: unknown): value is Error {
+  return value instanceof Error;
+}
+
+// Narrowing por propiedad
+function hasId<T>(obj: T): obj is T & { id: string } {
+  return typeof (obj as any).id === 'string';
+}
+```
+
+## Inference de tipos de objetos constantes
+
+```typescript
+// Extraer los valores de un objeto como tipo union
+const ROLES = {
+  ADMIN: 'admin',
+  USER: 'user',
+  MODERATOR: 'moderator',
+} as const;
+
+type Role = typeof ROLES[keyof typeof ROLES];
+// Type: 'admin' | 'user' | 'moderator'
+
+// Extraer las claves
+type RoleKey = keyof typeof ROLES;
+// Type: 'ADMIN' | 'USER' | 'MODERATOR'
+```

@@ -1,0 +1,109 @@
+---
+name: husky
+description: Git hooks para proyectos Node.js. Integrado en package.json, corre linters y tests automáticamente antes de cada commit o push.
+category: git-hacks
+tags: [git, hooks, nodejs, npm, lint-staged, automation]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  npm: npm install --save-dev husky
+links:
+  repo: https://github.com/typicode/husky
+  docs: https://typicode.github.io/husky/
+addedAt: 2025-03-20
+---
+
+## Git hooks para el ecosistema Node
+
+husky permite configurar Git hooks directamente desde `package.json`. A diferencia de `pre-commit` (Python), husky está pensado para proyectos JavaScript/TypeScript y se integra con `lint-staged` para ejecutar herramientas solo sobre los archivos modificados.
+
+## Instalación y setup automático
+
+```bash
+npx husky init
+```
+
+Esto:
+1. Instala husky como devDependency
+2. Crea la carpeta `.husky/`
+3. Añade el script `prepare` a `package.json`
+4. Crea un hook de ejemplo en `.husky/pre-commit`
+
+## Configuración típica con lint-staged
+
+```bash
+npm install --save-dev husky lint-staged
+npx husky init
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,md,json,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
+```
+
+```bash
+# .husky/pre-commit
+npx lint-staged
+```
+
+Con `lint-staged`, husky solo corre los linters sobre los archivos que están en staging — no sobre todo el proyecto. Mucho más rápido.
+
+## Hook de commit-msg para Conventional Commits
+
+```bash
+# .husky/commit-msg
+npx --no -- commitlint --edit $1
+```
+
+```js
+// commitlint.config.js
+export default {
+  extends: ['@commitlint/config-conventional'],
+};
+```
+
+```bash
+npm install --save-dev @commitlint/config-conventional @commitlint/cli
+```
+
+Ahora si intentas hacer un commit con un mensaje que no sigue Conventional Commits, el hook lo rechaza:
+
+```
+git commit -m "arreglé algo"
+# ✖ subject may not be empty [subject-empty]
+# ✖ type may not be empty [type-empty]
+
+git commit -m "fix(auth): handle expired JWT"
+# ✔ Commit accepted
+```
+
+## Hook pre-push para tests
+
+```bash
+# .husky/pre-push
+npm test -- --watchAll=false
+```
+
+Los tests corren antes de cada push. Si fallan, el push se cancela.
+
+## Saltar hooks en emergencias
+
+```bash
+git commit --no-verify -m "hotfix"
+git push --no-verify
+```
+
+Úsalo con criterio — los hooks existen por una razón.

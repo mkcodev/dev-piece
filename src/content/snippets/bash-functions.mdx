@@ -1,0 +1,147 @@
+---
+name: Bash Functions útiles
+description: Colección de funciones de shell para automatizar tareas del día a día. mkcd, backup rápido, extractor universal, buscar y reemplazar en proyecto y más.
+category: snippets
+tags: [bash, shell, functions, automation, productivity, zsh]
+os: [macos, linux]
+difficulty: beginner
+addedAt: 2025-03-20
+---
+
+## Funciones esenciales para tu .zshrc / .bashrc
+
+Añade estas funciones al final de tu `~/.zshrc` o `~/.bashrc`. Son utilidades que usarás constantemente.
+
+## mkcd — crear directorio y entrar
+
+```bash
+# Crea el directorio y entra en él en un solo comando
+mkcd() {
+  mkdir -p "$@" && cd "$_"
+}
+
+# Uso:
+mkcd nuevo-proyecto/src/components
+```
+
+## extract — descompresor universal
+
+```bash
+# Descomprime cualquier formato sin recordar flags
+extract() {
+  if [ -f "$1" ]; then
+    case "$1" in
+      *.tar.bz2)  tar xjf "$1"    ;;
+      *.tar.gz)   tar xzf "$1"    ;;
+      *.tar.xz)   tar xJf "$1"    ;;
+      *.tar.zst)  tar --zstd -xf "$1" ;;
+      *.bz2)      bunzip2 "$1"    ;;
+      *.gz)       gunzip "$1"     ;;
+      *.tar)      tar xf "$1"     ;;
+      *.tbz2)     tar xjf "$1"    ;;
+      *.tgz)      tar xzf "$1"    ;;
+      *.zip)      unzip "$1"      ;;
+      *.Z)        uncompress "$1" ;;
+      *.7z)       7z x "$1"       ;;
+      *.rar)      unrar x "$1"    ;;
+      *)          echo "'$1' no reconocido" ;;
+    esac
+  else
+    echo "'$1' no es un archivo válido"
+  fi
+}
+```
+
+## backup — copia rápida con timestamp
+
+```bash
+# Hace backup de un archivo añadiendo fecha
+backup() {
+  cp "$1" "${1}.bak.$(date +%Y%m%d_%H%M%S)"
+  echo "Backup: ${1}.bak.$(date +%Y%m%d_%H%M%S)"
+}
+
+# Uso:
+backup nginx.conf
+# → nginx.conf.bak.20250315_143022
+```
+
+## findreplace — buscar y reemplazar en todo el proyecto
+
+```bash
+# Busca texto y lo reemplaza en todos los archivos del directorio
+findreplace() {
+  if [ -z "$1" ] || [ -z "$2" ]; then
+    echo "Uso: findreplace <buscar> <reemplazar> [directorio]"
+    return 1
+  fi
+  local dir="${3:-.}"
+  grep -rl "$1" "$dir" | xargs sed -i "s/$1/$2/g"
+  echo "Reemplazado '$1' por '$2' en $dir"
+}
+
+# Uso:
+findreplace "old-api.example.com" "api.example.com" ./src
+```
+
+## port — qué proceso usa un puerto
+
+```bash
+# Muestra qué proceso está usando un puerto
+port() {
+  lsof -i :"$1"
+}
+
+# Uso:
+port 3000
+port 8080
+```
+
+## killport — matar proceso en un puerto
+
+```bash
+killport() {
+  local pid=$(lsof -ti :"$1")
+  if [ -n "$pid" ]; then
+    kill -9 $pid
+    echo "Proceso $pid en puerto $1 terminado"
+  else
+    echo "Ningún proceso en puerto $1"
+  fi
+}
+
+# Uso:
+killport 3000
+```
+
+## weather — clima en la terminal
+
+```bash
+# Muestra el tiempo sin salir de la terminal
+weather() {
+  curl "wttr.in/${1:-}"
+}
+
+# Uso:
+weather Madrid
+weather "New York"
+weather  # detecta ubicación automáticamente
+```
+
+## up — navegar N directorios arriba
+
+```bash
+# Sube N niveles de directorio
+up() {
+  local n="${1:-1}"
+  local path=""
+  for ((i=0; i<n; i++)); do
+    path="../$path"
+  done
+  cd "$path" || return
+}
+
+# Uso:
+up      # cd ..
+up 3    # cd ../../..
+```

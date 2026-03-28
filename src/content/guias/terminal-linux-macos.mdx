@@ -1,0 +1,294 @@
+---
+name: "Terminal productiva en Linux/macOS"
+description: "Alacritty + Zsh con Oh My Zsh, Starship prompt, fzf para búsqueda difusa, zoxide para navegación y bat/eza/ripgrep para reemplazar las herramientas clásicas."
+slug: terminal-linux-macos
+os: [linux, macos]
+difficulty: beginner
+estimatedTime: "50 min"
+tags: [terminal, linux, macos, zsh, starship, fzf, zoxide]
+completedByCount: 3102
+addedAt: 2025-01-22
+lastUpdated: 2025-06-10
+steps:
+  - id: paso-1
+    title: "Instala Alacritty"
+    description: "El emulador de terminal más rápido. Configuración en TOML, GPU-accelerated, sin distracciones."
+    quickCommands:
+      - "# macOS: brew install --cask alacritty"
+      - "# Ubuntu: sudo apt install alacritty"
+      - "# Arch: sudo pacman -S alacritty"
+    tools:
+      - slug: alacritty
+        category: terminales
+  - id: paso-2
+    title: "Configura Zsh + Starship"
+    description: "Zsh tiene mejor autocompletado que Bash. Starship le añade el prompt más informativo sin configuración."
+    quickCommands:
+      - "chsh -s $(which zsh)"
+      - "curl -sS https://starship.rs/install.sh | sh"
+      - "echo 'eval \"$(starship init zsh)\"' >> ~/.zshrc"
+    tools:
+      - slug: starship
+        category: terminales
+      - slug: shell-aliases
+        category: snippets
+  - id: paso-3
+    title: "fzf + zoxide"
+    description: "Búsqueda difusa en historial, archivos y directorios. Navegación inteligente que aprende tus rutas."
+    quickCommands:
+      - "brew install fzf zoxide  # macOS"
+      - "sudo apt install fzf && cargo install zoxide  # Ubuntu"
+      - "echo 'eval \"$(zoxide init zsh)\"' >> ~/.zshrc"
+    tools:
+      - slug: fzf
+        category: cli-tools
+      - slug: zoxide
+        category: cli-tools
+  - id: paso-4
+    title: "Reemplaza las herramientas clásicas"
+    description: "bat en vez de cat, eza en vez de ls, ripgrep en vez de grep. Mejores en todo: color, velocidad, UX."
+    quickCommands:
+      - "brew install bat eza ripgrep  # macOS"
+      - "sudo apt install bat eza ripgrep  # Ubuntu"
+    tools:
+      - slug: bat
+        category: cli-tools
+      - slug: eza
+        category: cli-tools
+      - slug: ripgrep
+        category: cli-tools
+---
+
+## La terminal Unix ya es buena. Vamos a hacerla excelente.
+
+A diferencia de Windows, Linux y macOS tienen terminales perfectamente funcionales desde el principio. Pero hay una brecha enorme entre "funcional" y "optimizada". Esta guía cierra esa brecha en menos de una hora.
+
+---
+
+## Paso 1: Instala Alacritty
+
+Alacritty es el emulador de terminal más rápido gracias a aceleración por GPU. Sin pestañas nativas (para eso está tmux), sin electron, sin overhead. Solo velocidad.
+
+### macOS
+
+```bash
+brew install --cask alacritty
+```
+
+### Ubuntu/Debian
+
+```bash
+sudo apt install alacritty
+```
+
+### Arch Linux
+
+```bash
+sudo pacman -S alacritty
+```
+
+Configuración básica en `~/.config/alacritty/alacritty.toml`:
+
+```toml
+[font]
+normal = { family = "JetBrains Mono", style = "Regular" }
+size = 14.0
+
+[window]
+padding = { x = 12, y = 10 }
+decorations = "none"
+opacity = 0.97
+
+[colors]
+# Catppuccin Frappé
+[colors.primary]
+background = "#303446"
+foreground = "#c6d0f5"
+```
+
+> El esquema de colores completo de Catppuccin para Alacritty está en el repositorio oficial: [github.com/catppuccin/alacritty](https://github.com/catppuccin/alacritty)
+
+---
+
+## Paso 2: Configura Zsh + Starship
+
+### Cambia a Zsh
+
+Zsh viene preinstalado en macOS (es el shell por defecto desde Catalina). En Linux:
+
+```bash
+sudo apt install zsh   # Ubuntu/Debian
+sudo pacman -S zsh     # Arch
+
+# Cámbialo como shell por defecto
+chsh -s $(which zsh)
+```
+
+Abre una nueva terminal — Zsh te pedirá configuración inicial. Elige la opción **0** (archivo vacío) para empezar desde cero.
+
+### Instala Starship
+
+```bash
+curl -sS https://starship.rs/install.sh | sh
+```
+
+Añade al final de `~/.zshrc`:
+
+```bash
+eval "$(starship init zsh)"
+```
+
+Configuración de Starship en `~/.config/starship.toml`:
+
+```toml
+format = """
+$directory$git_branch$git_status$nodejs$python$rust$go$cmd_duration$line_break$character"""
+
+[character]
+success_symbol = "[❯](bold #a6d189)"
+error_symbol   = "[❯](bold #e78284)"
+
+[git_branch]
+symbol = " "
+style  = "bold #ca9ee6"
+
+[directory]
+style = "bold #8caaee"
+truncate_to_repo = true
+```
+
+### Aliases esenciales en ~/.zshrc
+
+```bash
+# Reemplazos modernos (instalar en paso 4)
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -la --icons --group-directories-first'
+alias cat='bat --style=plain'
+alias grep='rg'
+alias find='fd'
+
+# Git shortcuts
+alias g='git'
+alias gst='git status'
+alias gco='git checkout'
+alias gcm='git commit -m'
+alias glog='git log --oneline --graph --decorate'
+
+# Navegación rápida
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ~='cd ~'
+alias proj='cd ~/Projects'
+```
+
+---
+
+## Paso 3: fzf + zoxide
+
+### fzf — búsqueda difusa en todo
+
+```bash
+# macOS
+brew install fzf
+
+# Ubuntu
+sudo apt install fzf
+
+# Arch
+sudo pacman -S fzf
+```
+
+Activa las integraciones de fzf (añade a `~/.zshrc`):
+
+```bash
+# Si está instalado via brew:
+source "$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
+source "$(brew --prefix)/opt/fzf/shell/completion.zsh"
+```
+
+Esto activa:
+- `Ctrl+R` — historial de comandos con búsqueda difusa
+- `Ctrl+T` — búsqueda de archivos en el directorio actual
+- `Alt+C` — cd interactivo en subdirectorios
+
+Personalización de fzf en `~/.zshrc`:
+
+```bash
+export FZF_DEFAULT_OPTS="
+  --height 40%
+  --border rounded
+  --color=bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284
+  --color=fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf
+  --color=marker:#f2d5cf,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284"
+```
+
+### zoxide — cd inteligente
+
+```bash
+# macOS
+brew install zoxide
+
+# Ubuntu
+sudo apt install zoxide   # o: cargo install zoxide
+
+# Arch
+sudo pacman -S zoxide
+```
+
+Añade al final de `~/.zshrc`:
+
+```bash
+eval "$(zoxide init zsh)"
+```
+
+Recarga la sesión:
+
+```bash
+source ~/.zshrc
+```
+
+Uso de zoxide:
+
+```bash
+z projects          # salta a ~/Projects
+z my-app            # salta a ~/Projects/my-app (si lo has visitado)
+zi                  # modo interactivo con fzf
+```
+
+---
+
+## Paso 4: Herramientas modernas de CLI
+
+Estos cuatro reemplazos hacen que el uso diario de la terminal sea notablemente mejor:
+
+```bash
+# macOS (instalar todo de una vez)
+brew install bat eza ripgrep fd
+
+# Ubuntu
+sudo apt install bat eza ripgrep fd-find
+# Nota: en Ubuntu, bat puede instalarse como 'batcat', crear alias: alias bat='batcat'
+
+# Arch
+sudo pacman -S bat eza ripgrep fd
+```
+
+| Clásico | Moderno | Mejora clave |
+|---------|---------|--------------|
+| `cat`   | `bat`   | Syntax highlighting, números de línea, Git diff |
+| `ls`    | `eza`   | Iconos, colores, árbol de directorios |
+| `grep`  | `ripgrep` | 10x más rápido, ignora .gitignore automáticamente |
+| `find`  | `fd`    | Sintaxis más simple, más rápido |
+
+---
+
+## Resultado
+
+Tu terminal ahora:
+- Arranca instantáneamente (Alacritty)
+- Muestra información útil en el prompt (Starship)
+- Te permite buscar cualquier cosa con `Ctrl+R`/`Ctrl+T` (fzf)
+- Recuerda tus rutas favoritas (zoxide)
+- Tiene herramientas CLI modernas que hacen el trabajo mejor
+
+El siguiente paso natural: configura tu **Git workflow** con lazygit y los aliases de Git para trabajar con repositorios como un profesional.

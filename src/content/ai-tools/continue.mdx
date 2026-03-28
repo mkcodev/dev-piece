@@ -1,0 +1,109 @@
+---
+name: Continue
+description: Extensión open source de IA para VS Code y JetBrains. Conecta cualquier modelo (Claude, GPT-4, Ollama local) con tu editor de forma configurable.
+category: ai-tools
+tags: [ai, vscode, open-source, ollama, chat, autocomplete]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  manual: ext install Continue.continue
+links:
+  repo: https://github.com/continuedev/continue
+  docs: https://docs.continue.dev/
+  website: https://continue.dev/
+addedAt: 2025-03-20
+---
+
+## IA en tu editor, con control total
+
+Continue es una extensión open source para VS Code y JetBrains que actúa como capa de IA configurable. La diferencia clave con Copilot o Cursor: **tú eliges el modelo** — puede ser Claude, GPT-4, Gemini o un modelo local con Ollama, sin cambiar de editor.
+
+## Instalación
+
+```bash
+# VS Code
+code --install-extension Continue.continue
+
+# O desde el marketplace: busca "Continue"
+```
+
+## Configuración básica
+
+```json
+// ~/.continue/config.json
+{
+  "models": [
+    {
+      "title": "Claude Sonnet",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "apiKey": "sk-ant-..."
+    },
+    {
+      "title": "Llama local (sin coste)",
+      "provider": "ollama",
+      "model": "llama3.2"
+    }
+  ],
+  "tabAutocompleteModel": {
+    "title": "Starcoder2 local",
+    "provider": "ollama",
+    "model": "starcoder2:3b"
+  }
+}
+```
+
+## Las 3 funciones principales
+
+### Chat (Ctrl+L)
+
+```
+# Con contexto del archivo actual
+Explica esta función → @CurrentFile
+
+# Referenciando archivos específicos
+@src/auth.ts ¿por qué falla el JWT refresh?
+
+# Todo el codebase (usa embeddings locales)
+@Codebase ¿dónde se validan los permisos?
+```
+
+### Edición inline (Ctrl+I)
+
+Selecciona código → `Ctrl+I` → describe el cambio → diff para aceptar/rechazar.
+
+### Autocompletado (Tab)
+
+Modelos optimizados para completado como `starcoder2:3b` o `codestral` vía Ollama. Más privado que Copilot, corre localmente.
+
+## Stack 100% local y privado
+
+```json
+{
+  "models": [{
+    "title": "Llama 3.2 local",
+    "provider": "ollama",
+    "model": "llama3.2"
+  }],
+  "tabAutocompleteModel": {
+    "provider": "ollama",
+    "model": "starcoder2:3b"
+  },
+  "embeddingsProvider": {
+    "provider": "ollama",
+    "model": "nomic-embed-text"
+  }
+}
+```
+
+Con esta configuración, ningún dato sale de tu máquina.
+
+## Ventaja vs alternativas
+
+| | Continue | Copilot | Cursor |
+|--|--------|---------|--------|
+| Open source | ✓ | ✗ | ✗ |
+| Elige modelo | ✓ | ✗ | Parcial |
+| Modelos locales | ✓ | ✗ | ✗ |
+| JetBrains | ✓ | ✓ | ✗ |
+| Precio | Gratis | $10/mes | $20/mes |

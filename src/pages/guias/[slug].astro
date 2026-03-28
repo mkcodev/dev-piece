@@ -1,0 +1,227 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GuideIsland from '../../components/guias/GuideIsland';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guias');
+  return guides.map((entry) => ({
+    params: { slug: entry.data.slug ?? entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const data = entry.data;
+
+const difficultyConfig: Record<string, { label: string; color: string }> = {
+  beginner:     { label: 'Principiante', color: 'text-green  bg-green/10  border-green/30'  },
+  intermediate: { label: 'Intermedio',   color: 'text-yellow bg-yellow/10 border-yellow/30' },
+  advanced:     { label: 'Avanzado',     color: 'text-red    bg-red/10    border-red/30'    },
+};
+
+const osBadgeConfig: Record<string, { label: string; color: string }> = {
+  windows: { label: 'Windows', color: 'bg-blue/20   text-blue   border-blue/30'   },
+  macos:   { label: 'macOS',   color: 'bg-mauve/20  text-mauve  border-mauve/30'  },
+  linux:   { label: 'Linux',   color: 'bg-peach/20  text-peach  border-peach/30'  },
+};
+
+const diffCfg = difficultyConfig[data.difficulty] ?? { label: data.difficulty, color: 'text-subtext0 bg-surface0 border-surface1' };
+
+const formatDate = (d: Date | string) =>
+  new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d));
+
+// Map steps from schema-validated data
+const steps = data.steps.map((s) => ({
+  id:            s.id,
+  title:         s.title,
+  description:   s.description,
+  quickCommands: s.quickCommands,
+  tools:         s.tools,
+}));
+
+const guideSlug: string = data.slug ?? entry.id;
+---
+
+<BaseLayout title={data.name} description={data.description}>
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm text-subtext0 mb-6 stagger-in" style="--i: 0" aria-label="Ruta de navegación">
+    <a href="/" class="hover:text-text transition-colors">Inicio</a>
+    <span aria-hidden="true">/</span>
+    <a href="/guias" class="hover:text-text transition-colors">Guías</a>
+    <span aria-hidden="true">/</span>
+    <span class="text-text font-medium" aria-current="page">{data.name}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-8">
+    <!-- Main content -->
+    <div>
+      <!-- Guide header -->
+      <div class="mb-8 stagger-in" style="--i: 1">
+        <h1 class="text-3xl font-black text-text mb-3 leading-tight">{data.name}</h1>
+        <p class="text-subtext1 text-base leading-relaxed mb-4">{data.description}</p>
+
+        <!-- Meta badges -->
+        <div class="flex flex-wrap items-center gap-2">
+          <span class={`text-xs px-2.5 py-1 rounded-full border font-medium ${diffCfg.color}`}>
+            {diffCfg.label}
+          </span>
+          <span class="flex items-center gap-1 text-xs text-subtext0 bg-surface0 border border-surface1 px-2.5 py-1 rounded-full">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+            </svg>
+            {data.estimatedTime}
+          </span>
+          <span class="flex items-center gap-1 text-xs text-subtext0 bg-surface0 border border-surface1 px-2.5 py-1 rounded-full">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+            </svg>
+            {(data.completedByCount ?? 0).toLocaleString('es-ES')} completaron
+          </span>
+          {data.os.map((os) => {
+            const cfg = osBadgeConfig[os];
+            return cfg ? (
+              <span class={`text-xs px-2.5 py-1 rounded-full border font-medium ${cfg.color}`}>
+                {cfg.label}
+              </span>
+            ) : null;
+          })}
+          {data.tags.slice(0, 4).map((tag) => (
+            <span class="text-xs px-2 py-0.5 rounded-full bg-surface1 text-subtext0 border border-surface1">
+              #{tag}
+            </span>
+          ))}
+        </div>
+
+        <!-- Accent divider -->
+        <div class="mt-5 h-px rounded-full opacity-20 bg-gradient-to-r from-teal via-green to-transparent" aria-hidden="true" />
+      </div>
+
+      <!-- Interactive guide island (steps + guía rápida + progress) -->
+      <GuideIsland client:load slug={guideSlug} steps={steps} />
+
+      <!-- MDX content — full article -->
+      <div class="mt-8 stagger-in prose prose-invert prose-sm max-w-none
+        prose-headings:text-text prose-headings:font-semibold
+        prose-p:text-subtext1 prose-p:leading-relaxed
+        prose-a:text-blue prose-a:no-underline hover:prose-a:text-lavender
+        prose-code:text-sky prose-code:bg-surface0 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-['']
+        prose-pre:bg-crust prose-pre:border prose-pre:border-surface0 prose-pre:rounded-lg
+        prose-strong:text-text prose-strong:font-semibold
+        prose-ul:text-subtext1 prose-ol:text-subtext1
+        prose-li:marker:text-teal
+        prose-blockquote:border-l-teal prose-blockquote:text-subtext0
+        prose-hr:border-surface1
+        prose-th:text-text prose-td:text-subtext1"
+        style="--i: 5"
+      >
+        <Content />
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="space-y-4">
+      <!-- Steps overview -->
+      {steps.length > 0 && (
+        <div class="bg-surface0 rounded-xl border border-surface1 p-4">
+          <h3 class="text-sm font-semibold text-text mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            {steps.length} pasos
+          </h3>
+          <ol class="space-y-2">
+            {steps.map((step, i) => (
+              <li class="flex items-start gap-2 text-xs">
+                <span class="w-4 h-4 rounded-full bg-surface1 text-subtext0 flex items-center justify-center flex-shrink-0 font-mono font-bold mt-0.5">
+                  {i + 1}
+                </span>
+                <span class="text-subtext1 leading-tight">{step.title}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      <!-- Metadata -->
+      <div class="bg-surface0 rounded-xl border border-surface1 p-4">
+        <h3 class="text-sm font-semibold text-text mb-3">Información</h3>
+        <dl class="space-y-2 text-xs">
+          <div class="flex justify-between">
+            <dt class="text-subtext0">Dificultad</dt>
+            <dd class={`font-medium px-2 py-0.5 rounded-full border ${diffCfg.color}`}>{diffCfg.label}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-subtext0">Duración estimada</dt>
+            <dd class="text-subtext1">{data.estimatedTime}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-subtext0">Completada por</dt>
+            <dd class="text-subtext1">{(data.completedByCount ?? 0).toLocaleString('es-ES')} devs</dd>
+          </div>
+          {data.addedAt && (
+            <div class="flex justify-between">
+              <dt class="text-subtext0">Añadida</dt>
+              <dd class="text-subtext1">{formatDate(data.addedAt)}</dd>
+            </div>
+          )}
+          {data.lastUpdated && (
+            <div class="flex justify-between">
+              <dt class="text-subtext0">Actualizada</dt>
+              <dd class="text-subtext1">{formatDate(data.lastUpdated)}</dd>
+            </div>
+          )}
+        </dl>
+      </div>
+
+      <!-- Back link -->
+      <a
+        href="/guias"
+        class="flex items-center gap-2 text-sm text-subtext1 hover:text-text transition-colors"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/>
+        </svg>
+        Volver a Guías
+      </a>
+
+      <!-- Feedback -->
+      <div class="bg-surface0 rounded-xl border border-surface1 p-4 text-center" id="feedback-widget">
+        <p class="text-xs text-subtext0 mb-3" id="feedback-question">¿Te ha sido útil esta guía?</p>
+        <div class="flex items-center justify-center gap-2" id="feedback-buttons">
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green/10 text-green border border-green/20 hover:bg-green/20 hover:border-green/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
+            data-feedback="yes"
+            aria-label="Sí, me ha sido útil"
+          >
+            👍 <span class="text-xs">Sí</span>
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red/10 text-red border border-red/20 hover:bg-red/20 hover:border-red/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
+            data-feedback="no"
+            aria-label="No, no me ha sido útil"
+          >
+            👎 <span class="text-xs">No</span>
+          </button>
+        </div>
+        <div id="feedback-thanks" class="hidden">
+          <p class="text-sm font-semibold text-text">¡Gracias!</p>
+          <p class="text-xs text-subtext0 mt-0.5">Nos ayuda a mejorar las guías</p>
+        </div>
+      </div>
+
+      <script>
+        document.querySelectorAll<HTMLButtonElement>('[data-feedback]').forEach(b => {
+          b.addEventListener('click', () => {
+            document.getElementById('feedback-buttons')?.classList.add('hidden');
+            document.getElementById('feedback-question')?.classList.add('hidden');
+            document.getElementById('feedback-thanks')?.classList.remove('hidden');
+          });
+        });
+      </script>
+    </aside>
+  </div>
+</BaseLayout>

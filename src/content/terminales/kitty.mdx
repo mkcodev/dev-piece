@@ -1,0 +1,120 @@
+---
+name: Kitty
+description: Emulador de terminal GPU-accelerated con soporte nativo de ligaduras, imágenes en terminal, múltiples layouts y extensible con plugins (kittens).
+category: terminales
+tags: [terminal, gpu, fast, ligatures, images, layouts, linux, macos]
+os: [linux, macos]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install --cask kitty
+  manual: curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+links:
+  repo: https://github.com/kovidgoyal/kitty
+  docs: https://sw.kovidgoyal.net/kitty/
+  website: https://sw.kovidgoyal.net/kitty/
+addedAt: 2025-03-20
+---
+
+## El terminal GPU-accelerated más completo
+
+Kitty es un emulador de terminal que usa OpenGL para renderizado — significativamente más rápido que terminales basados en CPU para texto denso. Además soporta imágenes en la terminal (protocolo Kitty), ligaduras de fuentes y multiplexing nativo sin tmux.
+
+## Por qué Kitty sobre Alacritty
+
+- **Imágenes en terminal** — protocolo Kitty permite mostrar imágenes (usado por Neovim, yazi, etc.)
+- **Ligaduras** — soporte nativo sin patches
+- **Multiplexing nativo** — ventanas, tabs y paneles sin tmux
+- **Kittens** — scripts Python para extender funcionalidad
+
+## Configuración básica
+
+```ini
+# ~/.config/kitty/kitty.conf
+
+# Fuente
+font_family      JetBrainsMono Nerd Font
+font_size        14.0
+font_features    JetBrainsMonoNF-Regular +calt +liga
+
+# Rendering
+enable_audio_bell no
+visual_bell_duration 0
+
+# Colores: Catppuccin Frappé
+include catppuccin-frappe.conf
+
+# Ventana
+window_padding_width 12
+background_opacity 0.97
+hide_window_decorations no
+
+# Cursor
+cursor_shape block
+cursor_blink_interval 0
+
+# Scrollback
+scrollback_lines 10000
+
+# URL
+url_color #89b4fa
+url_style curly
+open_url_with default
+```
+
+## Instalar tema Catppuccin
+
+```bash
+# Instalar
+mkdir -p ~/.config/kitty/
+curl -o ~/.config/kitty/catppuccin-frappe.conf \
+  https://raw.githubusercontent.com/catppuccin/kitty/main/themes/frappe.conf
+
+# En kitty.conf añadir:
+include catppuccin-frappe.conf
+```
+
+## Multiplexing nativo (sin tmux)
+
+```ini
+# kitty.conf — atajos de teclado
+# Tabs
+map ctrl+shift+t new_tab
+map ctrl+shift+q close_tab
+map ctrl+shift+right next_tab
+map ctrl+shift+left previous_tab
+
+# Paneles (ventanas en kitty)
+map ctrl+shift+enter new_window
+map ctrl+shift+] next_window
+map ctrl+shift+[ previous_window
+
+# Layouts
+map ctrl+shift+l next_layout
+enabled_layouts tall,fat,grid,horizontal,vertical,stack
+```
+
+## Imágenes en terminal
+
+Kitty es necesario para ver imágenes en herramientas como:
+- **yazi** — file manager con previsualizaciones de imágenes
+- **Neovim** con plugin `image.nvim`
+- **chafa** — imágenes en ASCII art de alta calidad
+
+```bash
+# Ver imagen en la terminal
+kitty +kitten icat imagen.png
+
+# O con kitten directamente
+kitten icat imagen.jpg
+```
+
+## SSH con colores y fuentes correctos
+
+```bash
+# Sin kitten: la fuente y colores pueden fallar en el servidor remoto
+ssh usuario@servidor
+
+# Con kitten: transmite las variables de entorno necesarias
+kitty +kitten ssh usuario@servidor
+```

@@ -1,0 +1,104 @@
+---
+name: chezmoi
+description: Gestiona tus dotfiles entre múltiples máquinas con un repositorio Git. Plantillas, secretos cifrados y sincronización en segundos.
+category: dotfiles
+tags: [dotfiles, sync, git, cross-platform, automation]
+os: [windows, macos, linux]
+featured: true
+difficulty: intermediate
+install:
+  brew: brew install chezmoi
+  scoop: scoop install chezmoi
+  apt: sudo apt install chezmoi
+  manual: sh -c "$(curl -fsLS get.chezmoi.io)"
+links:
+  repo: https://github.com/twpayne/chezmoi
+  docs: https://www.chezmoi.io/
+addedAt: 2025-03-20
+---
+
+## Tus dotfiles en todas partes
+
+chezmoi gestiona los archivos de configuración (`~/.zshrc`, `~/.gitconfig`, configs de Neovim, etc.) sincronizándolos entre máquinas a través de un repositorio Git.
+
+A diferencia de un simple repo con symlinks, chezmoi soporta plantillas (para diferencias entre macOS y Linux), secretos cifrados con age/gpg, y scripts de instalación.
+
+## Primeros pasos
+
+```bash
+# Inicializar (crea ~/.local/share/chezmoi)
+chezmoi init
+
+# Añadir un dotfile al control de chezmoi
+chezmoi add ~/.zshrc
+chezmoi add ~/.gitconfig
+chezmoi add ~/.config/nvim/init.lua
+
+# Ver qué va a cambiar antes de aplicar
+chezmoi diff
+
+# Aplicar los cambios
+chezmoi apply
+```
+
+## Directorio fuente
+
+chezmoi guarda los archivos en `~/.local/share/chezmoi/` con un esquema de nombres:
+
+| Nombre en chezmoi | Destino real |
+|-------------------|--------------|
+| `dot_zshrc` | `~/.zshrc` |
+| `dot_config/nvim/init.lua` | `~/.config/nvim/init.lua` |
+| `private_dot_ssh/config` | `~/.ssh/config` (permisos 600) |
+| `executable_script.sh` | `~/script.sh` (chmod +x) |
+
+## Flujo de trabajo diario
+
+```bash
+# Editar un dotfile directamente
+chezmoi edit ~/.zshrc
+
+# Ver cambios pendientes
+chezmoi diff
+
+# Aplicar
+chezmoi apply
+
+# Commit y push del repositorio fuente
+chezmoi cd
+git add -A
+git commit -m "feat: update zshrc"
+git push
+```
+
+## Plantillas para diferencias entre máquinas
+
+```bash
+# ~/.local/share/chezmoi/dot_gitconfig.tmpl
+[user]
+    name = {{ .name }}
+    email = {{ .email }}
+
+# En macOS usa Keychain para GPG; en Linux no
+{{ if eq .chezmoi.os "darwin" }}
+[credential]
+    helper = osxkeychain
+{{ end }}
+```
+
+Los valores de las plantillas se definen en `~/.config/chezmoi/chezmoi.toml`:
+
+```toml
+[data]
+    name = "Tu Nombre"
+    email = "tu@email.com"
+```
+
+## Bootstrap en máquina nueva
+
+```bash
+# Un solo comando instala chezmoi y aplica todos tus dotfiles
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply github.com/tu-usuario/dotfiles
+```
+
+Esto clona tu repo, instala las dependencias y aplica la configuración completa.

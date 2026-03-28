@@ -1,0 +1,85 @@
+---
+name: dive
+description: Explora el contenido de imágenes Docker capa por capa. Descubre qué archivos añade cada instrucción y optimiza el tamaño de tus imágenes.
+category: docker
+tags: [docker, images, optimization, devops, debugging]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install dive
+  scoop: scoop install dive
+  apt: sudo apt install dive
+links:
+  repo: https://github.com/wagoodman/dive
+addedAt: 2025-03-20
+---
+
+## Entiende qué hay dentro de tu imagen Docker
+
+Cuando haces `docker build`, cada instrucción del `Dockerfile` crea una capa. `dive` te permite ver exactamente qué archivos añade, modifica o elimina cada capa.
+
+Resultado: sabes por qué tu imagen pesa 1.2 GB y qué hacer para reducirla.
+
+## Uso básico
+
+```bash
+# Analizar imagen existente
+dive mi-app:latest
+
+# Construir y analizar en un solo paso
+dive build -t mi-app .
+```
+
+## Navegación en la TUI
+
+```
+┌─────────────────────────┬──────────────────────────────┐
+│ Layers                  │ Current Layer Contents        │
+│ ─────────────────────── │ ─────────────────────────────│
+│ ● FROM ubuntu:22.04     │ drwxr-xr-x  /usr             │
+│ ● RUN apt-get install   │ drwxr-xr-x  /usr/bin         │
+│ ● COPY . /app           │ -rwxr-xr-x  /usr/bin/node    │
+│ ● RUN npm install       │ ...                           │
+└─────────────────────────┴──────────────────────────────┘
+         Image efficiency: 87%   Wasted space: 23 MB
+```
+
+| Tecla | Acción |
+|-------|--------|
+| `Tab` | Cambiar entre panel Layers / Contents |
+| `↑↓` | Navegar |
+| `Ctrl+U` | Mostrar solo archivos modificados en esta capa |
+| `Ctrl+A` | Mostrar todos los atributos de archivos |
+| `/` | Filtrar archivos |
+| `Space` | Expandir/colapsar directorios |
+
+## Lo que buscas
+
+Los archivos marcados en **naranja** son los añadidos en esa capa. Los **tachados** son eliminados.
+
+**Señales de imagen mal optimizada:**
+- Una capa de `RUN apt-get install` seguida de otra que limpia `apt` cache — si son capas separadas, el espacio no se ahorra
+- Archivos de build (`node_modules` de dev, archivos `.git`, cachés) en capas intermedias
+- Secretos o credenciales en alguna capa (quedan aunque los borres en capas posteriores)
+
+## Integración en CI
+
+```bash
+# Falla si efficiency < 90%
+CI=true dive mi-app:latest
+```
+
+Con `CI=true`, dive devuelve código de error si la imagen no supera el umbral de eficiencia configurado. Útil para evitar imágenes gordas en producción.
+
+## Mejoras típicas con dive
+
+```dockerfile
+# ❌ Dos capas: la cache de apt sigue en la primera
+RUN apt-get update
+RUN apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# ✅ Una sola capa: limpia en el mismo RUN
+RUN apt-get update && \
+    apt-get install -y curl && \
+    rm -rf /var/lib/apt/lists/*
+```

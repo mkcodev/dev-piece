@@ -1,0 +1,233 @@
+---
+name: "Terminal productiva en Windows"
+description: "Convierte PowerShell en una terminal moderna con Ghostty o WezTerm, un prompt con Starship, fuzzy finding con fzf y navegación rápida con zoxide."
+slug: terminal-windows
+os: [windows]
+difficulty: beginner
+estimatedTime: "60 min"
+tags: [terminal, windows, powershell, starship, fzf]
+completedByCount: 1847
+addedAt: 2025-01-22
+lastUpdated: 2025-06-10
+steps:
+  - id: paso-1
+    title: "Instala tu emulador de terminal"
+    description: "Ghostty es rápido y moderno. WezTerm es más configurable. Elige uno."
+    quickCommands:
+      - "winget install ghostty"
+      - "# O: winget install wez.wezterm"
+    tools:
+      - slug: ghostty
+        category: terminales
+      - slug: wezterm
+        category: terminales
+  - id: paso-2
+    title: "Configura el perfil de PowerShell"
+    description: "El $PROFILE de PowerShell es tu punto de entrada. Aliases, funciones y opciones que se cargan en cada sesión."
+    quickCommands:
+      - "notepad $PROFILE"
+    tools:
+      - slug: powershell-profile
+        category: snippets
+  - id: paso-3
+    title: "Instala Starship — el prompt que mola"
+    description: "Starship detecta Git, lenguajes, versiones y lo muestra en el prompt con iconos y colores."
+    quickCommands:
+      - "winget install Starship.Starship"
+      - "# Añade al final de $PROFILE:"
+      - "Invoke-Expression (&starship init powershell)"
+    tools:
+      - slug: starship
+        category: terminales
+  - id: paso-4
+    title: "fzf + zoxide para moverse como el viento"
+    description: "fzf es el fuzzy finder interactivo. zoxide aprende tus directorios más usados para saltar a ellos con z."
+    quickCommands:
+      - "winget install junegunn.fzf"
+      - "winget install ajeetdsouza.zoxide"
+      - "# En $PROFILE: Invoke-Expression (& { (zoxide init powershell | Out-String) })"
+    tools:
+      - slug: fzf
+        category: cli-tools
+      - slug: zoxide
+        category: cli-tools
+---
+
+## La terminal de Windows por defecto es suficiente… ¿o no?
+
+PowerShell 7 y Windows Terminal son perfectamente usables. Pero "usable" no es lo mismo que "productivo". Con el setup de esta guía vas a tener una terminal que:
+
+- Se abre instantáneamente (Ghostty/WezTerm)
+- Muestra información útil en el prompt sin configurar nada (Starship)
+- Te deja buscar archivos y comandos de forma interactiva (fzf)
+- Recuerda los directorios que más usas (zoxide)
+
+---
+
+## Paso 1: Instala tu emulador de terminal
+
+### Ghostty (recomendado para empezar)
+
+Ghostty es nuevo, rápido y con buenas configuraciones por defecto. Perfecto si quieres algo que funcione bien sin configurar demasiado.
+
+```powershell
+winget install ghostty
+```
+
+La configuración básica va en `%APPDATA%\ghostty\config`:
+
+```ini
+font-family = JetBrains Mono
+font-size = 14
+theme = catppuccin-frappe
+window-decoration = false
+```
+
+### WezTerm (si quieres más control)
+
+WezTerm es altamente configurable vía Lua. Más potente, con algo más de curva de aprendizaje.
+
+```powershell
+winget install wez.wezterm
+```
+
+---
+
+## Paso 2: Configura el perfil de PowerShell
+
+El perfil de PowerShell es un script que se ejecuta cada vez que abres una sesión. Es el equivalente al `.bashrc` o `.zshrc`.
+
+Primero, verifica si ya existe:
+
+```powershell
+Test-Path $PROFILE
+```
+
+Si devuelve `False`, créalo:
+
+```powershell
+New-Item -Path $PROFILE -Type File -Force
+```
+
+Ábrelo para editarlo:
+
+```powershell
+notepad $PROFILE
+```
+
+Configuración base recomendada:
+
+```powershell
+# Aliases útiles
+Set-Alias -Name ls   -Value eza   -Option AllScope
+Set-Alias -Name cat  -Value bat   -Option AllScope
+Set-Alias -Name grep -Value rg    -Option AllScope
+Set-Alias -Name top  -Value btop  -Option AllScope
+
+# Función para ir al directorio del proyecto rápido
+function proj { Set-Location "C:\Users\$env:USERNAME\Projects" }
+
+# Historial más inteligente
+Set-PSReadLineOption -HistorySearchCursorMovesToEnd
+Set-PSReadLineKeyHandler -Key UpArrow   -Function HistorySearchBackward
+Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
+
+# Predicciones inline (estilo fish)
+Set-PSReadLineOption -PredictionSource History
+Set-PSReadLineOption -PredictionViewStyle ListView
+```
+
+---
+
+## Paso 3: Instala Starship
+
+Starship es un prompt cross-shell escrito en Rust. Se instala una vez y funciona en PowerShell, Bash, Zsh, Fish...
+
+```powershell
+winget install Starship.Starship
+```
+
+Añade al final de tu `$PROFILE`:
+
+```powershell
+Invoke-Expression (&starship init powershell)
+```
+
+Crea el archivo de configuración de Starship en `~\.config\starship.toml`:
+
+```toml
+# Preset limpio y funcional
+format = """
+$directory$git_branch$git_status$nodejs$python$rust$cmd_duration$line_break$character"""
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol   = "[❯](bold red)"
+
+[git_branch]
+symbol = " "
+style  = "bold mauve"
+
+[git_status]
+style = "bold red"
+
+[directory]
+style        = "bold blue"
+truncate_to_repo = true
+```
+
+---
+
+## Paso 4: fzf + zoxide
+
+### fzf — fuzzy finder interactivo
+
+fzf te permite buscar cualquier lista de forma interactiva. Integrado con PowerShell, `Ctrl+R` abre el historial de comandos con búsqueda difusa.
+
+```powershell
+winget install junegunn.fzf
+```
+
+Integración en `$PROFILE`:
+
+```powershell
+# Historial con fzf (Ctrl+R)
+function _fzf_history {
+    $selected = Get-Content (Get-PSReadLineOption).HistorySavePath |
+        Select-Object -Unique |
+        fzf --tac --no-sort --height 40%
+    if ($selected) {
+        [Microsoft.PowerShell.PSConsoleReadLine]::RevertLine()
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert($selected)
+    }
+}
+Set-PSReadLineKeyHandler -Chord Ctrl+r -ScriptBlock { _fzf_history }
+```
+
+### zoxide — cd inteligente
+
+zoxide aprende los directorios que más visitas. Después de un tiempo de uso, `z pro` puede llevarte directamente a `C:\Users\tú\Projects\mi-proyecto`.
+
+```powershell
+winget install ajeetdsouza.zoxide
+```
+
+Añade a `$PROFILE`:
+
+```powershell
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
+```
+
+Uso básico:
+
+```powershell
+z projects    # salta a tu carpeta de proyectos
+z doc         # salta a Documentos
+zi            # modo interactivo con fzf para elegir directorio
+```
+
+---
+
+## Resultado
+
+Tienes ahora una terminal Windows que rivaliza con cualquier setup de Linux. El siguiente paso: echa un vistazo a la guía de **Git workflow pro** para sacarle partido completo a tus proyectos.

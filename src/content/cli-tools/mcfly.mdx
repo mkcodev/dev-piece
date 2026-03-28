@@ -1,0 +1,94 @@
+---
+name: McFly
+description: Reemplaza Ctrl+R con un historial inteligente que aprende de tus patrones. Sugiere comandos basándose en el directorio actual y frecuencia de uso.
+category: cli-tools
+tags: [shell, history, search, ai, zsh, bash, fish]
+os: [macos, linux, windows]
+difficulty: beginner
+install:
+  brew: brew install mcfly
+  cargo: cargo install mcfly
+  manual: curl -LSfs https://raw.githubusercontent.com/cantino/mcfly/master/ci/install.sh | sh -s -- --git cantino/mcfly
+links:
+  repo: https://github.com/cantino/mcfly
+addedAt: 2025-03-20
+---
+
+## Ctrl+R que aprende de ti
+
+McFly reemplaza el buscador de historial estándar de zsh/bash (`Ctrl+R`) con uno que usa un modelo de red neuronal ligero para priorizar comandos relevantes según el contexto: directorio actual, hora del día, comandos recientes, y frecuencia de uso.
+
+## Setup
+
+```bash
+# Instalar
+brew install mcfly
+
+# Añadir al shell
+echo 'eval "$(mcfly init zsh)"' >> ~/.zshrc    # zsh
+echo 'eval "$(mcfly init bash)"' >> ~/.bashrc   # bash
+echo 'mcfly init fish | source' >> ~/.config/fish/config.fish  # fish
+
+source ~/.zshrc
+```
+
+## Cómo funciona
+
+Cuando pulsas `Ctrl+R`, en lugar de una búsqueda lineal, McFly:
+
+1. Analiza el **directorio actual** — prioriza comandos que ejecutaste desde aquí
+2. Analiza el **contexto reciente** — qué comandos acabas de ejecutar
+3. Usa un **pequeño modelo de ML** entrenado con tu historial personal
+4. Muestra los comandos más relevantes, no solo los más recientes
+
+## Diferencias con la búsqueda estándar
+
+```bash
+# Ctrl+R estándar:
+# Busca lineal en el historial, solo muestra uno a la vez
+# Sin contexto, sin aprendizaje
+
+# McFly:
+# Interfaz TUI con múltiples resultados
+# Rankeados por relevancia contextual
+# Aprende con el tiempo qué comandos prefieres
+```
+
+## Comandos útiles
+
+```bash
+# Limpiar un comando incorrecto del historial
+# (para que no aparezca como sugerencia)
+mcfly clean --forget
+
+# Ver estadísticas
+mcfly search git  # busca en el historial
+
+# Modo claro/oscuro
+MCFLY_LIGHT=true  # en .zshrc para fondo claro
+```
+
+## Configuración
+
+```bash
+# .zshrc
+export MCFLY_KEY_SCHEME=vim     # hjkl para navegar
+export MCFLY_RESULTS=30         # cuántos resultados mostrar
+export MCFLY_INTERFACE_VIEW=TOP # TOP o BOTTOM
+export MCFLY_RESULTS_SORT=LAST_RUN  # o RANK
+
+# Tema (DARK por defecto)
+export MCFLY_LIGHT=false
+```
+
+## McFly vs atuin
+
+| | McFly | atuin |
+|--|-------|-------|
+| Aprendizaje ML | ✓ | ✗ |
+| Sync entre máquinas | ✗ | ✓ |
+| Estadísticas | Básicas | Detalladas |
+| Filtros avanzados | Básicos | ✓ |
+| Datos de contexto | Dir + sesión | Dir + host + sesión |
+
+Ambas mejoran `Ctrl+R` de forma distinta. McFly si quieres aprendizaje automático; atuin si quieres sync y estadísticas.

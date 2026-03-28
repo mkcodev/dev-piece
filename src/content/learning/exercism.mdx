@@ -1,0 +1,73 @@
+---
+name: Exercism
+description: Plataforma de práctica de programación con ejercicios en 67 lenguajes, mentores voluntarios y feedback de código real. Gratis y open source.
+category: learning
+tags: [practice, exercises, mentoring, languages, open-source, free]
+os: [windows, macos, linux]
+difficulty: beginner
+links:
+  website: https://exercism.org/
+  repo: https://github.com/exercism/exercism
+addedAt: 2025-03-20
+---
+
+## Aprende programando, con feedback real
+
+Exercism tiene ejercicios de programación en 67 lenguajes (desde JavaScript hasta Haskell o Zig), con la opción de recibir feedback de mentores voluntarios. A diferencia de plataformas como LeetCode, Exercism se centra en escribir código idiomático y limpio, no solo en resolver el algoritmo.
+
+## Cómo funciona
+
+1. Elige un lenguaje (o varios)
+2. Descarga ejercicios con la CLI de Exercism
+3. Resuelve localmente con tu editor favorito
+4. Sube la solución y opcionalmente pide feedback de un mentor
+
+## CLI de Exercism
+
+```bash
+# Instalar CLI
+brew install exercism
+
+# Configurar con tu token (de exercism.org/settings)
+exercism configure --token=tu_token_aqui
+
+# Descargar un ejercicio
+exercism download --track=typescript --exercise=hello-world
+
+# Subir solución
+exercism submit src/hello-world.ts
+
+# Ver ejercicios disponibles
+exercism list typescript
+```
+
+## Tracks recomendados para devs
+
+**Para aprender un lenguaje nuevo:**
+
+| Track | Para qué sirve |
+|-------|---------------|
+| TypeScript | Aprender TS idiomático con tipos avanzados |
+| Rust | Ownership, lifetimes, patrones |
+| Go | Concurrencia, interfaces, goroutines |
+| Python | Estructuras de datos, algoritmos |
+| Haskell | Programación funcional pura |
+
+**Para reforzar fundamentales:**
+
+```
+Tracks de Algorithms → estructuras de datos y algoritmos clásicos
+Track de TypeScript → tipos avanzados: generics, conditional types, mapped types
+Track de Rust → borrows, traits, iterators
+```
+
+## Modo práctica vs modo mentored
+
+- **Modo práctica**: resuelves a tu ritmo, sin feedback, pero puedes ver soluciones de otros
+- **Modo mentored**: esperas feedback de un mentor (puede tardar días, pero el feedback es de calidad)
+
+La mayoría de los ejercicios tienen muchas soluciones publicadas — después de resolver puedes ver cómo otros lo hicieron, que es una de las partes más valiosas.
+
+## Integración con VS Code
+
+Exercism descarga los ejercicios en `~/Exercism/`. Ábrelo como workspace en VS Code y trabaja normalmente. La mayoría de tracks incluyen tests que puedes ejecutar localmente.

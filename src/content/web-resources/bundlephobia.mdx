@@ -1,0 +1,64 @@
+---
+name: Bundlephobia
+description: Comprueba el tamaño real de cualquier paquete npm antes de instalarlo. Ve el tamaño minificado, gzippeado y el tiempo de carga estimado.
+category: web-resources
+tags: [npm, packages, performance, bundle-size, javascript]
+os: [windows, macos, linux]
+difficulty: beginner
+links:
+  website: https://bundlephobia.com/
+  repo: https://github.com/pastelsky/bundlephobia
+addedAt: 2025-03-20
+---
+
+## Comprueba el coste real de tus dependencias
+
+Antes de `npm install moment`, comprueba en Bundlephobia cuánto va a engordar tu bundle. Muchos paquetes tienen alternativas más ligeras que hacen lo mismo.
+
+## Cómo usarlo
+
+1. Ve a **bundlephobia.com**
+2. Escribe el nombre del paquete (ej: `lodash`, `moment`, `axios`)
+3. Ve el tamaño minificado y gzippeado, la tendencia de versiones anteriores, y las **alternativas más ligeras**
+
+## Casos reales que Bundlephobia revela
+
+| Paquete | Minified+gzip | Alternativa | Tamaño |
+|---------|--------------|-------------|--------|
+| `moment` | 72.1 kB | `date-fns` | 12 kB |
+| `lodash` | 24.5 kB | `lodash-es` + tree shaking | < 5 kB |
+| `axios` | 13.2 kB | `ky` | 4 kB |
+| `jquery` | 30.8 kB | Vanilla JS | 0 kB |
+| `uuid` | 5.6 kB | `crypto.randomUUID()` | 0 kB |
+
+## Integración en el flujo de trabajo
+
+**Antes de añadir una dependencia:**
+```bash
+# Mentalmente: ¿merece 50 kB este paquete?
+# Bundlephobia: ¿hay algo más ligero?
+```
+
+**En VS Code con Import Cost extension:**
+Muestra el tamaño de cada import directamente en el editor:
+```typescript
+import { format } from 'date-fns';  // 5.2 kB
+import axios from 'axios';           // 13.2 kB
+```
+
+**En el CI con bundlesize:**
+```json
+// package.json
+{
+  "bundlesize": [
+    { "path": "./dist/main.js", "maxSize": "50 kB" }
+  ]
+}
+```
+
+## Reglas heurísticas
+
+- **< 5 kB**: sin preocupación
+- **5-20 kB**: razonable si el paquete hace mucho
+- **> 20 kB**: busca alternativa o importa solo lo que necesitas
+- **> 100 kB**: casi nunca justificable en el cliente

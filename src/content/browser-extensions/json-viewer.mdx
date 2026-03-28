@@ -1,0 +1,69 @@
+---
+name: JSON Viewer
+description: Formatea y resalta JSON en el navegador. Convierte el texto plano que devuelven las APIs en un árbol colapsable y legible.
+category: browser-extensions
+tags: [json, api, formatting, developer-tools, rest]
+os: [windows, macos, linux]
+difficulty: beginner
+links:
+  website: https://chromewebstore.google.com/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh
+addedAt: 2025-03-20
+---
+
+## JSON legible en el navegador
+
+Cuando abres una URL de API en el navegador, ves el JSON en texto plano difícil de leer. JSON Viewer lo convierte automáticamente en un árbol formateado con colores, colapsable y con búsqueda.
+
+## Instalación
+
+- Chrome: [JSON Viewer en Chrome Web Store](https://chromewebstore.google.com/detail/json-viewer/gbmdgpbipfallnflgajpaliibnhdgobh)
+- Firefox: JSON Formatter (alternativa equivalente)
+
+## Lo que hace
+
+**Antes (sin extensión):**
+```
+{"users":[{"id":1,"name":"Ana","email":"ana@example.com","role":"admin"},{"id":2,"name":"Carlos","email":"carlos@example.com","role":"user"}]}
+```
+
+**Después (con JSON Viewer):**
+```json
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Ana",
+      "email": "ana@example.com",
+      "role": "admin"
+    },
+    ...
+  ]
+}
+```
+
+Con colores para strings, números, booleans y null. Y la posibilidad de colapsar/expandir cualquier objeto o array.
+
+## Funciones útiles
+
+**Búsqueda en el JSON**: `Ctrl+F` busca en el JSON formateado.
+
+**Colapsar todo**: útil para JSONs muy grandes, colapsa hasta el primer nivel para ver la estructura general.
+
+**Ver el raw**: botón para alternar entre la vista formateada y el JSON original.
+
+**Copiar al portapapeles**: copia el JSON formateado o el raw.
+
+## Alternativas y cuándo usarlas
+
+| Herramienta | Cuándo usarla |
+|-------------|---------------|
+| JSON Viewer (extensión) | APIs en el navegador, exploración rápida |
+| `jq` (CLI) | Procesamiento en terminal, scripts |
+| Thunder Client | Colecciones organizadas de peticiones |
+| VS Code + JSON | Archivos locales con format on save |
+
+## Para APIs que requieren auth
+
+JSON Viewer no puede autenticar. Para APIs con token:
+1. Usa la consola del navegador: `fetch('/api/users', {headers: {Authorization: 'Bearer token'}}).then(r => r.json()).then(console.log)`
+2. O usa Thunder Client / REST Client en VS Code

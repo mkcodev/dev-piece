@@ -1,0 +1,92 @@
+---
+name: YouTube Enhancer
+description: "Userscript que añade funciones útiles a YouTube: velocidad de reproducción rápida, saltar secciones patrocinadas en vídeos técnicos y atajos de teclado extra."
+category: userscripts
+tags: [youtube, video, userscript, productivity, keyboard-shortcuts]
+os: [windows, macos, linux]
+difficulty: beginner
+addedAt: 2025-03-20
+---
+
+## YouTube con superpoderes para aprender programación
+
+Este userscript está pensado para desarrolladores que usan YouTube para aprender: poder al video, saltar al momento correcto y navegar sin mouse.
+
+> Nota: para bloquear anuncios de forma robusta usa **uBlock Origin**. Este script añade funcionalidades de usabilidad, no bloqueo de anuncios.
+
+## Instalar Tampermonkey
+
+Si no lo tienes, instala Tampermonkey desde la tienda de extensiones de tu navegador.
+
+## Userscript: atajos de teclado mejorados
+
+```javascript
+// ==UserScript==
+// @name         YouTube Dev Tools
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Mejoras de usabilidad para YouTube
+// @match        https://www.youtube.com/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  document.addEventListener('keydown', function(e) {
+    // Solo si no estamos escribiendo en un input
+    if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+    const video = document.querySelector('video');
+    if (!video) return;
+
+    switch(e.key) {
+      // Velocidades de reproducción rápidas
+      case 'U': video.playbackRate = 1.0; break;
+      case 'I': video.playbackRate = 1.5; break;
+      case 'O': video.playbackRate = 1.75; break;
+      case 'P': video.playbackRate = 2.0; break;
+      case 'Y': video.playbackRate = 2.5; break;
+
+      // Saltos precisos (además de los ← → de 5s)
+      case 'A': video.currentTime -= 30; break;  // -30s
+      case 'D': video.currentTime += 30; break;  // +30s
+
+      // Ir al inicio/final
+      case 'Home': video.currentTime = 0; break;
+      case 'End': video.currentTime = video.duration - 5; break;
+    }
+  });
+
+  // Mostrar velocidad actual en el título del vídeo
+  const originalTitle = document.title;
+  const showSpeed = () => {
+    const video = document.querySelector('video');
+    if (video && video.playbackRate !== 1) {
+      document.title = `[${video.playbackRate}x] ${originalTitle}`;
+    }
+  };
+  setInterval(showSpeed, 1000);
+
+})();
+```
+
+## Atajos que añade
+
+| Tecla | Acción |
+|-------|--------|
+| `U` | Velocidad 1.0x (normal) |
+| `I` | Velocidad 1.5x |
+| `O` | Velocidad 1.75x |
+| `P` | Velocidad 2.0x |
+| `Y` | Velocidad 2.5x |
+| `A` | Retroceder 30 segundos |
+| `D` | Avanzar 30 segundos |
+
+## Alternativa: extensiones dedicadas
+
+Si prefieres una extensión mantenida con más funciones:
+
+- **SponsorBlock**: salta segmentos de patrocinios votados por la comunidad (open source)
+- **Return YouTube Dislike**: restaura el contador de dislikes
+- **YouTube Speed Control**: control de velocidad con scroll del ratón

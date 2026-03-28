@@ -1,0 +1,78 @@
+---
+name: ShareX
+description: Herramienta de capturas y grabación de pantalla open source para Windows. Screenshots, GIFs, grabación de vídeo, OCR y subida automática.
+category: windows-tools
+tags: [windows, screenshot, recording, gif, open-source, productivity]
+os: [windows]
+difficulty: beginner
+install:
+  winget: winget install ShareX.ShareX
+  scoop: scoop install sharex
+links:
+  repo: https://github.com/ShareX/ShareX
+  website: https://getsharex.com/
+addedAt: 2025-03-20
+---
+
+## Screenshots profesionales en Windows, gratis
+
+ShareX es la alternativa open source y sin límites a Snagit, Lightshot o la herramienta de recortes de Windows. Tiene todo lo que necesita un desarrollador para documentar, crear tutoriales o reportar bugs.
+
+## Atajos de teclado esenciales
+
+| Atajo | Acción |
+|-------|--------|
+| `Print Screen` | Captura región (configurable) |
+| `Ctrl+Print Screen` | Captura pantalla completa |
+| `Shift+Print Screen` | Captura ventana activa |
+| `Alt+Print Screen` | Grabación de GIF (región) |
+| `Ctrl+Shift+Print Screen` | Grabación de vídeo |
+
+## Flujo de trabajo para documentar bugs
+
+1. `Print Screen` → selecciona la región
+2. En el editor: añade flechas, texto, recuadros, blur para datos sensibles
+3. Copia al portapapeles o guarda en carpeta configurada
+
+## Anotaciones en el editor
+
+ShareX tiene un editor de anotaciones integrado con:
+- **Flechas y líneas** — señalar elementos
+- **Recuadros** — destacar secciones
+- **Texto** — añadir notas
+- **Blur/pixelar** — ocultar datos sensibles o contraseñas
+- **Numeración** — pasos 1, 2, 3 para tutoriales
+
+## GIFs para documentación
+
+```
+Alt+Print Screen → selecciona región → graba interacción → Stop
+```
+
+Genera un GIF optimizado listo para pegar en un PR, README o issue de GitHub. Mucho más útil que una captura estática para explicar comportamientos de UI.
+
+## OCR — copiar texto de imágenes
+
+ShareX incluye reconocimiento óptico de caracteres:
+1. Captura una región con texto
+2. En el editor: `Herramientas → OCR`
+3. El texto aparece en el portapapeles
+
+Útil para copiar texto de PDFs, capturas de error, mensajes de Windows que no permiten copiar texto.
+
+## Subida automática a servicios
+
+ShareX puede subir automáticamente a:
+- **Imgur** (imágenes anónimas)
+- **GitHub Gist** (capturas de código)
+- **Directorio local** configurado
+- Docenas de servicios más (Dropbox, OneDrive, S3, etc.)
+
+## Configuración recomendada para devs
+
+```
+Captura → Guardar en carpeta local (ej: ~/Pictures/ShareX)
+Captura → Copiar al portapapeles automáticamente
+Nombre de archivo: %y%mo%d_%h%mi%s_%rn4 (fecha + número random)
+Calidad JPEG: 90% para documentos, PNG para código/UI
+```

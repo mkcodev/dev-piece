@@ -1,0 +1,88 @@
+---
+name: Cascadia Code
+description: Fuente monoespaciada de Microsoft con ligaduras y versión Nerd Font. La fuente por defecto de Windows Terminal y Visual Studio.
+category: fonts
+tags: [font, microsoft, ligatures, windows, monospace]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  scoop: scoop install cascadia-code
+  manual: https://github.com/microsoft/cascadia-code/releases
+links:
+  repo: https://github.com/microsoft/cascadia-code
+addedAt: 2025-03-20
+---
+
+## La fuente de Microsoft que conquistó a todos
+
+Cascadia Code fue creada por Microsoft en 2019 para Windows Terminal y Visual Studio. Tiene un diseño limpio, curvas suaves y un juego de ligaduras muy completo. Disponible en múltiples variantes.
+
+## Variantes disponibles
+
+| Nombre | Características |
+|--------|-----------------|
+| `Cascadia Code` | Regular con ligaduras |
+| `Cascadia Mono` | Sin ligaduras |
+| `CaskaydiaCove Nerd Font` | Con iconos de Nerd Fonts |
+| `CaskaydiaCove Nerd Font Mono` | Nerd Font sin ligaduras |
+
+> Para terminales con Starship, oh-my-posh o prompts con iconos: usa `CaskaydiaCove Nerd Font`.
+
+## Activar en Windows Terminal
+
+```json
+// settings.json
+{
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "Cascadia Code",
+        "size": 12,
+        "features": {
+          "calt": 1
+        }
+      }
+    }
+  }
+}
+```
+
+## Activar en VS Code
+
+```json
+{
+  "editor.fontFamily": "'Cascadia Code', Consolas, monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14
+}
+```
+
+## Activar en oh-my-posh / Starship en Windows
+
+Si usas un prompt con iconos, necesitas la variante Nerd Font:
+
+```json
+// Windows Terminal
+{
+  "font": {
+    "face": "CaskaydiaCove Nerd Font"
+  }
+}
+```
+
+## Ligaduras incluidas
+
+Cascadia Code soporta las mismas ligaduras que Fira Code y añade algunas propias para PowerShell:
+
+```
+=>   >=   <=   !=   ==   ===
+->   <-   |>   <|   >>   <<
+++   --   +=   -=   **
+```
+
+## Por qué elegir Cascadia Code
+
+- **Integración Windows perfecta**: viene preinstalada en muchos entornos Microsoft
+- **Diseño más redondeado** que Fira Code — preferencia personal
+- **Variante Nerd Font oficial** `CaskaydiaCove` mantenida por el equipo
+- **ClearType optimizado** para Windows

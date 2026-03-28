@@ -1,10 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8caaee"/>
-      <stop offset="100%" style="stop-color:#ca9ee6"/>
+    <radialGradient id="s" cx="40%" cy="35%" r="60%">
+      <stop offset="0%"   stop-color="#e0c6f5"/>
+      <stop offset="45%"  stop-color="#babbf1"/>
+      <stop offset="100%" stop-color="#f0a070"/>
+    </radialGradient>
+    <linearGradient id="b" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#f0d080"/>
+      <stop offset="100%" stop-color="#d4a850"/>
     </linearGradient>
+    <clipPath id="c">
+      <circle cx="32" cy="33" r="23"/>
+    </clipPath>
   </defs>
-  <rect width="32" height="32" rx="8" fill="url(#g)"/>
-  <text x="16" y="22" text-anchor="middle" font-family="system-ui,sans-serif" font-weight="900" font-size="14" fill="#232634">DV</text>
+
+  <!-- Sphere -->
+  <circle cx="32" cy="33" r="23" fill="url(#s)" stroke="#1c1e2b" stroke-width="2.5"/>
+
+  <!-- Hat brim — wide, behind nothing, in front of sphere -->
+  <ellipse cx="32" cy="33" rx="31" ry="8.5" fill="url(#b)" stroke="#1c1e2b" stroke-width="2.5"/>
+
+  <!-- Hat band (pink) — thin stripe on brim -->
+  <ellipse cx="32" cy="33" rx="23" ry="5.5" fill="#f4b8e4" stroke="#1c1e2b" stroke-width="1.8"/>
+
+  <!-- Code  <  bracket -->
+  <text x="19" y="44" font-family="monospace" font-weight="900" font-size="14" fill="#1c1e2b" text-anchor="middle">&lt;</text>
+
+  <!-- Code  >  bracket -->
+  <text x="35" y="44" font-family="monospace" font-weight="900" font-size="14" fill="#1c1e2b" text-anchor="middle">&gt;</text>
+
+  <!-- Cursor arrow (simplified, right side) -->
+  <polygon
+    points="44,36 44,50 47,46.5 50.5,52 52.5,51 49,45.5 53.5,45.5"
+    fill="white" stroke="#1c1e2b" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"
+  />
 </svg>

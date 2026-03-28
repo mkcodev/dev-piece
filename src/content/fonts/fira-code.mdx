@@ -1,0 +1,98 @@
+---
+name: Fira Code
+description: Fuente monoespaciada con ligaduras de programación. Convierte != en ≠, => en ⇒ y docenas de símbolos más en representaciones visuales más limpias.
+category: fonts
+tags: [font, ligatures, programming, monospace, readability]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  brew: brew install --cask font-fira-code
+  scoop: scoop install fira-code
+  manual: https://github.com/tonsky/FiraCode/releases
+links:
+  repo: https://github.com/tonsky/FiraCode
+  website: https://github.com/tonsky/FiraCode
+addedAt: 2025-03-20
+---
+
+## Código que se lee diferente
+
+Fira Code es la fuente con ligaduras más conocida del mundo de la programación. Creada por Nikita Prokopov, convierte combinaciones de caracteres frecuentes en símbolos visualmente más significativos.
+
+No cambia el código — solo cómo se muestra en pantalla.
+
+## Las ligaduras más usadas
+
+```
+Código   →  Visual
+──────────────────
+!=       →  ≠
+==       →  ═
+===      →  ≡
+!==      →  ≢
+=>       →  ⇒
+->       →  →
+<-       →  ←
+<=       →  ≤
+>=       →  ≥
+<<       →  ≪
+>>       →  ≫
+...      →  …
+::       →  ∷
+|>       →  ▷
+```
+
+## Activar en VS Code
+
+```json
+// settings.json
+{
+  "editor.fontFamily": "Fira Code",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.fontWeight": "400"
+}
+```
+
+## Activar en Neovim
+
+```lua
+-- Las ligaduras funcionan automáticamente si el terminal las soporta
+-- Kitty, Alacritty (con ligatures patch), WezTerm: sí
+-- iTerm2: sí (con fuente configurada)
+vim.opt.guifont = "FiraCode Nerd Font:h14"
+```
+
+## Activar en terminal
+
+Para que las ligaduras funcionen en la terminal, el emulador debe soportarlas:
+
+- **Kitty**: soporte nativo
+- **WezTerm**: soporte nativo
+- **Alacritty**: soporte experimental (requiere build especial)
+- **Windows Terminal**: soporte nativo desde v1.9
+
+```jsonc
+// Windows Terminal settings.json
+{
+  "profiles": {
+    "defaults": {
+      "font": {
+        "face": "Fira Code",
+        "size": 12
+      }
+    }
+  }
+}
+```
+
+## Variantes
+
+- **Fira Code Regular** (weight 400) — para uso general
+- **Fira Code Light** (weight 300) — para pantallas de alta densidad
+- **Fira Code Retina** (weight 450) — la más recomendada para pantallas 2K/4K
+- **FiraCode Nerd Font** — versión con iconos de Nerd Fonts, ideal para terminales con Starship/oh-my-zsh
+
+## ¿Ligaduras sí o no?
+
+Las ligaduras dividen opiniones. Pruébalas durante una semana y decide. Lo importante es que el código fuente no cambia — son puramente visuales y no afectan a copy/paste ni a otros desarrolladores.

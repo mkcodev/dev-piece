@@ -1,0 +1,280 @@
+---
+name: "Git workflow profesional"
+description: "gitconfig bien configurado, aliases que ahorran tiempo, lazygit para operaciones visuales, conventional commits para historial limpio y técnicas avanzadas con bisect y reflog."
+slug: git-workflow-pro
+os: [windows, macos, linux]
+difficulty: intermediate
+estimatedTime: "40 min"
+tags: [git, terminal, productividad, conventional-commits, lazygit]
+completedByCount: 1523
+addedAt: 2025-01-25
+lastUpdated: 2025-06-12
+steps:
+  - id: paso-1
+    title: "Configura tu gitconfig"
+    description: "Nombre, email, editor, delta para diffs bonitos y opciones de push/pull sensatas."
+    quickCommands:
+      - "git config --global user.name 'Tu Nombre'"
+      - "git config --global user.email 'tu@email.com'"
+      - "git config --global core.editor 'code --wait'"
+    tools:
+      - slug: gitconfig
+        category: dotfiles
+  - id: paso-2
+    title: "Aliases de Git que ahorran horas"
+    description: "gst, gco, gcm, glog — shortcuts para los comandos que usas 50 veces al día."
+    quickCommands:
+      - "git config --global alias.st status"
+      - "git config --global alias.co checkout"
+      - "git config --global alias.br branch"
+      - "git config --global alias.lg 'log --oneline --graph --decorate --all'"
+    tools:
+      - slug: git-aliases
+        category: snippets
+  - id: paso-3
+    title: "Instala lazygit"
+    description: "TUI visual para Git en la terminal. Staging interactivo, cherry-pick, rebase interactivo... todo con teclado."
+    quickCommands:
+      - "winget install JesseDuffield.lazygit  # Windows"
+      - "brew install lazygit  # macOS"
+      - "sudo pacman -S lazygit  # Arch"
+    tools:
+      - slug: lazygit
+        category: cli-tools
+  - id: paso-4
+    title: "Conventional Commits"
+    description: "Mensajes de commit estandarizados que generan changelogs automáticos y hacen el historial legible."
+    quickCommands:
+      - "# Formato: tipo(scope): descripción"
+      - "git commit -m 'feat(auth): add OAuth2 login'"
+      - "git commit -m 'fix(api): handle null response'"
+    tools:
+      - slug: conventional-commits
+        category: git-hacks
+---
+
+## Por qué la mayoría de devs usa Git mal
+
+Git es la herramienta que más usan los desarrolladores y paradójicamente una de las menos configuradas. La instalación por defecto funciona, pero en cuanto tienes un historial de 200 commits con mensajes como "fix" o "asdf", empiezas a sentir el coste.
+
+Esta guía te da el workflow que usan los equipos que trabajan en serio con Git.
+
+---
+
+## Paso 1: Configura tu gitconfig
+
+El archivo `~/.gitconfig` (o `%USERPROFILE%\.gitconfig` en Windows) controla el comportamiento de Git a nivel global. Aquí están las configuraciones que marcan la diferencia:
+
+```bash
+# Identidad
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+
+# Editor por defecto (VSCode)
+git config --global core.editor "code --wait"
+
+# Branch principal por defecto
+git config --global init.defaultBranch main
+
+# Push a la rama actual sin especificar
+git config --global push.autoSetupRemote true
+
+# Pull con rebase en lugar de merge
+git config --global pull.rebase true
+
+# Mayúsculas/minúsculas en filenames
+git config --global core.ignorecase false
+```
+
+### Delta — diffs que se pueden leer
+
+Delta mejora drásticamente la visualización de `git diff` y `git log -p` con syntax highlighting y números de línea.
+
+```bash
+# macOS
+brew install git-delta
+
+# Windows
+winget install dandavison.delta
+
+# Linux
+sudo apt install git-delta
+```
+
+Añade a tu `~/.gitconfig`:
+
+```ini
+[core]
+    pager = delta
+
+[delta]
+    navigate = true
+    side-by-side = true
+    line-numbers = true
+    syntax-theme = Catppuccin-frappe
+
+[interactive]
+    diffFilter = delta --color-only
+```
+
+---
+
+## Paso 2: Aliases de Git que ahorran horas
+
+Los aliases de Git son shortcuts para comandos que usas constantemente. Aquí los más útiles:
+
+```bash
+# Básicos
+git config --global alias.st    "status -sb"
+git config --global alias.co    "checkout"
+git config --global alias.br    "branch"
+git config --global alias.cp    "cherry-pick"
+
+# Log visual en una línea
+git config --global alias.lg    "log --oneline --graph --decorate --all"
+
+# Último commit
+git config --global alias.last  "log -1 HEAD --stat"
+
+# Unstage un archivo
+git config --global alias.unstage "reset HEAD --"
+
+# Deshacer el último commit (mantiene los cambios)
+git config --global alias.undo  "reset HEAD~1 --mixed"
+
+# Stash rápido con nombre
+git config --global alias.ss    "stash save"
+git config --global alias.sl    "stash list"
+git config --global alias.sp    "stash pop"
+```
+
+Uso en práctica:
+
+```bash
+git lg          # historial visual completo
+git st          # status compacto
+git undo        # deshacer último commit sin perder cambios
+git ss "wip"    # stash con nombre descriptivo
+```
+
+---
+
+## Paso 3: Lazygit — Git visual en la terminal
+
+Lazygit es una TUI (Text User Interface) para Git. Hace que operaciones complejas como el rebase interactivo, el cherry-pick o el staging selectivo sean accesibles sin memorizar comandos.
+
+```bash
+# Windows
+winget install JesseDuffield.lazygit
+
+# macOS
+brew install lazygit
+
+# Arch Linux
+sudo pacman -S lazygit
+
+# Ubuntu (desde el repositorio PPA)
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep '"tag_name"' | sed -E 's/.*"v*([^"]+)".*/\1/')
+curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+tar xf lazygit.tar.gz lazygit
+sudo install lazygit /usr/local/bin
+```
+
+Añade el alias `lg` a tu shell:
+
+```bash
+alias lg='lazygit'
+```
+
+### Comandos clave dentro de lazygit
+
+| Tecla | Acción |
+|-------|--------|
+| `Space` | Stage/unstage archivo o hunk |
+| `c` | Commit |
+| `p` | Push |
+| `P` | Pull |
+| `i` | Rebase interactivo |
+| `e` | Abrir en editor |
+| `?` | Ayuda completa |
+
+---
+
+## Paso 4: Conventional Commits
+
+Conventional Commits es una especificación para mensajes de commit que hace el historial legible automáticamente y permite generar changelogs.
+
+### Formato
+
+```
+tipo(scope): descripción breve
+
+[cuerpo opcional]
+
+[footer opcional: BREAKING CHANGE: ...]
+```
+
+### Tipos principales
+
+| Tipo | Cuándo usarlo |
+|------|---------------|
+| `feat` | Nueva funcionalidad |
+| `fix` | Corrección de bug |
+| `docs` | Solo documentación |
+| `style` | Formato, sin cambios de lógica |
+| `refactor` | Refactorización sin feat ni fix |
+| `test` | Añadir o corregir tests |
+| `chore` | Tareas de mantenimiento |
+| `perf` | Mejoras de rendimiento |
+
+### Ejemplos reales
+
+```bash
+git commit -m "feat(auth): add GitHub OAuth login"
+git commit -m "fix(api): handle empty response from weather endpoint"
+git commit -m "refactor(db): extract connection pool to service"
+git commit -m "docs(readme): add setup instructions for macOS"
+git commit -m "chore(deps): update all dependencies to latest"
+```
+
+### Configuración con herramienta de ayuda
+
+```bash
+# Instala commitizen para commits guiados
+npm install -g commitizen cz-conventional-changelog
+echo '{ "path": "cz-conventional-changelog" }' > ~/.czrc
+
+# Usar en lugar de git commit
+git cz
+```
+
+---
+
+## Bonus: Git bisect para encontrar bugs
+
+`git bisect` hace una búsqueda binaria en el historial para encontrar qué commit introdujo un bug. Es una de las herramientas más potentes y menos conocidas de Git.
+
+```bash
+git bisect start
+git bisect bad            # el commit actual tiene el bug
+git bisect good v1.0.0    # esta versión funcionaba bien
+
+# Git te muestra un commit. Prueba si el bug existe:
+git bisect good   # este commit está bien
+git bisect bad    # este commit tiene el bug
+
+# Git sigue bisectando. Repite hasta que encuentre el commit exacto.
+# Al terminar:
+git bisect reset
+```
+
+---
+
+## Resultado
+
+Ahora tienes un workflow de Git que te permite:
+- Trabajar con un historial limpio y legible (conventional commits)
+- Navegar y operar visualmente en el repo (lazygit)
+- Diffs hermosos con context (delta)
+- Shortcuts para los comandos del día a día (aliases)
+- Encontrar cualquier bug por regresión (bisect)

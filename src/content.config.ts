@@ -43,6 +43,33 @@ const toolSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+const stepToolSchema = z.object({
+  slug:     z.string(),
+  category: z.string(),
+});
+
+const stepSchema = z.object({
+  id:            z.string(),
+  title:         z.string(),
+  description:   z.string(),
+  quickCommands: z.array(z.string()).default([]),
+  tools:         z.array(stepToolSchema).default([]),
+});
+
+const guiaSchema = z.object({
+  name:             z.string(),
+  description:      z.string(),
+  slug:             z.string(),
+  os:               z.array(z.enum(['windows', 'macos', 'linux'])),
+  difficulty:       z.enum(['beginner', 'intermediate', 'advanced']),
+  estimatedTime:    z.string(),
+  tags:             z.array(z.string()).default([]),
+  completedByCount: z.number().default(0),
+  addedAt:          z.coerce.date(),
+  lastUpdated:      z.coerce.date().optional(),
+  steps:            z.array(stepSchema).default([]),
+});
+
 export const collections = {
   terminales: defineCollection({
     loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/terminales' }),
@@ -99,5 +126,17 @@ export const collections = {
   'windows-tools': defineCollection({
     loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/windows-tools' }),
     schema: toolSchema,
+  }),
+  learning: defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/learning' }),
+    schema: toolSchema,
+  }),
+  'web-resources': defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/web-resources' }),
+    schema: toolSchema,
+  }),
+  guias: defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guias' }),
+    schema: guiaSchema,
   }),
 };

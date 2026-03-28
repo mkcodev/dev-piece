@@ -27,47 +27,105 @@ const {
 
 const href = `/${category}/${slug}`;
 
-// Get best install command for display
 const installEntries = install ? Object.entries(install).filter(([, v]) => v) : [];
 const firstInstall = installEntries[0];
 
 const difficultyConfig = {
-  beginner: { label: 'Principiante', color: 'bg-green', title: 'Nivel: Principiante' },
-  intermediate: { label: 'Intermedio', color: 'bg-yellow', title: 'Nivel: Intermedio' },
-  advanced: { label: 'Avanzado', color: 'bg-red', title: 'Nivel: Avanzado' },
+  beginner:     { label: 'Principiante', color: 'bg-green',  title: 'Nivel: Principiante' },
+  intermediate: { label: 'Intermedio',   color: 'bg-yellow', title: 'Nivel: Intermedio' },
+  advanced:     { label: 'Avanzado',     color: 'bg-red',    title: 'Nivel: Avanzado' },
 };
 
 const osBadgeConfig: Record<string, { label: string; color: string }> = {
-  windows: { label: 'Win', color: 'bg-blue/20 text-blue border-blue/30' },
-  macos: { label: 'Mac', color: 'bg-mauve/20 text-mauve border-mauve/30' },
-  linux: { label: 'Linux', color: 'bg-peach/20 text-peach border-peach/30' },
-  cross: { label: 'Cross', color: 'bg-green/20 text-green border-green/30' },
+  windows: { label: 'Win',   color: 'bg-blue/20 text-blue border-blue/30' },
+  macos:   { label: 'Mac',   color: 'bg-mauve/20 text-mauve border-mauve/30' },
+  linux:   { label: 'Linux', color: 'bg-peach/20 text-peach border-peach/30' },
+  cross:   { label: 'Cross', color: 'bg-green/20 text-green border-green/30' },
 };
+
+const SLUG_ICONS: Record<string, string> = {
+  'claude-code': 'anthropic', 'github-copilot': 'githubcopilot', 'ollama': 'ollama',
+  'bitwarden': 'bitwarden', 'ublock-origin': 'ublockorigin', 'wappalyzer': 'wappalyzer',
+  'httpie': 'httpie', 'docker-compose-patterns': 'docker', 'gitconfig': 'git',
+  'jetbrains-mono': 'jetbrains', 'conventional-commits': 'conventionalcommits',
+  'git-bisect': 'git', 'git-reflog': 'git', 'git-worktree': 'git',
+  'docker-hacks': 'docker', 'git-aliases': 'git',
+  'shell-aliases': 'gnubash', 'alacritty': 'alacritty', 'ghostty': 'ghostty',
+  'nushell': 'nushell', 'starship': 'starship',
+  'warp': 'warp', 'wezterm': 'wezterm', 'catppuccin-vscode': 'vscodium',
+  'error-lens': 'vscodium', 'gitlens': 'gitkraken',
+  'todo-tree': 'vscodium', 'vscode-settings': 'vscodium',
+  'vscodevim': 'vim',
+  'roadmap-dev': 'roadmapdotsh', 'javascript-info': 'javascript',
+  'mdn-web-docs': 'mdnwebdocs',
+};
+
+const CATEGORY_ICONS: Record<string, string> = {
+  'neovim': 'neovim',
+  'scripts-ahk': 'autohotkey',
+  'learning': 'bookstack',
+  'web-resources': 'mdnwebdocs',
+};
+
+const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
 ---
 
 <article
-  class="group relative bg-surface0 rounded-xl border border-surface1 hover:border-lavender/40 card-glow transition-all duration-200 flex flex-col overflow-hidden animate-fade-in"
+  class="tool-card scroll-reveal group relative bg-surface0 rounded-xl border border-surface1 flex flex-col overflow-hidden"
+  style={`--card-accent: ${accent};`}
+  data-fav-slug={slug}
+  data-fav-cat={category}
+  data-fav-name={name}
+  data-fav-desc={description}
+  data-fav-tags={JSON.stringify(tags)}
+  data-fav-os={JSON.stringify(os)}
+  data-fav-accent={accent}
+  data-fav-difficulty={difficulty ?? ''}
+  data-fav-install={JSON.stringify(Object.fromEntries(installEntries))}
 >
-  {featured && (
-    <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue via-lavender to-mauve" aria-hidden="true" />
+  <!-- Featured top bar (permanent gradient) -->
+  {featured ? (
+    <div class="card-featured-bar" aria-hidden="true" />
+  ) : (
+    <!-- Hover accent bar (slides in on hover) -->
+    <div class="card-accent-bar" aria-hidden="true" />
   )}
 
-  <div class="p-4 flex flex-col gap-3 flex-1">
+  <div class="relative z-10 p-4 flex flex-col gap-3 flex-1">
     <!-- Header row -->
     <div class="flex items-start justify-between gap-2">
       <div class="flex items-center gap-2.5 min-w-0">
+        <!-- Icon — morphing target: card-icon-wrap -->
         <div
-          class="w-8 h-8 rounded-lg flex items-center justify-center text-crust font-bold text-sm flex-shrink-0"
-          style={`background-color: ${accent}30; color: ${accent};`}
+          class="card-icon-wrap w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
+          style={`background-color: ${accent}20;`}
           aria-hidden="true"
         >
-          {name.charAt(0).toUpperCase()}
+          {simpleIconSlug ? (
+            <img
+              src={`https://cdn.simpleicons.org/${simpleIconSlug}`}
+              alt=""
+              width="22"
+              height="22"
+              class="w-[22px] h-[22px] object-contain icon-img"
+              data-fallback={name.charAt(0).toUpperCase()}
+              data-accent={accent}
+            />
+          ) : (
+            <span class="font-bold text-sm" style={`color: ${accent};`}>
+              {name.charAt(0).toUpperCase()}
+            </span>
+          )}
         </div>
-        <h3 class="font-semibold text-text text-base leading-tight truncate">{name}</h3>
+        <!-- Title — morphing target: card-title-el -->
+        <h3 class="card-title-el font-semibold text-text text-base leading-tight truncate">{name}</h3>
+        <!-- EN USO badge (shown via JS when integrated) -->
+        <span class="js-in-use-badge hidden text-[10px] font-bold px-1.5 py-0.5 rounded border flex-shrink-0" style="background:rgba(229,200,144,0.15);border-color:rgba(229,200,144,0.35);color:#e5c890;">EN USO</span>
+        <!-- ALTERNATIVA badge (shown via JS when another tool in same category is integrated) -->
+        <span class="js-alt-badge hidden text-[10px] font-bold px-1.5 py-0.5 rounded border flex-shrink-0" style="background:rgba(239,159,118,0.15);border-color:rgba(239,159,118,0.35);color:#ef9f76;">ALTERNATIVA</span>
       </div>
 
       <div class="flex items-center gap-1.5 flex-shrink-0">
-        <!-- OS badges -->
         <div class="flex gap-1">
           {os.slice(0, 3).map((o) => {
             const cfg = osBadgeConfig[o];
@@ -78,8 +136,6 @@ const osBadgeConfig: Record<string, { label: string; color: string }> = {
             ) : null;
           })}
         </div>
-
-        <!-- Difficulty dot -->
         {difficulty && (
           <span
             class={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${difficultyConfig[difficulty].color}`}
@@ -107,24 +163,264 @@ const osBadgeConfig: Record<string, { label: string; color: string }> = {
       </div>
     )}
 
-    <!-- Install command + link -->
+    <!-- Footer: install + favorite + link -->
     <div class="flex items-center justify-between gap-2 pt-1 border-t border-surface1/50">
       {firstInstall ? (
-        <code class="text-xs text-sky bg-crust/50 px-2 py-1 rounded font-mono truncate max-w-[60%]">
+        <code class="text-xs text-sky bg-crust/50 px-2 py-1 rounded font-mono truncate max-w-[50%]">
           {firstInstall[1]}
         </code>
-      ) : (
-        <span />
-      )}
-      <a
-        href={href}
-        class="text-xs text-blue hover:text-lavender font-medium transition-colors flex items-center gap-1 flex-shrink-0"
-      >
-        Ver más
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/>
-        </svg>
-      </a>
+      ) : <span />}
+
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <button
+          class="js-alt-btn p-1 rounded text-subtext0 hover:text-peach transition-colors"
+          aria-label={`Marcar ${name} como alternativa conocida`}
+          title="Marcar como alternativa"
+        >
+          <svg class="w-3.5 h-3.5 js-alt-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+          </svg>
+        </button>
+        <button
+          class="js-int-btn p-1 rounded text-subtext0 hover:text-yellow transition-colors"
+          aria-label={`Marcar ${name} como integrado`}
+          title="Marcar como integrado"
+        >
+          <svg class="w-3.5 h-3.5 js-int-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </button>
+        <button
+          class="js-fav-btn p-1 rounded text-subtext0 hover:text-red transition-colors"
+          aria-label={`Añadir ${name} a favoritos`}
+          title="Añadir a favoritos"
+        >
+          <svg class="w-3.5 h-3.5 js-fav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </button>
+        <a
+          href={href}
+          class="text-xs text-blue hover:text-lavender font-medium transition-colors flex items-center gap-1"
+        >
+          Ver más
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 </article>
+
+<script>
+  /* ---- Favorites ---- */
+  const FAV_KEY = 'devvault-favorites';
+
+  function getFavs(): Array<Record<string, unknown>> {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY) ?? '[]'); } catch { return []; }
+  }
+
+  function isFav(slug: string, cat: string) {
+    return getFavs().some((f) => f.slug === slug && f.category === cat);
+  }
+
+  function syncFavBtn(btn: HTMLButtonElement) {
+    const article = btn.closest('article') as HTMLElement | null;
+    if (!article) return;
+    const slug = article.dataset.favSlug ?? '';
+    const cat  = article.dataset.favCat  ?? '';
+    const active = isFav(slug, cat);
+    const icon = btn.querySelector('svg');
+    if (icon) icon.setAttribute('fill', active ? 'currentColor' : 'none');
+    btn.classList.toggle('text-red',      active);
+    btn.classList.toggle('text-subtext0', !active);
+    btn.setAttribute('aria-label', active ? 'Quitar de favoritos' : 'Añadir a favoritos');
+  }
+
+  function initFavBtns() {
+    document.querySelectorAll<HTMLButtonElement>('.js-fav-btn').forEach((btn) => {
+      if (btn.dataset.favInit) return;
+      btn.dataset.favInit = '1';
+      syncFavBtn(btn);
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const article = btn.closest('article') as HTMLElement | null;
+        if (!article) return;
+        const { favSlug: slug, favCat: cat, favName: name, favDesc: description,
+                favTags, favOs, favAccent: accent, favDifficulty: difficulty } = article.dataset;
+        if (!slug || !cat) return;
+        let favs = getFavs();
+        if (isFav(slug, cat)) {
+          favs = favs.filter((f) => !(f.slug === slug && f.category === cat));
+        } else {
+          favs.unshift({ slug, category: cat, name, description,
+            tags: JSON.parse(favTags ?? '[]'),
+            os:   JSON.parse(favOs   ?? '[]'),
+            accent, difficulty });
+        }
+        localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+        window.dispatchEvent(new CustomEvent('favorites-updated'));
+        /* Heart pulse */
+        btn.classList.add('fav-btn-active');
+        btn.addEventListener('animationend', () => btn.classList.remove('fav-btn-active'), { once: true });
+        syncFavBtn(btn);
+      });
+    });
+  }
+
+  initFavBtns();
+  document.addEventListener('astro:page-load', initFavBtns);
+
+  /* ---- Integrations ---- */
+  const INT_KEY = 'devvault-integrations';
+
+  function getInts(): Array<Record<string, unknown>> {
+    try { return JSON.parse(localStorage.getItem(INT_KEY) ?? '[]'); } catch { return []; }
+  }
+  function isInt(slug: string, cat: string) {
+    return getInts().some((i) => i.slug === slug && i.category === cat);
+  }
+  function syncIntBtn(btn: HTMLButtonElement) {
+    const article = btn.closest('article') as HTMLElement | null;
+    if (!article) return;
+    const slug = article.dataset.favSlug ?? '';
+    const cat  = article.dataset.favCat  ?? '';
+    const active = isInt(slug, cat);
+    const icon = btn.querySelector('svg');
+    if (icon) icon.setAttribute('fill', active ? 'currentColor' : 'none');
+    btn.classList.toggle('text-yellow',   active);
+    btn.classList.toggle('text-subtext0', !active);
+    btn.setAttribute('aria-label', active ? 'Quitar integración' : 'Marcar como integrado');
+    /* EN USO badge */
+    const badge = article.querySelector<HTMLElement>('.js-in-use-badge');
+    if (badge) badge.classList.toggle('hidden', !active);
+  }
+  function initIntBtns() {
+    document.querySelectorAll<HTMLButtonElement>('.js-int-btn').forEach((btn) => {
+      if (btn.dataset.intInit) return;
+      btn.dataset.intInit = '1';
+      syncIntBtn(btn);
+      btn.addEventListener('click', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const article = btn.closest('article') as HTMLElement | null;
+        if (!article) return;
+        const { favSlug: slug, favCat: cat, favName: name, favDesc: description,
+                favTags, favOs, favAccent: accent, favDifficulty: difficulty, favInstall } = article.dataset;
+        if (!slug || !cat) return;
+        let ints = getInts();
+        if (isInt(slug, cat)) {
+          ints = ints.filter((i) => !(i.slug === slug && i.category === cat));
+        } else {
+          const rawInstall = JSON.parse(favInstall ?? '{}');
+          ints.unshift({ slug, category: cat, name, description,
+            tags: JSON.parse(favTags ?? '[]'), os: JSON.parse(favOs ?? '[]'),
+            accent, difficulty, install: rawInstall });
+        }
+        localStorage.setItem(INT_KEY, JSON.stringify(ints));
+        window.dispatchEvent(new CustomEvent('integrations-updated'));
+        syncIntBtn(btn);
+      });
+    });
+  }
+  initIntBtns();
+  document.addEventListener('astro:page-load', initIntBtns);
+
+  /* ---- Alternatives ---- */
+  const ALT_KEY = 'devvault-alternatives';
+
+  function getAlts(): Array<Record<string, unknown>> {
+    try { return JSON.parse(localStorage.getItem(ALT_KEY) ?? '[]'); } catch { return []; }
+  }
+  function isAlt(slug: string, cat: string) {
+    return getAlts().some((a) => a.slug === slug && a.category === cat);
+  }
+
+  function syncAltBadges() {
+    const ints = getInts();
+    const intCats = new Set(ints.map((i) => i.category));
+    const intKeys = new Set(ints.map((i) => `${i.category}/${i.slug}`));
+    document.querySelectorAll<HTMLElement>('article[data-fav-cat]').forEach((article) => {
+      const cat  = article.dataset.favCat  ?? '';
+      const slug = article.dataset.favSlug ?? '';
+      const altBadge   = article.querySelector<HTMLElement>('.js-alt-badge');
+      const inUseBadge = article.querySelector<HTMLElement>('.js-in-use-badge');
+      const isIntegrated = intKeys.has(`${cat}/${slug}`);
+      const catHasInt    = intCats.has(cat);
+      if (altBadge)   altBadge.classList.toggle('hidden',   !(catHasInt && !isIntegrated));
+      if (inUseBadge) inUseBadge.classList.toggle('hidden',  !isIntegrated);
+      // Highlight active (integrated) tool with accent ring
+      article.classList.toggle('ring-1', isIntegrated);
+      article.classList.toggle('ring-yellow/30', isIntegrated);
+    });
+  }
+
+  function syncAltBtn(btn: HTMLButtonElement) {
+    const article = btn.closest('article') as HTMLElement | null;
+    if (!article) return;
+    const slug = article.dataset.favSlug ?? '';
+    const cat  = article.dataset.favCat  ?? '';
+    const active = isAlt(slug, cat);
+    btn.classList.toggle('text-peach', active);
+    btn.classList.toggle('text-subtext0', !active);
+    btn.setAttribute('aria-label', active ? 'Quitar alternativa' : 'Marcar como alternativa conocida');
+    btn.setAttribute('title', active ? 'Quitar alternativa' : 'Marcar como alternativa');
+  }
+
+  function initAltBtns() {
+    document.querySelectorAll<HTMLButtonElement>('.js-alt-btn').forEach((btn) => {
+      if (btn.dataset.altInit) return;
+      btn.dataset.altInit = '1';
+      syncAltBtn(btn);
+      btn.addEventListener('click', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const article = btn.closest('article') as HTMLElement | null;
+        if (!article) return;
+        const { favSlug: slug, favCat: cat, favName: name, favDesc: description,
+                favTags, favOs, favAccent: accent, favDifficulty: difficulty } = article.dataset;
+        if (!slug || !cat) return;
+        let alts = getAlts();
+        if (isAlt(slug, cat)) {
+          alts = alts.filter((a) => !(a.slug === slug && a.category === cat));
+        } else {
+          alts.unshift({ slug, category: cat, name, description,
+            tags: JSON.parse(favTags ?? '[]'), os: JSON.parse(favOs ?? '[]'),
+            accent, difficulty });
+        }
+        localStorage.setItem(ALT_KEY, JSON.stringify(alts));
+        window.dispatchEvent(new CustomEvent('alternatives-updated'));
+        syncAltBtn(btn);
+      });
+    });
+  }
+
+  initAltBtns();
+  syncAltBadges();
+  document.addEventListener('astro:page-load', () => { initAltBtns(); syncAltBadges(); });
+  window.addEventListener('integrations-updated', syncAltBadges);
+  window.addEventListener('alternatives-updated', () => {
+    document.querySelectorAll<HTMLButtonElement>('.js-alt-btn').forEach(syncAltBtn);
+  });
+
+  /* ---- Icon CDN fallback ---- */
+  function applyIconFallback(img: HTMLImageElement) {
+    const span = document.createElement('span');
+    span.className = 'font-bold text-sm';
+    span.style.color = img.dataset.accent ?? '#8caaee';
+    span.textContent = img.dataset.fallback ?? '?';
+    img.replaceWith(span);
+  }
+
+  function initIconFallbacks() {
+    document.querySelectorAll<HTMLImageElement>('img.icon-img').forEach((img) => {
+      if (img.dataset.fbInit) return;
+      img.dataset.fbInit = '1';
+      if (img.complete && img.naturalWidth === 0) applyIconFallback(img);
+      else img.addEventListener('error', () => applyIconFallback(img));
+    });
+  }
+
+  initIconFallbacks();
+  document.addEventListener('astro:page-load', initIconFallbacks);
+</script>

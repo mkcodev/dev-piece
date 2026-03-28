@@ -1,0 +1,241 @@
+---
+name: "Setup de IA para devs"
+description: "Integra Claude Code en tu terminal, GitHub Copilot en VSCode y Ollama para modelos locales. El stack de IA que usan los devs más productivos en 2025."
+slug: setup-ia-dev
+os: [windows, macos, linux]
+difficulty: intermediate
+estimatedTime: "30 min"
+tags: [ia, claude, copilot, ollama, productividad]
+completedByCount: 987
+addedAt: 2025-02-01
+lastUpdated: 2025-06-20
+steps:
+  - id: paso-1
+    title: "Claude Code — IA en tu terminal"
+    description: "El agente de código más potente directamente en tu CLI. Edita archivos, ejecuta comandos, entiende tu codebase completo."
+    quickCommands:
+      - "npm install -g @anthropic-ai/claude-code"
+      - "claude"
+    tools:
+      - slug: claude-code
+        category: ai-tools
+  - id: paso-2
+    title: "GitHub Copilot en VSCode"
+    description: "Autocompletado de código con IA. El modelo de sugerencias inline más usado del mundo."
+    quickCommands:
+      - "ext install GitHub.copilot"
+      - "ext install GitHub.copilot-chat"
+    tools:
+      - slug: github-copilot
+        category: ai-tools
+  - id: paso-3
+    title: "Ollama — modelos locales sin límites"
+    description: "Corre Llama, Mistral, CodeLlama y docenas de modelos en tu propia máquina. Sin API key, sin privacidad comprometida."
+    quickCommands:
+      - "# macOS/Linux: curl -fsSL https://ollama.ai/install.sh | sh"
+      - "winget install Ollama.Ollama  # Windows"
+      - "ollama pull llama3.2"
+      - "ollama run llama3.2"
+    tools:
+      - slug: ollama
+        category: ai-tools
+---
+
+## El stack de IA en 2025: dónde encaja cada herramienta
+
+Hay tres categorías distintas de herramientas de IA para desarrolladores, y la respuesta correcta no es elegir una — es usar las tres para lo que cada una hace mejor:
+
+| Herramienta | Mejor para |
+|-------------|-----------|
+| **Claude Code** | Tareas complejas, refactoring, entender codebases, agente autónomo |
+| **GitHub Copilot** | Autocompletado inline mientras escribes |
+| **Ollama** | Consultas privadas, modelos especializados, sin latencia de red |
+
+---
+
+## Paso 1: Claude Code — IA en tu terminal
+
+Claude Code es un CLI que conecta Claude (el modelo de Anthropic) directamente con tu terminal. Puede leer archivos, ejecutar comandos, navegar por tu codebase y hacer cambios coordinados en múltiples archivos.
+
+### Instalación
+
+```bash
+npm install -g @anthropic-ai/claude-code
+```
+
+### Primeros pasos
+
+```bash
+# En cualquier directorio de proyecto
+claude
+
+# O con una tarea directa
+claude "explícame cómo funciona este proyecto"
+claude "refactoriza esta función para que sea más legible"
+claude "añade tests para esta función"
+```
+
+Claude Code entiende el contexto completo de tu proyecto: `package.json`, estructura de archivos, git history, etc.
+
+### Tips de uso
+
+```bash
+# Modo plan: Claude te muestra qué va a hacer antes de hacerlo
+claude --plan "implementa autenticación JWT"
+
+# Con contexto específico de archivos
+claude @src/auth.ts "añade manejo de errores"
+
+# Ver cambios antes de aplicar
+claude --diff "extrae esta lógica a un helper"
+```
+
+---
+
+## Paso 2: GitHub Copilot en VSCode
+
+Copilot funciona de forma diferente a Claude Code: no entiende tu codebase entero, sino que predice la siguiente línea o bloque de código basándose en el contexto cercano. Es increíblemente útil para:
+
+- Autocompletar funciones repetitivas
+- Escribir tests a partir de código existente
+- Generar boilerplate
+- Recordar APIs de librerías que no usas todos los días
+
+### Instalación
+
+```
+Ctrl+Shift+X → busca "GitHub Copilot" → Instalar
+```
+
+O desde la terminal:
+
+```bash
+code --install-extension GitHub.copilot
+code --install-extension GitHub.copilot-chat
+```
+
+### Configuración recomendada
+
+Añade a tu settings.json de VSCode:
+
+```json
+{
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": true
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+
+  // Copilot Chat en el panel lateral
+  "github.copilot.chat.welcomeMessage": "never"
+}
+```
+
+### Atajos clave
+
+| Atajo | Acción |
+|-------|--------|
+| `Tab` | Aceptar sugerencia completa |
+| `Alt+]` / `Alt+[` | Siguiente/anterior sugerencia |
+| `Ctrl+Enter` | Ver todas las sugerencias |
+| `Ctrl+I` | Copilot Chat inline |
+| `Ctrl+Shift+I` | Abrir Copilot Chat panel |
+
+---
+
+## Paso 3: Ollama — modelos de IA locales
+
+Ollama te permite descargar y ejecutar modelos de lenguaje en tu propia máquina. Las ventajas:
+- **Sin coste por token** — los modelos se ejecutan localmente
+- **Privacidad total** — tu código nunca sale del ordenador
+- **Sin límites de rate** — tan rápido como tu hardware permita
+- **Funciona sin internet** — ideal para entornos restringidos
+
+### Instalación
+
+**macOS/Linux:**
+```bash
+curl -fsSL https://ollama.ai/install.sh | sh
+```
+
+**Windows:**
+```powershell
+winget install Ollama.Ollama
+```
+
+### Modelos recomendados para devs
+
+```bash
+# Para conversación general y código
+ollama pull llama3.2          # 3.2 GB — bueno para todo
+ollama pull llama3.2:1b       # 1.3 GB — versión ligera
+
+# Especializado en código
+ollama pull codellama          # 3.8 GB — optimizado para código
+ollama pull qwen2.5-coder      # 4.7 GB — excelente en código
+
+# Para máquinas potentes (16+ GB VRAM)
+ollama pull llama3.1:70b       # 40 GB — calidad casi GPT-4
+```
+
+### Uso básico
+
+```bash
+# Modo interactivo
+ollama run llama3.2
+
+# Con prompt directo
+ollama run codellama "escribe una función en TypeScript que valide emails"
+
+# Lista los modelos instalados
+ollama list
+
+# Ver modelos disponibles en el hub
+ollama search code
+```
+
+### Integración con Open WebUI (interfaz visual)
+
+Si prefieres una interfaz tipo ChatGPT en el navegador:
+
+```bash
+docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  ghcr.io/open-webui/open-webui:main
+
+# Accede en: http://localhost:3000
+```
+
+---
+
+## Cómo combinar las tres herramientas en la práctica
+
+**Flujo típico de un dev con este stack:**
+
+1. **Mientras escribes código** → Copilot sugiere completado inline
+2. **Cuando tienes una tarea compleja** → Claude Code en la terminal para implementar
+3. **Para consultas rápidas/privadas** → `ollama run llama3.2` sin preocuparte de privacidad
+4. **Para revisar un PR grande** → Claude Code analiza el diff completo
+
+```bash
+# Ejemplo de flujo real:
+# 1. Estás en VSCode, Copilot te completa los tipos TypeScript
+# 2. Necesitas refactorizar un módulo entero:
+claude "refactoriza el módulo src/payments/ para usar el patrón Repository"
+# 3. Tienes una pregunta sobre datos sensibles del cliente:
+ollama run llama3.2 "ayúdame a diseñar el esquema de BD para esto..."
+```
+
+---
+
+## Resultado
+
+Tienes ahora el stack de IA completo:
+- **Claude Code**: el agente más potente para tareas complejas en tu terminal
+- **Copilot**: el asistente inline mientras escribes
+- **Ollama**: tu propio servidor de IA local para privacidad y sin límites
+
+Este setup te va a ahorrar horas cada semana. La clave está en saber cuándo usar cada herramienta.

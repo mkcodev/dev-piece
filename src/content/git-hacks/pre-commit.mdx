@@ -1,0 +1,113 @@
+---
+name: pre-commit
+description: Framework para gestionar Git hooks. Define qué herramientas corren en cada commit (linters, formatters, tests) con un archivo de configuración.
+category: git-hacks
+tags: [git, hooks, linting, formatting, automation, ci]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install pre-commit
+  pip: pip install pre-commit
+links:
+  repo: https://github.com/pre-commit/pre-commit
+  docs: https://pre-commit.com/
+  website: https://pre-commit.com/
+addedAt: 2025-03-20
+---
+
+## Hooks de Git sin dolor de cabeza
+
+Los Git hooks (scripts que se ejecutan antes/después de operaciones de Git) son potentes pero difíciles de compartir en equipo: viven en `.git/hooks/` que no se commitea. `pre-commit` resuelve esto con un archivo de configuración `.pre-commit-config.yaml` que sí va en el repositorio.
+
+## Instalación y setup
+
+```bash
+# Instalar pre-commit
+pip install pre-commit
+# o
+brew install pre-commit
+
+# Crear el archivo de configuración
+touch .pre-commit-config.yaml
+
+# Instalar los hooks en el repo
+pre-commit install
+```
+
+## .pre-commit-config.yaml para proyectos web
+
+```yaml
+repos:
+  # Checks básicos de archivos
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: detect-private-key
+
+  # Prettier para JS/TS/CSS/HTML/JSON
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        types_or: [javascript, jsx, ts, tsx, css, scss, json, yaml, markdown]
+
+  # ESLint
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.57.0
+    hooks:
+      - id: eslint
+        files: \.[jt]sx?$
+        additional_dependencies:
+          - eslint@8.57.0
+          - typescript@5.4.5
+```
+
+## Para proyectos Python
+
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.7
+    hooks:
+      - id: ruff           # linter (reemplaza flake8/isort)
+      - id: ruff-format    # formateador (reemplaza black)
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.9.0
+    hooks:
+      - id: mypy
+```
+
+## Comandos útiles
+
+```bash
+# Ejecutar todos los hooks en todos los archivos (sin hacer commit)
+pre-commit run --all-files
+
+# Ejecutar un hook específico
+pre-commit run prettier --all-files
+
+# Actualizar todos los hooks a la última versión
+pre-commit autoupdate
+
+# Saltar hooks en un commit específico (emergencias)
+git commit --no-verify -m "hotfix"
+
+# Desinstalar hooks
+pre-commit uninstall
+```
+
+## Integración en CI
+
+```yaml
+# .github/workflows/lint.yml
+- name: Run pre-commit
+  uses: pre-commit/action@v3.0.1
+```
+
+Así los mismos checks que corren localmente también corren en CI, garantizando consistencia.

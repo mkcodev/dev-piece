@@ -1,0 +1,57 @@
+---
+name: Can I Use
+description: Tabla de compatibilidad de APIs y características web en todos los navegadores. Imprescindible antes de usar cualquier feature moderna.
+category: web-resources
+tags: [compatibilidad, css, javascript, navegadores, referencia]
+os: [cross]
+featured: true
+difficulty: beginner
+links:
+  website: https://caniuse.com
+  repo: https://github.com/nicholasjohnson/Fyrd/caniuse
+addedAt: 2025-01-20
+---
+
+## ¿Qué es Can I Use?
+
+Can I Use es la herramienta de referencia para comprobar la compatibilidad de características HTML, CSS y JavaScript en los distintos navegadores y versiones. Antes de usar `grid`, `container queries`, `View Transitions API` o cualquier otra feature moderna, puedes comprobar si tus usuarios podrán verla correctamente.
+
+Muestra datos actualizados de compatibilidad para Chrome, Firefox, Safari, Edge, Opera y sus versiones móviles, con porcentajes de uso global.
+
+## Cómo usarlo
+
+1. Busca la característica que necesitas (ej: `CSS grid`, `fetch`, `WebP`)
+2. Revisa la tabla de colores: verde = soportado, rojo = no soportado, amarillo = parcial
+3. Comprueba el porcentaje de usuarios globales que tienen soporte
+4. Consulta las notas de cada celda para ver comportamientos específicos
+
+## Características más buscadas
+
+```
+CSS Grid Layout       — 98% soporte global
+CSS Custom Properties — 97% soporte global
+Flexbox               — 99% soporte global
+View Transitions API  — Soporte limitado (solo Chromium)
+Container Queries     — 92% soporte global
+CSS :has()            — 90% soporte global
+```
+
+## Integración con proyectos
+
+Puedes usar Can I Use directamente en tus herramientas:
+
+```bash
+# Con Browserslist en package.json
+"browserslist": ["> 1%", "last 2 versions", "not dead"]
+
+# Autoprefixer lo usa automáticamente al compilar CSS
+# PostCSS + autoprefixer añade prefijos según compatibilidad
+```
+
+## Pro Tips
+
+**Usa la extensión de navegador**: Can I Use tiene extensión para Chrome y Firefox que muestra compatibilidad directamente al seleccionar texto en MDN u otros sitios de documentación.
+
+**Embeddings en README**: Puedes añadir badges de compatibilidad en tu proyecto con `https://img.shields.io/badge/can%20i%20use-...`.
+
+**Alternativa con datos de uso real**: Combínalo con [httparchive.org](https://httparchive.org) para ver qué features usan realmente los sitios en producción.

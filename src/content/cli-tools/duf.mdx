@@ -1,0 +1,62 @@
+---
+name: duf
+description: Alternativa moderna a df para ver el uso de disco por partición. Tabla colorida con barras de progreso y filtros por tipo de filesystem.
+category: cli-tools
+tags: [disk, storage, filesystem, monitoring, df]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  brew: brew install duf
+  scoop: scoop install duf
+  apt: sudo apt install duf
+links:
+  repo: https://github.com/muesli/duf
+addedAt: 2025-03-20
+---
+
+## df con tabla bonita y colores
+
+`df -h` muestra el uso de disco por partición, pero en formato difícil de leer. `duf` lo presenta en una tabla con colores, barras de progreso y agrupación por tipo de filesystem.
+
+## Uso
+
+```bash
+# Ver todas las particiones
+duf
+
+# Solo particiones locales (sin pseudo-filesystems)
+duf --only local
+
+# Dispositivos específicos
+duf /home /tmp
+
+# Ordenar por espacio disponible
+duf --sort avail
+
+# Ocultar loops y filesystems especiales
+duf --hide special,loops
+```
+
+## Salida de ejemplo
+
+```
+╭─────────────────────────────────────────────────────────────────╮
+│ 2 local devices                                                  │
+├──────────┬───────┬───────┬───────┬───────────────────┬──────────┤
+│ MOUNTED  │  SIZE │  USED │ AVAIL │       USE%        │  TYPE    │
+├──────────┼───────┼───────┼───────┼───────────────────┼──────────┤
+│ /        │  500G │  123G │  377G │ [██░░░░░] 24.6%  │ ext4     │
+│ /home    │  1.0T │  456G │  544G │ [████░░░] 44.5%  │ ext4     │
+╰──────────┴───────┴───────┴───────┴───────────────────┴──────────╯
+```
+
+Las barras se ponen en naranja/rojo cuando el espacio está cerca de agotarse (>80%).
+
+## Diferencia con dust
+
+| Herramienta | Equivale a | Para qué |
+|-------------|------------|----------|
+| `duf` | `df` | Ver uso por **partición/disco** |
+| `dust` | `du` | Ver uso por **subdirectorio** |
+
+Flujo típico: `duf` para ver qué partición tiene poco espacio → `dust /` para encontrar el directorio que lo ocupa.

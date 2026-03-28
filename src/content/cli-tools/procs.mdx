@@ -1,0 +1,102 @@
+---
+name: procs
+description: Reemplazo moderno de ps con colores, búsqueda, árbol de procesos y más información útil. Escrito en Rust.
+category: cli-tools
+tags: [processes, ps, system, monitoring, rust, terminal]
+os: [macos, linux, windows]
+difficulty: beginner
+install:
+  brew: brew install procs
+  cargo: cargo install procs
+  scoop: scoop install procs
+links:
+  repo: https://github.com/dalance/procs
+addedAt: 2025-03-20
+---
+
+## ps con color y búsqueda
+
+`ps aux` funciona, pero es difícil de leer. `procs` añade colores por tipo de proceso, columnas adicionales útiles (uso de CPU, RAM en formato legible, threads) y búsqueda por nombre o PID integrada.
+
+## Uso básico
+
+```bash
+# Todos los procesos (equivalente a ps aux)
+procs
+
+# Buscar por nombre
+procs node
+procs python
+procs nginx
+
+# Buscar por PID
+procs 1234
+
+# Ver árbol de procesos (proceso padre → hijos)
+procs --tree
+
+# Ordenar por CPU
+procs --sortd cpu
+
+# Ordenar por memoria
+procs --sortd mem
+```
+
+## Columnas que muestra por defecto
+
+```
+PID   USER    CPU%   MEM(MB)   THREADS   STARTED   COMMAND
+1234  mikel   12.3   245.6     8         12:34      node server.js
+...
+```
+
+Los procesos de sistema van en gris, los del usuario en blanco, los que consumen mucho CPU en naranja/rojo.
+
+## Búsqueda de procesos de desarrollo
+
+```bash
+# Ver todos los procesos Node.js activos
+procs node
+
+# Ver qué está usando el puerto (combinar con lsof/ss)
+procs nginx
+
+# Ver si hay procesos zombie
+procs --watch  # actualización en tiempo real
+
+# Matar proceso por nombre (con grep)
+kill $(procs node --no-header | awk '{print $1}' | head -1)
+```
+
+## Configuración
+
+```toml
+# ~/.config/procs/config.toml
+[[columns]]
+kind = "Pid"
+style = "BrightYellow|Yellow"
+
+[[columns]]
+kind = "Username"
+style = "BrightGreen|Green"
+
+[[columns]]
+kind = "CpuTime"
+style = "BrightBlue|Blue"
+
+[[columns]]
+kind = "MemSize"
+style = "BrightMagenta|Magenta"
+
+[[columns]]
+kind = "Command"
+style = "White|White"
+```
+
+## Alias recomendado
+
+```bash
+alias psg='procs'          # reemplaza ps grep
+alias pst='procs --tree'   # árbol de procesos
+alias psw='procs --watch'  # monitoreo en tiempo real
+```

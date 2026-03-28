@@ -1,0 +1,86 @@
+---
+name: glow
+description: Renderiza Markdown en la terminal con estilos y colores. Lee READMEs, docs y notas directamente desde el terminal con formato correcto.
+category: cli-tools
+tags: [markdown, terminal, reading, documentation, rendering]
+os: [macos, linux, windows]
+difficulty: beginner
+install:
+  brew: brew install glow
+  scoop: scoop install glow
+  apt: sudo apt install glow
+links:
+  repo: https://github.com/charmbracelet/glow
+addedAt: 2025-03-20
+---
+
+## Markdown bonito en la terminal
+
+`cat README.md` muestra el texto plano con toda la sintaxis Markdown visible. `glow README.md` lo renderiza con estilos: headings grandes, bold de verdad, código con syntax highlighting, tablas formateadas.
+
+Ideal para leer docs sin abrir el navegador.
+
+## Uso básico
+
+```bash
+# Renderizar archivo local
+glow README.md
+
+# Renderizar con paginación (para archivos largos)
+glow -p README.md
+
+# Renderizar desde stdin
+cat CHANGELOG.md | glow -
+
+# Renderizar URL directamente
+glow https://raw.githubusercontent.com/usuario/repo/main/README.md
+
+# Modo TUI — navegar todos los .md del directorio
+glow
+```
+
+## Modo TUI (sin argumentos)
+
+```bash
+glow
+```
+
+Muestra una lista de todos los archivos Markdown del directorio actual y subdirectorios. Navega con `↑↓`, `Enter` para leer, `Esc` para volver.
+
+También tienes un **Stash** donde guardar archivos Markdown para acceder rápidamente.
+
+## Integración útil
+
+```bash
+# Ver README de un paquete npm sin instalarlo
+npm view express readme | glow -
+
+# Ver CHANGELOG antes de actualizar
+cat node_modules/typescript/CHANGELOG.md | glow -p -
+
+# Ver manpages con formato markdown (con man2md)
+man git | glow -p -
+
+# Alias para READMEs rápidos
+alias readme='glow README.md'
+alias changelog='glow CHANGELOG.md'
+```
+
+## Configuración
+
+```toml
+# ~/.config/glow/glow.yml
+style: "dracula"   # dark, light, notty, dracula, pink, ascii
+pager: true        # usar paginador por defecto
+width: 80
+```
+
+Estilos disponibles: `dark`, `light`, `dracula`, `notty`, `pink`, `ascii`.
+
+## Por qué glow sobre otras opciones
+
+- **mdcat**: similar, más simple, sin TUI
+- **bat** con `--language md`: muestra colores de sintaxis pero no renderiza
+- **glow**: renderiza de verdad (headings grandes, tablas, bold/italic real)
+
+Para documentación técnica con tablas y código, glow es el más legible.

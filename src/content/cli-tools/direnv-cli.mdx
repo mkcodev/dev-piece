@@ -1,0 +1,91 @@
+---
+name: mise
+description: Gestor de versiones universal para Node, Python, Ruby, Go, Rust y cualquier herramienta. Reemplaza nvm, pyenv, rbenv y asdf con una sola herramienta.
+category: cli-tools
+tags: [version-manager, node, python, ruby, go, rust, asdf, nvm]
+os: [macos, linux, windows]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install mise
+  cargo: cargo install mise
+  manual: curl https://mise.run | sh
+links:
+  repo: https://github.com/jdx/mise
+  docs: https://mise.jdx.dev/
+  website: https://mise.jdx.dev/
+addedAt: 2025-03-20
+---
+
+## Un gestor de versiones para dominarlos a todos
+
+Normalmente tienes: `nvm` para Node, `pyenv` para Python, `rbenv` para Ruby, `rustup` para Rust, `goenv` para Go... `mise` reemplaza todo eso con una sola herramienta que funciona igual para todos.
+
+Además es compatible con `.nvmrc`, `.python-version` y otros archivos de configuración existentes.
+
+## Instalación y setup
+
+```bash
+# Instalar mise
+curl https://mise.run | sh
+
+# Añadir al shell
+echo 'eval "$(mise activate zsh)"' >> ~/.zshrc    # zsh
+echo 'eval "$(mise activate bash)"' >> ~/.bashrc   # bash
+source ~/.zshrc
+```
+
+## Gestión de versiones
+
+```bash
+# Node.js
+mise install node@20
+mise install node@lts         # última LTS
+mise use --global node@20     # versión global
+mise use node@18              # versión para este proyecto (crea .mise.toml)
+
+# Python
+mise install python@3.12
+mise use --global python@3.12
+
+# Go, Ruby, Rust, etc.
+mise install go@1.22
+mise install ruby@3.3
+```
+
+## .mise.toml por proyecto
+
+```toml
+# .mise.toml — commitable en el repositorio
+[tools]
+node    = "20.11.0"
+python  = "3.12.2"
+pnpm    = "9.0.0"
+
+[env]
+NODE_ENV = "development"
+DATABASE_URL = "postgres://localhost/mi_proyecto"
+```
+
+Cuando entras al directorio, mise activa automáticamente esas versiones.
+
+## Compatibilidad con archivos existentes
+
+```bash
+# .nvmrc con "20" → mise lo lee automáticamente
+# .python-version con "3.12" → mise lo lee
+# .tool-versions (asdf) → mise lo lee
+
+# Migrar desde asdf:
+mise migrate asdf
+```
+
+## Comparativa
+
+| | mise | nvm | pyenv | asdf |
+|--|------|-----|-------|------|
+| Multi-lenguaje | ✓ | ✗ | ✗ | ✓ |
+| Velocidad | ★★★★★ | ★★★ | ★★★ | ★★★ |
+| Variables de entorno | ✓ | ✗ | ✗ | Parcial |
+| Compatible nvmrc | ✓ | ✓ | — | — |
+| Escrito en | Rust | Shell | Shell | Shell |

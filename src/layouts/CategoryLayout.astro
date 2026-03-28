@@ -1,6 +1,5 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import ToolCard from '../components/tools/ToolCard.astro';
 import CategoryFilterIsland from '../components/search/CategoryFilterIsland';
 import { CATEGORY_CONFIG } from '../lib/utils';
 import type { CollectionEntry } from 'astro:content';
@@ -15,10 +14,8 @@ const config = CATEGORY_CONFIG[category as keyof typeof CATEGORY_CONFIG];
 
 if (!config) throw new Error(`Unknown category: ${category}`);
 
-// Get all unique tags in this category
 const allTags = [...new Set(entries.flatMap((e) => e.data.tags))].sort();
 
-// Serialize entries for client-side filtering
 const serializedEntries = entries.map((e) => ({
   slug: e.id,
   name: e.data.name,
@@ -30,33 +27,100 @@ const serializedEntries = entries.map((e) => ({
   install: e.data.install,
   addedAt: e.data.addedAt.toISOString(),
 }));
+
+// Simple Icons for categories
+const CATEGORY_SIMPLE_ICONS: Record<string, string> = {
+  terminales: 'gnubash', 'cli-tools': 'gnubash', snippets: 'git',
+  neovim: 'neovim', vscode: 'visualstudiocode', 'browser-extensions': 'googlechrome',
+  'scripts-ahk': 'autohotkey', userscripts: 'tampermonkey', dotfiles: 'git',
+  docker: 'docker', 'git-hacks': 'git', fonts: 'googlefonts',
+  'ai-tools': 'anthropic', 'windows-tools': 'windows',
+  learning: 'bookstack', 'web-resources': 'mdnwebdocs',
+};
+
+const iconSlug = CATEGORY_SIMPLE_ICONS[category];
 ---
 
 <BaseLayout title={config.label} description={config.description}>
-  <!-- Hero header for category -->
-  <div class="mb-8">
-    <div class="flex items-center gap-3 mb-3">
+  <!-- Category hero header -->
+  <div class="mb-10 stagger-in" style="--i: 0">
+    <div class="flex items-center gap-4 mb-3">
+      <!-- Icon — morphing target from featured categories scroll -->
       <div
-        class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-crust"
-        style={`background-color: ${config.accent};`}
+        class="cat-icon-el w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden shadow-lg"
+        style={`background-color: ${config.accent}25; box-shadow: 0 0 24px ${config.accent}30; view-transition-name: cat-icon-active;`}
         aria-hidden="true"
       >
-        {config.label.charAt(0)}
+        {iconSlug ? (
+          <img
+            src={`https://cdn.simpleicons.org/${iconSlug}`}
+            alt=""
+            width="32"
+            height="32"
+            class="w-8 h-8 object-contain cat-layout-icon"
+            data-fallback={config.label.charAt(0)}
+            data-accent={config.accent}
+          />
+        ) : (
+          <span class="font-black text-xl" style={`color: ${config.accent};`}>
+            {config.label.charAt(0)}
+          </span>
+        )}
       </div>
+
       <div>
-        <h1 class="text-2xl font-bold text-text">{config.label}</h1>
-        <p class="text-sm text-subtext0">{entries.length} herramienta{entries.length !== 1 ? 's' : ''}</p>
+        <!-- Title — morphing target -->
+        <h1
+          class="text-3xl font-black text-text leading-tight"
+          style="view-transition-name: cat-title-active;"
+        >
+          {config.label}
+        </h1>
+        <p class="text-sm text-subtext0 mt-0.5">
+          {entries.length} herramienta{entries.length !== 1 ? 's' : ''} curadas
+        </p>
       </div>
     </div>
-    <p class="text-subtext1 max-w-2xl">{config.description}</p>
+
+    <p class="text-subtext1 max-w-2xl leading-relaxed">{config.description}</p>
+
+    <!-- Accent divider -->
+    <div
+      class="mt-5 h-px w-full rounded-full opacity-30"
+      style={`background: linear-gradient(90deg, ${config.accent}, transparent);`}
+      aria-hidden="true"
+    />
   </div>
 
   <!-- Filter island + dynamic grid -->
-  <CategoryFilterIsland
-    client:load
-    tags={allTags}
-    entries={serializedEntries}
-    category={category}
-    accent={config.accent}
-  />
+  <div class="stagger-in" style="--i: 1">
+    <CategoryFilterIsland
+      client:load
+      tags={allTags}
+      entries={serializedEntries}
+      category={category}
+      accent={config.accent}
+    />
+  </div>
 </BaseLayout>
+
+<script>
+  // Icon fallback for category header
+  function initCatLayoutIcons() {
+    document.querySelectorAll<HTMLImageElement>('img.cat-layout-icon').forEach((img) => {
+      if (img.dataset.fbInit) return;
+      img.dataset.fbInit = '1';
+      const fallback = () => {
+        const span = document.createElement('span');
+        span.className = 'font-black text-xl';
+        span.style.color = img.dataset.accent ?? '#8caaee';
+        span.textContent = img.dataset.fallback ?? '?';
+        img.replaceWith(span);
+      };
+      if (img.complete && img.naturalWidth === 0) fallback();
+      else img.addEventListener('error', fallback);
+    });
+  }
+  initCatLayoutIcons();
+  document.addEventListener('astro:page-load', initCatLayoutIcons);
+</script>

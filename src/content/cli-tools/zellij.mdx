@@ -1,0 +1,108 @@
+---
+name: zellij
+description: Multiplexor de terminal moderno con layouts declarativos, plugins en WebAssembly y UX mucho más accesible que tmux.
+category: cli-tools
+tags: [terminal, multiplexer, tmux, sessions, layouts, wasm]
+os: [macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install zellij
+  cargo: cargo install --locked zellij
+links:
+  repo: https://github.com/zellij-org/zellij
+  docs: https://zellij.dev/documentation/
+  website: https://zellij.dev/
+addedAt: 2025-03-20
+---
+
+## tmux con UX del siglo XXI
+
+Un multiplexor de terminal te permite tener múltiples paneles y sesiones persistentes en una sola terminal. zellij lo hace con una curva de aprendizaje mucho menor que tmux: los atajos aparecen en pantalla, la configuración es en YAML/KDL y el UX es intuitivo desde el primer día.
+
+## Por qué zellij sobre tmux
+
+- **Status bar con atajos visible** — no necesitas memorizar nada
+- **Layouts declarativos** — define tu entorno de trabajo en un archivo
+- **Plugins en WebAssembly** — extensible y aislado
+- **Renombrar paneles/tabs** — más claro que los números de tmux
+- **Modo sin prefix** — muchos atajos directos sin chord inicial
+
+## Atajos esenciales (aparecen en pantalla)
+
+```
+Ctrl+P  →  Modo Panel (crear, cerrar, mover paneles)
+Ctrl+T  →  Modo Tab (crear, renombrar, navegar tabs)
+Ctrl+N  →  Nuevo panel abajo
+Ctrl+O  →  Nuevo panel a la derecha
+
+En modo Panel:
+  n  →  Nuevo panel
+  x  →  Cerrar panel
+  f  →  Pantalla completa
+  ←→↑↓  →  Cambiar foco
+  hjkl  →  Igual (vim keys)
+
+En modo Tab:
+  n  →  Nueva tab
+  r  →  Renombrar tab
+  1-9  →  Ir a tab N
+```
+
+## Layouts declarativos
+
+```yaml
+# ~/.config/zellij/layouts/trabajo.yaml
+---
+layout:
+  direction: Horizontal
+  parts:
+    - direction: Vertical
+      split_size:
+        Percent: 60
+      parts:
+        - pane
+        - pane
+    - direction: Vertical
+      split_size:
+        Percent: 40
+      parts:
+        - pane
+          name: "git"
+        - pane
+          name: "servidor"
+          command: "pnpm run dev"
+```
+
+```bash
+# Abrir con layout personalizado
+zellij --layout trabajo
+```
+
+## Sesiones persistentes
+
+```bash
+# Crear sesión con nombre
+zellij -s mi-proyecto
+
+# Listar sesiones activas
+zellij list-sessions
+
+# Reconectar a sesión
+zellij attach mi-proyecto
+
+# Si la conexión SSH se cae, la sesión sigue corriendo
+```
+
+## Alias recomendado
+
+```bash
+# .zshrc
+alias zj='zellij'
+alias zja='zellij attach'
+alias zjl='zellij list-sessions'
+
+# Crear o adjuntarse a una sesión con el nombre del directorio
+zj-project() {
+  zellij attach $(basename "$PWD") 2>/dev/null || zellij -s $(basename "$PWD")
+}
+```

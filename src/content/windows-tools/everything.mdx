@@ -1,0 +1,102 @@
+---
+name: Everything
+description: Búsqueda instantánea de archivos y carpetas en Windows. Indexa todo el sistema en segundos y encuentra cualquier archivo mientras escribes.
+category: windows-tools
+tags: [windows, search, files, productivity, fast, indexing]
+os: [windows]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install voidtools.Everything
+  scoop: scoop install everything
+links:
+  website: https://www.voidtools.com/
+  docs: https://www.voidtools.com/support/everything/
+addedAt: 2025-03-20
+---
+
+## Búsqueda de archivos en tiempo real
+
+La búsqueda de Windows es lenta. Everything indexa el sistema de archivos completo en segundos usando el índice NTFS del sistema operativo (sin escanear archivos, solo el filesystem journal) y muestra resultados mientras escribes, sin espera.
+
+Encuentra cualquier archivo en tu disco en milisegundos.
+
+## Instalación y uso
+
+```bash
+winget install voidtools.Everything
+```
+
+Después de instalar, Everything se ejecuta en segundo plano y está disponible con `Alt+Space` (o el atajo que configures). La primera indexación tarda segundos; las siguientes son instantáneas porque usa el journal del NTFS.
+
+## Sintaxis de búsqueda
+
+```bash
+# Buscar por extensión
+*.tsx
+*.env
+
+# Buscar en una ruta específica
+C:\Projects\ package.json
+
+# Búsqueda de texto exacto (con comillas)
+"mi archivo importante"
+
+# Combinaciones
+type:folder react
+
+# Archivos modificados hoy
+dm:today *.ts
+
+# Por tamaño (mayores de 100MB)
+size:>100mb
+
+# Regex
+regex:app\..*\.js
+```
+
+## Filtros avanzados útiles para devs
+
+```bash
+# Todos los package.json en Projects
+C:\Projects\ package.json
+
+# Todos los .env (¡cuidado con lo que aparece!)
+*.env
+
+# Archivos de config recientes
+dm:last7days *.json|*.yaml|*.toml
+
+# node_modules grandes
+dm:today node_modules
+
+# Buscar en todo excepto node_modules
+!path:node_modules *.ts
+```
+
+## Integración con Flow Launcher / PowerToys Run
+
+Everything se integra como plugin de búsqueda para los launchers:
+
+```
+# Flow Launcher: plugin de Everything automático
+# PowerToys Run: habilitar "File Search" en configuración
+```
+
+## Everything CLI (es.exe)
+
+```cmd
+# Búsqueda desde CMD/PowerShell
+es *.log
+es -path "C:\Projects" package.json
+
+# Abre el archivo en el explorador
+es -open-path *.tsx
+```
+
+## Configuración recomendada
+
+- **Inicio con Windows**: Sí (necesario para que el índice esté actualizado)
+- **Hotkey**: `Alt+Space` o `Win+S` personalizado
+- **Indexar UNC paths**: No (evita cuelgues con unidades de red lentas)
+- **Excluir carpetas**: añade `node_modules`, `.git`, `dist` para menos ruido

@@ -1,0 +1,187 @@
+---
+name: "Configura VSCode desde 0"
+description: "De una instalación limpia a un editor de código completo, rápido y con tu propio estilo. Extensiones, tema Catppuccin, settings.json optimizado y modo Vim."
+slug: vscode-desde-cero
+os: [windows, macos, linux]
+difficulty: beginner
+estimatedTime: "45 min"
+tags: [vscode, editor, productividad, tema, vim]
+completedByCount: 2341
+addedAt: 2025-01-20
+lastUpdated: 2025-06-15
+steps:
+  - id: paso-1
+    title: "Instala el tema Catppuccin Frappé"
+    description: "El tema visual que lo cambia todo. Colores suaves pero distintos, perfectos para largas sesiones."
+    quickCommands:
+      - "ext install Catppuccin.catppuccin-vscode"
+    tools:
+      - slug: catppuccin-vscode
+        category: vscode
+  - id: paso-2
+    title: "Extensiones esenciales de productividad"
+    description: "GitLens para ver el historial inline, Error Lens para errores visibles, Todo Tree para no perder el hilo."
+    quickCommands:
+      - "ext install eamodio.gitlens"
+      - "ext install usernamehw.errorlens"
+      - "ext install Gruntfuggly.todo-tree"
+    tools:
+      - slug: gitlens
+        category: vscode
+      - slug: error-lens
+        category: vscode
+      - slug: todo-tree
+        category: vscode
+  - id: paso-3
+    title: "Optimiza tu settings.json"
+    description: "Las configuraciones que hacen que VSCode vuele: fuente JetBrains Mono, autoguardado, bracket pairs, minimap off y más."
+    quickCommands:
+      - "Ctrl+Shift+P → Open User Settings (JSON)"
+    tools:
+      - slug: vscode-settings
+        category: vscode
+      - slug: jetbrains-mono
+        category: fonts
+  - id: paso-4
+    title: "Activa el modo Vim (opcional pero poderoso)"
+    description: "VSCodeVim te da los movimientos de Vim sin salir de VSCode. Una vez lo pruebas, no hay vuelta atrás."
+    quickCommands:
+      - "ext install vscodevim.vim"
+    tools:
+      - slug: vscodevim
+        category: vscode
+---
+
+## Por qué configurar VSCode desde el principio importa
+
+La mayoría de desarrolladores usan VSCode con la configuración por defecto durante meses. Es funcional, pero estás dejando mucha productividad sobre la mesa. Con 45 minutos de setup inicial consigues un entorno que se adapta a ti, no al revés.
+
+Esta guía va de lo visual a lo funcional: primero hacemos que tu editor se vea bien (porque pasar 8 horas mirando algo feo importa), luego añadimos las extensiones que realmente usarás, y por último afinamos la configuración.
+
+---
+
+## Paso 1: Instala el tema Catppuccin Frappé
+
+Abre la paleta de comandos con `Ctrl+Shift+P` (o `Cmd+Shift+P` en Mac) y escribe **"Install Extension"**. Busca **Catppuccin** y selecciona `Catppuccin.catppuccin-vscode`.
+
+Una vez instalado, ve a `Ctrl+Shift+P` → **"Color Theme"** → selecciona **Catppuccin Frappé**.
+
+El resultado es un tema con colores pastel bien diferenciados que reduce la fatiga visual. Los cuatro sabores disponibles van de más oscuro a más claro: Mocha, Macchiato, Frappé, Latte. Frappé es el punto dulce para la mayoría.
+
+```json
+// settings.json
+"workbench.colorTheme": "Catppuccin Frappé"
+```
+
+---
+
+## Paso 2: Extensiones esenciales de productividad
+
+### GitLens — Supercharge Git
+
+GitLens añade el historial de Git directamente en tu código. Hover sobre cualquier línea y ves quién la escribió, cuándo y en qué commit. En el panel lateral tienes el historial completo, comparación de branches y mucho más.
+
+```bash
+# Desde la terminal integrada:
+code --install-extension eamodio.gitlens
+```
+
+### Error Lens — Errores donde los necesitas
+
+En lugar de tener que ir a la barra inferior para ver los errores, Error Lens los muestra inline, en la misma línea del código. Los errores son rojos, los warnings son amarillos. Elimina el ciclo de "guardo → miro abajo → vuelvo arriba".
+
+```bash
+code --install-extension usernamehw.errorlens
+```
+
+### Todo Tree — Nunca pierdas un TODO
+
+Escanea todo tu proyecto en busca de `TODO:`, `FIXME:`, `HACK:` y similares, y los agrupa en un panel lateral. Perfecto para no olvidar deudas técnicas.
+
+```bash
+code --install-extension Gruntfuggly.todo-tree
+```
+
+---
+
+## Paso 3: Optimiza tu settings.json
+
+Abre `Ctrl+Shift+P` → **"Open User Settings (JSON)"**. Este archivo controla todo el comportamiento de VSCode. Aquí tienes las configuraciones más impactantes:
+
+```json
+{
+  // Fuente con ligaduras para código
+  "editor.fontFamily": "JetBrains Mono, Cascadia Code, Fira Code, monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.lineHeight": 1.6,
+
+  // Guarda automáticamente al cambiar de pestaña
+  "files.autoSave": "onFocusChange",
+
+  // Bracket pairs con colores
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+
+  // Minimap desactivado (ocupa espacio, da poca info)
+  "editor.minimap.enabled": false,
+
+  // Scroll suave
+  "editor.smoothScrolling": true,
+  "workbench.list.smoothScrolling": true,
+
+  // Terminal integrada
+  "terminal.integrated.fontFamily": "JetBrains Mono",
+  "terminal.integrated.fontSize": 13,
+
+  // Sin animación de cursor (más responsive)
+  "editor.cursorBlinking": "solid",
+  "editor.cursorSmoothCaretAnimation": "off",
+
+  // Formato automático al guardar
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
+```
+
+> **Nota sobre JetBrains Mono:** Si no la tienes instalada en el sistema, VSCode usará el fallback. Instálala desde [jetbrains.com/lp/mono](https://www.jetbrains.com/lp/mono/) o con tu gestor de paquetes.
+
+---
+
+## Paso 4: Activa el modo Vim (opcional pero poderoso)
+
+VSCodeVim simula los modos y movimientos de Vim dentro de VSCode. No necesitas saber Vim para empezar — puedes activarlo y usar VSCode normalmente hasta que vayas aprendiendo los comandos.
+
+```bash
+code --install-extension vscodevim.vim
+```
+
+Configuración básica recomendada en settings.json:
+
+```json
+{
+  "vim.useSystemClipboard": true,
+  "vim.hlsearch": true,
+  "vim.leader": "<space>",
+  "vim.normalModeKeyBindingsNonRecursive": [
+    { "before": ["<leader>", "w"], "commands": ["workbench.action.files.save"] },
+    { "before": ["<leader>", "e"], "commands": ["workbench.view.explorer"] }
+  ]
+}
+```
+
+Si en algún momento quieres desactivarlo temporalmente: `Ctrl+Shift+P` → **"Toggle Vim Mode"**.
+
+---
+
+## Resultado final
+
+Con estos 4 pasos tienes un VSCode que:
+- Se ve bien durante horas de trabajo (Catppuccin)
+- Te muestra los errores donde los necesitas (Error Lens)
+- Mantiene el historial Git al alcance (GitLens)
+- Nunca pierde un TODO (Todo Tree)
+- Está configurado para ser rápido y limpio (settings.json)
+- Opcional: tiene los movimientos de Vim (VSCodeVim)
+
+El siguiente paso natural es configurar tu terminal para que combine con este setup. Echa un vistazo a la guía **"Terminal en Windows"** o **"Terminal en Linux/macOS"**.

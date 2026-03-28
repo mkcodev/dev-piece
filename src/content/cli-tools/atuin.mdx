@@ -1,0 +1,94 @@
+---
+name: atuin
+description: Historial de shell inteligente con búsqueda fuzzy, estadísticas y sincronización cifrada entre máquinas. Reemplaza Ctrl+R con algo mucho mejor.
+category: cli-tools
+tags: [shell, history, search, sync, terminal, zsh, bash]
+os: [macos, linux, windows]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install atuin
+  cargo: cargo install atuin
+  manual: curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+links:
+  repo: https://github.com/atuinsh/atuin
+  docs: https://docs.atuin.sh/
+addedAt: 2025-03-20
+---
+
+## El historial de comandos que mereces
+
+`Ctrl+R` del shell busca en el historial línea por línea. atuin reemplaza eso con una interfaz TUI de búsqueda fuzzy que muestra el contexto completo: cuándo ejecutaste el comando, desde qué directorio, si tuvo éxito o falló, y en qué máquina.
+
+Además sincroniza el historial entre todas tus máquinas con cifrado end-to-end.
+
+## Setup
+
+```bash
+# Instalar
+brew install atuin
+
+# Añadir al shell
+echo 'eval "$(atuin init zsh)"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+## Uso
+
+```bash
+# Ctrl+R ahora abre la TUI de atuin
+# Escribe para filtrar, ↑↓ para navegar, Enter para ejecutar
+
+# Búsqueda avanzada
+atuin search docker
+atuin search --cwd . npm     # Solo comandos en el dir actual
+atuin search --exit 0 git    # Solo comandos exitosos
+
+# Estadísticas del historial
+atuin stats
+# Muestra tus 10 comandos más usados, frecuencia por hora, etc.
+```
+
+## Búsqueda con filtros
+
+Dentro de la TUI puedes filtrar por:
+- `directorio:` — comandos ejecutados en un directorio específico
+- `host:` — comandos de una máquina concreta (útil con sync)
+- Solo errores / solo éxitos con los botones del UI
+
+## Sincronización entre máquinas
+
+```bash
+# Registrarte (gratis, self-hostable también)
+atuin register -u tu-usuario -e tu@email.com -p password
+
+# Login en otra máquina
+atuin login -u tu-usuario -p password
+
+# Sync manual (el auto-sync funciona al iniciar sesión)
+atuin sync
+```
+
+El historial se cifra en tu máquina antes de subirse al servidor. El servidor no puede leer tus comandos.
+
+## Self-hosting
+
+```bash
+# El servidor de atuin es open source y se puede hostear
+docker run -d \
+  --name atuin \
+  -e ATUIN_HOST=0.0.0.0 \
+  -p 8888:8888 \
+  ghcr.io/atuinsh/atuin:latest server start
+```
+
+## Configuración
+
+```toml
+# ~/.config/atuin/config.toml
+search_mode = "fuzzy"    # fuzzy, fulltext, prefix, regex
+style = "compact"        # full, compact, auto
+show_preview = true      # muestra el comando completo en preview
+max_preview_height = 4
+filter_mode = "smart"    # global, host, session, directory, smart
+```

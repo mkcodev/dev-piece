@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArsenalPage from '../components/arsenal/ArsenalPage';
+import { getCollection } from 'astro:content';
+import { CATEGORY_CONFIG } from '../lib/utils';
+
+const categoryCounts: Record<string, number>  = {};
+const categoryLabels: Record<string, string>  = {};
+const categoryAccents: Record<string, string> = {};
+
+for (const [slug, config] of Object.entries(CATEGORY_CONFIG)) {
+  try {
+    const entries = await getCollection(slug as any);
+    categoryCounts[slug] = entries.length;
+  } catch {
+    categoryCounts[slug] = 0;
+  }
+  categoryLabels[slug]  = config.label;
+  categoryAccents[slug] = config.accent;
+}
+---
+
+<BaseLayout
+  title="Mi Arsenal"
+  description="Tu colección personal de herramientas DevPiece — favoritos, integraciones y core setup."
+>
+  <ArsenalPage
+    client:load
+    categoryCounts={categoryCounts}
+    categoryLabels={categoryLabels}
+    categoryAccents={categoryAccents}
+  />
+</BaseLayout>

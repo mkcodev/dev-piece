@@ -1,0 +1,194 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { ROADMAPS } from '../../data/roadmaps';
+
+const techRoadmaps = ROADMAPS.filter((r) => r.type === 'tech');
+const toolsRoadmaps = ROADMAPS.filter((r) => r.type === 'tools');
+---
+
+<BaseLayout
+  title="Roadmaps"
+  description="Roadmaps de aprendizaje interactivos para desarrolladores. Frontend, Backend, Full Stack y setups de herramientas."
+>
+  <!-- Page header -->
+  <div class="mb-12">
+    <div class="flex items-center gap-3 mb-4">
+      <a
+        href="/"
+        class="text-subtext0 hover:text-text text-sm transition-colors"
+      >Inicio</a>
+      <span class="text-overlay0 text-sm">/</span>
+      <span class="text-text text-sm font-medium">Roadmaps</span>
+    </div>
+
+    <div class="relative text-center py-10">
+      <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[200px] bg-gradient-to-r from-blue/10 via-mauve/10 to-pink/10 blur-3xl rounded-full" />
+      </div>
+
+      <div class="relative">
+        <div class="inline-flex items-center gap-2 bg-surface0 border border-surface1 rounded-full px-4 py-1.5 text-xs text-subtext1 mb-5">
+          <span class="w-1.5 h-1.5 rounded-full bg-mauve animate-pulse" aria-hidden="true" />
+          Rutas de aprendizaje interactivas
+        </div>
+
+        <h1 class="text-4xl md:text-6xl font-black mb-4 leading-tight">
+          <span class="text-gradient">Roadmaps</span>
+          <br />
+          <span class="text-text text-3xl md:text-4xl font-bold">de Aprendizaje</span>
+        </h1>
+
+        <p class="text-base md:text-lg text-subtext1 max-w-2xl mx-auto leading-relaxed">
+          Rutas visuales e interactivas para guiar tu aprendizaje. Marca nodos como completados,
+          explora recursos y sigue tu progreso en cada roadmap.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech Roadmaps -->
+  <section class="mb-14" aria-labelledby="tech-heading">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-2xl" aria-hidden="true">🖥️</span>
+      <div>
+        <h2 id="tech-heading" class="text-xl font-bold text-text">Tech</h2>
+        <p class="text-sm text-subtext0">Rutas de desarrollo técnico</p>
+      </div>
+      <div class="flex-1 h-px bg-surface1 ml-2" aria-hidden="true" />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {techRoadmaps.map((roadmap, i) => (
+        <a
+          href={`/roadmaps/${roadmap.slug}`}
+          class="tool-card group block bg-surface0 border border-surface1 rounded-xl p-5 no-underline relative overflow-hidden stagger-in"
+          style={`--i: ${i}; --card-accent: ${roadmap.accent};`}
+          aria-label={`Ir al roadmap ${roadmap.label}`}
+        >
+          <div class="card-accent-bar" aria-hidden="true" />
+
+          <div class="relative z-10">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+              <div class="card-icon-wrap text-4xl leading-none" aria-hidden="true">
+                {roadmap.icon}
+              </div>
+              <span
+                class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border"
+                style={`background: ${roadmap.accent}18; color: ${roadmap.accent}; border-color: ${roadmap.accent}40;`}
+              >
+                Tech
+              </span>
+            </div>
+
+            <!-- Info -->
+            <h3
+              class="text-base font-bold text-text mb-2 group-hover:text-gradient transition-colors"
+            >
+              {roadmap.label}
+            </h3>
+            <p class="text-sm text-subtext1 leading-relaxed line-clamp-2 mb-4">
+              {roadmap.description}
+            </p>
+
+            <!-- Footer stats -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs text-subtext0">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                </svg>
+                {roadmap.nodes.length} nodos
+              </div>
+              <div
+                class="text-xs font-semibold flex items-center gap-1"
+                style={`color: ${roadmap.accent};`}
+              >
+                Explorar
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Tools Roadmaps -->
+  <section aria-labelledby="tools-heading">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="text-2xl" aria-hidden="true">🛠️</span>
+      <div>
+        <h2 id="tools-heading" class="text-xl font-bold text-text">Tools</h2>
+        <p class="text-sm text-subtext0">Setup y herramientas del desarrollador</p>
+      </div>
+      <div class="flex-1 h-px bg-surface1 ml-2" aria-hidden="true" />
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {toolsRoadmaps.map((roadmap, i) => (
+        <a
+          href={`/roadmaps/${roadmap.slug}`}
+          class="tool-card group block bg-surface0 border border-surface1 rounded-xl p-5 no-underline relative overflow-hidden stagger-in"
+          style={`--i: ${i + techRoadmaps.length}; --card-accent: ${roadmap.accent};`}
+          aria-label={`Ir al roadmap ${roadmap.label}`}
+        >
+          <div class="card-accent-bar" aria-hidden="true" />
+
+          <div class="relative z-10">
+            <div class="flex items-start justify-between mb-4">
+              <div class="card-icon-wrap text-4xl leading-none" aria-hidden="true">
+                {roadmap.icon}
+              </div>
+              <span
+                class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border"
+                style={`background: ${roadmap.accent}18; color: ${roadmap.accent}; border-color: ${roadmap.accent}40;`}
+              >
+                Tools
+              </span>
+            </div>
+
+            <h3
+              class="text-base font-bold text-text mb-2 group-hover:text-gradient transition-colors"
+            >
+              {roadmap.label}
+            </h3>
+            <p class="text-sm text-subtext1 leading-relaxed line-clamp-2 mb-4">
+              {roadmap.description}
+            </p>
+
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 text-xs text-subtext0">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                </svg>
+                {roadmap.nodes.length} nodos
+              </div>
+              <div
+                class="text-xs font-semibold flex items-center gap-1"
+                style={`color: ${roadmap.accent};`}
+              >
+                Explorar
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Info footer -->
+  <div class="mt-12 p-5 bg-mantle border border-surface1 rounded-xl flex flex-col sm:flex-row items-start sm:items-center gap-4">
+    <div class="text-2xl flex-shrink-0" aria-hidden="true">💡</div>
+    <div>
+      <p class="text-sm text-subtext1 leading-relaxed">
+        Los roadmaps son <strong class="text-text">interactivos</strong>: haz clic en cualquier nodo para ver
+        descripción, recursos y marcarlo como completado. Tu progreso se guarda localmente en el navegador.
+      </p>
+    </div>
+  </div>
+</BaseLayout>

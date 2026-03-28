@@ -1,0 +1,320 @@
+---
+name: "Neovim desde 0"
+description: "De nunca haber abierto Neovim a tener un editor completo con lazy.nvim, LSP con autocompletado, Telescope para búsquedas, Harpoon para navegación y Which-key para no perderte."
+slug: neovim-desde-cero
+os: [linux, macos, windows]
+difficulty: advanced
+estimatedTime: "90 min"
+tags: [neovim, vim, editor, lsp, lua]
+completedByCount: 634
+addedAt: 2025-02-10
+lastUpdated: 2025-06-18
+steps:
+  - id: paso-1
+    title: "Instala Neovim y entiende la estructura"
+    description: "Neovim ≥ 0.10 recomendado. La configuración vive en ~/.config/nvim/ y está escrita en Lua."
+    quickCommands:
+      - "brew install neovim  # macOS"
+      - "sudo pacman -S neovim  # Arch"
+      - "winget install Neovim.Neovim  # Windows"
+    tools:
+      - slug: neovim-config
+        category: neovim
+  - id: paso-2
+    title: "lazy.nvim — el gestor de plugins moderno"
+    description: "lazy.nvim carga los plugins de forma diferida. Más rápido, con interfaz visual y lockfile para reproducibilidad."
+    quickCommands:
+      - "# Se instala solo al iniciar Neovim con la config correcta"
+    tools:
+      - slug: lazy-nvim
+        category: neovim
+  - id: paso-3
+    title: "LSP + autocompletado con lsp-zero"
+    description: "Language Server Protocol da inteligencia al editor: autocompletado, diagnósticos, go-to-definition, rename... para cualquier lenguaje."
+    quickCommands:
+      - "# En la config Lua: require('lsp-zero').setup()"
+      - ":MasonInstall typescript-language-server"
+    tools:
+      - slug: lsp-zero
+        category: neovim
+  - id: paso-4
+    title: "Telescope — búsqueda en todo"
+    description: "Busca archivos, texto, buffers, comandos de Git... todo con una interfaz fuzzy potentísima."
+    quickCommands:
+      - "# Ctrl+P: buscar archivos"
+      - "# Ctrl+F: buscar texto en el proyecto"
+    tools:
+      - slug: telescope
+        category: neovim
+  - id: paso-5
+    title: "Harpoon + Which-key"
+    description: "Harpoon para marcar 4-5 archivos y saltar entre ellos al instante. Which-key para ver todos tus atajos disponibles."
+    quickCommands:
+      - "# <leader>a: añadir archivo a Harpoon"
+      - "# <leader>1-4: saltar al archivo N de Harpoon"
+    tools:
+      - slug: harpoon
+        category: neovim
+      - slug: which-key
+        category: neovim
+---
+
+## La curva de aprendizaje de Neovim vale la pena
+
+Neovim tiene fama de difícil. Es cierto que la curva inicial es pronunciada, pero también es cierto que una vez que lo dominas, tu velocidad de edición se multiplica. Esta guía te lleva de cero a un setup productivo con las herramientas correctas.
+
+> **Prerequisito:** conocer los movimientos básicos de Vim. Si nunca has usado Vim, ejecuta `vimtutor` en tu terminal (viene con casi todos los sistemas) y complétalo antes de seguir.
+
+---
+
+## Paso 1: Instala Neovim
+
+Necesitas Neovim ≥ 0.10 para las features modernas (incluyendo el soporte nativo de LSP mejorado).
+
+```bash
+# macOS
+brew install neovim
+
+# Arch Linux
+sudo pacman -S neovim
+
+# Ubuntu (el repositorio puede tener versión antigua, usa el PPA)
+sudo add-apt-repository ppa:neovim-ppa/unstable
+sudo apt update && sudo apt install neovim
+
+# Windows
+winget install Neovim.Neovim
+```
+
+Verifica la versión:
+
+```bash
+nvim --version
+# NVIM v0.10.x
+```
+
+### Estructura de configuración
+
+La configuración de Neovim vive en `~/.config/nvim/` (Linux/macOS) o `~/AppData/Local/nvim/` (Windows):
+
+```
+~/.config/nvim/
+├── init.lua              ← punto de entrada
+└── lua/
+    ├── options.lua       ← opciones del editor
+    ├── keymaps.lua       ← atajos de teclado
+    └── plugins/
+        ├── init.lua      ← lista de plugins (lazy.nvim)
+        ├── lsp.lua       ← configuración LSP
+        ├── telescope.lua ← configuración Telescope
+        └── ...
+```
+
+---
+
+## Paso 2: lazy.nvim — el gestor de plugins
+
+lazy.nvim es el gestor de plugins estándar de Neovim moderno. Se instala automáticamente la primera vez que inicias Neovim con esta configuración.
+
+Añade esto a tu `init.lua`:
+
+```lua
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+-- Carga los plugins
+require("lazy").setup("plugins")
+```
+
+Opciones básicas recomendadas en `lua/options.lua`:
+
+```lua
+local opt = vim.opt
+
+-- Números de línea
+opt.number         = true
+opt.relativenumber = true
+
+-- Indentación
+opt.tabstop        = 2
+opt.shiftwidth     = 2
+opt.expandtab      = true
+opt.smartindent    = true
+
+-- Búsqueda
+opt.ignorecase     = true
+opt.smartcase      = true
+opt.hlsearch       = false
+
+-- UI
+opt.termguicolors  = true
+opt.scrolloff      = 8
+opt.signcolumn     = "yes"
+opt.wrap           = false
+opt.cursorline     = true
+
+-- Leader key
+vim.g.mapleader = " "
+```
+
+---
+
+## Paso 3: LSP + autocompletado con lsp-zero
+
+lsp-zero simplifica dramáticamente la configuración de Language Servers. Sin él, necesitas configurar nvim-lspconfig, Mason, nvim-cmp y varios plugins más por separado.
+
+En tu `lua/plugins/init.lua`:
+
+```lua
+return {
+  -- Gestor de LSP servers
+  { "williamboman/mason.nvim" },
+  { "williamboman/mason-lspconfig.nvim" },
+
+  -- lsp-zero: une todo
+  {
+    "VonHeikemen/lsp-zero.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "neovim/nvim-lspconfig",
+      "hrsh7th/nvim-cmp",
+      "hrsh7th/cmp-nvim-lsp",
+      "L3MON4D3/LuaSnip",
+    },
+  },
+}
+```
+
+Configuración en `lua/plugins/lsp.lua`:
+
+```lua
+local lsp_zero = require("lsp-zero")
+
+lsp_zero.on_attach(function(client, bufnr)
+  -- Atajos disponibles cuando el LSP está activo
+  lsp_zero.default_keymaps({ buffer = bufnr })
+  -- gd: go to definition
+  -- K: hover documentation
+  -- <F2>: rename
+  -- <F4>: code actions
+end)
+
+-- Instala servers con Mason
+require("mason").setup()
+require("mason-lspconfig").setup({
+  ensure_installed = {
+    "ts_ls",           -- TypeScript/JavaScript
+    "pyright",         -- Python
+    "lua_ls",          -- Lua
+    "rust_analyzer",   -- Rust
+  },
+  handlers = { lsp_zero.default_setup },
+})
+```
+
+Para instalar más servers manualmente:
+
+```
+:MasonInstall gopls tailwindcss-language-server
+```
+
+---
+
+## Paso 4: Telescope — búsqueda en todo
+
+Telescope es el fuzzy finder de Neovim. Puede buscar archivos, texto, buffers, diagnósticos LSP, commits de Git... todo con la misma interfaz.
+
+```lua
+-- en plugins/init.lua
+{
+  "nvim-telescope/telescope.nvim",
+  tag = "0.1.8",
+  dependencies = { "nvim-lua/plenary.nvim" },
+}
+```
+
+Keymaps en `lua/keymaps.lua`:
+
+```lua
+local telescope = require("telescope.builtin")
+
+-- Buscar archivos (Ctrl+P en otros editores)
+vim.keymap.set("n", "<leader>ff", telescope.find_files, { desc = "Find files" })
+
+-- Buscar texto en el proyecto (grep)
+vim.keymap.set("n", "<leader>fg", telescope.live_grep, { desc = "Live grep" })
+
+-- Buffers abiertos
+vim.keymap.set("n", "<leader>fb", telescope.buffers, { desc = "Find buffers" })
+
+-- Diagnósticos LSP
+vim.keymap.set("n", "<leader>fd", telescope.diagnostics, { desc = "Find diagnostics" })
+```
+
+---
+
+## Paso 5: Harpoon + Which-key
+
+### Harpoon — salta entre tus archivos clave
+
+En cualquier proyecto, trabajas principalmente con 4-5 archivos. Harpoon te permite marcarlos y saltar entre ellos instantáneamente.
+
+```lua
+{
+  "ThePrimeagen/harpoon",
+  branch = "harpoon2",
+  dependencies = { "nvim-lua/plenary.nvim" },
+}
+```
+
+```lua
+local harpoon = require("harpoon")
+harpoon:setup()
+
+-- Añadir archivo actual
+vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end)
+
+-- Ver la lista
+vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+-- Saltar al archivo N
+for i = 1, 4 do
+  vim.keymap.set("n", "<leader>" .. i, function() harpoon:list():select(i) end)
+end
+```
+
+### Which-key — nunca olvides un atajo
+
+Which-key muestra un popup con todos los keymaps disponibles cuando empiezas a escribir un atajo.
+
+```lua
+{
+  "folke/which-key.nvim",
+  event = "VeryLazy",
+  opts = { delay = 500 }
+}
+```
+
+Al pulsar `<Space>` y esperar 500ms, aparece un menú con todos tus atajos con prefijo `<leader>`.
+
+---
+
+## Resultado
+
+Tienes ahora un Neovim con:
+- **lazy.nvim**: plugins cargados de forma diferida, inicio rápido
+- **LSP**: autocompletado, diagnósticos, go-to-definition para cualquier lenguaje
+- **Telescope**: búsqueda de archivos y texto ultra rápida
+- **Harpoon**: salto instantáneo entre tus archivos principales
+- **Which-key**: todos tus atajos documentados y accesibles
+
+La curva de aprendizaje ya la tienes superada. A partir de aquí, cada día que uses Neovim serás más rápido.

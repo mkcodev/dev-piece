@@ -1,0 +1,122 @@
+---
+name: Thunder Client
+description: Cliente HTTP ligero integrado en VS Code con interfaz visual. Crea colecciones de peticiones, entornos y tests sin salir del editor.
+category: vscode
+tags: [vscode, http, api, rest, gui, testing, postman]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  manual: ext install rangav.vscode-thunder-client
+links:
+  repo: https://github.com/rangav/thunder-client-support
+  website: https://www.thunderclient.com/
+addedAt: 2025-03-20
+---
+
+## Postman dentro de VS Code, sin cuentas obligatorias
+
+Thunder Client es una extensión de VS Code con UI visual para hacer peticiones HTTP — similar a Postman o Insomnia pero integrada en el editor. La versión gratuita incluye colecciones, entornos y tests básicos sin requerir registro.
+
+## Instalación
+
+```
+Ctrl+Shift+X → buscar "Thunder Client" → Instalar
+```
+
+Aparece un icono de rayo en la barra lateral izquierda.
+
+## Interfaz principal
+
+La UI tiene tres secciones:
+- **Activity** — peticiones recientes
+- **Collections** — grupos de peticiones organizadas por proyecto/API
+- **Env** — variables de entorno (local, dev, staging, prod)
+
+## Crear una petición básica
+
+1. Clic en el icono Thunder Client en la barra lateral
+2. **New Request**
+3. Selecciona método (GET/POST/PUT/DELETE...)
+4. Introduce la URL
+5. Configura headers, body, params en las pestañas
+6. **Send**
+
+## Colecciones para proyectos
+
+Organiza las peticiones de cada API en una colección:
+
+```
+📁 Mi Proyecto API
+  📁 Auth
+    → POST /auth/login
+    → POST /auth/refresh
+    → POST /auth/logout
+  📁 Users
+    → GET /users
+    → GET /users/:id
+    → POST /users
+    → PUT /users/:id
+    → DELETE /users/:id
+  📁 Products
+    → GET /products
+    → POST /products
+```
+
+## Variables de entorno
+
+```json
+// Entorno "Local"
+{
+  "baseUrl": "http://localhost:3000",
+  "token": "mi-token-de-desarrollo"
+}
+
+// Entorno "Staging"
+{
+  "baseUrl": "https://staging.api.example.com",
+  "token": "token-de-staging"
+}
+```
+
+Usa las variables con la sintaxis `{{baseUrl}}` en las URLs y headers.
+
+## Tests automáticos
+
+Thunder Client incluye un editor de tests básico para validar respuestas:
+
+```javascript
+// En la pestaña "Tests" de cada petición
+tc.test("Status code 200", () => {
+  tc.expect(tc.response.status).to.equal(200);
+});
+
+tc.test("Response tiene campo id", () => {
+  tc.expect(tc.response.json.id).to.not.be.undefined;
+});
+
+tc.test("Response time < 500ms", () => {
+  tc.expect(tc.response.time).to.be.below(500);
+});
+```
+
+## Guardar colecciones en Git
+
+Thunder Client puede guardar las colecciones en archivos JSON en el proyecto:
+
+```
+Preferencias → Settings → Save to workspace
+```
+
+Los archivos se guardan en `thunder-tests/` y se pueden commitear para compartir con el equipo.
+
+## Thunder Client vs REST Client
+
+| | Thunder Client | REST Client |
+|--|------------|-------------|
+| UI visual | ✓ | ✗ |
+| Archivos .http | ✗ | ✓ |
+| Colecciones | ✓ | Carpetas de archivos |
+| Tests | ✓ | Básicos |
+| Versionable | JSON (pesado) | .http (legible) |
+
+Usa Thunder Client si vienes de Postman y prefieres UI. REST Client si prefieres archivos de texto versionables.

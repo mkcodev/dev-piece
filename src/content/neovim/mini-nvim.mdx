@@ -1,0 +1,113 @@
+---
+name: mini.nvim
+description: Colección de 40+ plugins pequeños y rápidos para Neovim. Cada módulo es independiente. mini.surround, mini.pairs, mini.comment y más.
+category: neovim
+tags: [neovim, plugins, surround, pairs, comment, icons, starter]
+os: [windows, macos, linux]
+difficulty: intermediate
+links:
+  repo: https://github.com/echasnovski/mini.nvim
+addedAt: 2025-03-20
+---
+
+## 40 plugins en uno, solo usas lo que necesitas
+
+mini.nvim es una colección de módulos independientes para Neovim. Cada uno hace una cosa bien, sin dependencias entre ellos. Puedes usar solo `mini.comment` o todos los módulos — cada uno se configura por separado.
+
+## Instalación (solo los módulos que usas)
+
+```lua
+-- lazy.nvim
+return {
+  { "echasnovski/mini.nvim", version = false },
+}
+```
+
+Luego configura solo los módulos que quieras:
+
+```lua
+-- mini.pairs — auto-cierre de paréntesis, comillas, etc.
+require("mini.pairs").setup()
+
+-- mini.comment — comentar con gc
+require("mini.comment").setup()
+
+-- mini.surround — cambiar/añadir/eliminar delimitadores
+require("mini.surround").setup()
+
+-- mini.statusline — barra de estado ligera
+require("mini.statusline").setup()
+
+-- mini.icons — iconos para el ecosistema de Neovim
+require("mini.icons").setup()
+```
+
+## Módulos más usados
+
+### mini.comment — comentar código
+
+```vim
+" Comentar línea actual
+gcc
+
+" Comentar selección visual
+gc (en visual mode)
+
+" Comentar hasta el movimiento
+gc3j   " comenta las 3 líneas siguientes
+gcip   " comenta el párrafo (inner paragraph)
+```
+
+### mini.surround — gestión de delimitadores
+
+```vim
+" Añadir surroundings
+sa{motion}{char}
+saiw"    " añade comillas alrededor de la palabra
+sa2w(    " añade paréntesis alrededor de 2 palabras
+sap[     " añade corchetes alrededor del párrafo
+
+" Borrar surroundings
+sd{char}
+sd"      " borra las comillas más cercanas
+sd(      " borra los paréntesis más cercanos
+
+" Reemplazar surroundings
+sr{old}{new}
+sr"'     " cambia " por '
+sr(]     " cambia () por []
+```
+
+### mini.pairs — auto-cierre
+
+Se configura solo con defaults sensatos. Cierra `()`, `[]`, `{}`, `""`, `''`, ` `` ` automáticamente y borra el par completo con Backspace.
+
+### mini.move — mover líneas/selecciones
+
+```vim
+" Mover línea/selección con Alt+hjkl
+Alt+j    " mover línea/bloque hacia abajo
+Alt+k    " mover línea/bloque hacia arriba
+Alt+h    " mover selección a la izquierda
+Alt+l    " mover selección a la derecha
+```
+
+### mini.statusline — barra de estado mínima
+
+```lua
+require("mini.statusline").setup({
+  use_icons = true,  -- requiere mini.icons o nvim-web-devicons
+})
+```
+
+## mini.nvim vs plugins individuales
+
+| Función | mini.nvim | Plugin dedicado |
+|---------|-----------|-----------------|
+| Surroundings | mini.surround | vim-surround, nvim-surround |
+| Comentarios | mini.comment | Comment.nvim |
+| Auto-pares | mini.pairs | nvim-autopairs |
+| Statusline | mini.statusline | lualine.nvim |
+| Startup | mini.starter | alpha-nvim, dashboard.nvim |
+
+mini.nvim es más ligero; los plugins dedicados tienen más opciones. Para una configuración mínima y rápida, mini.nvim es ideal.

@@ -1,0 +1,81 @@
+---
+name: Cursor
+description: Editor de código con IA integrada en su núcleo. Fork de VS Code con chat contextual, edición multi-archivo y modo agente autónomo.
+category: ai-tools
+tags: [ai, editor, vscode, autocomplete, chat, agent]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  manual: https://cursor.sh
+links:
+  website: https://cursor.sh
+addedAt: 2025-03-20
+---
+
+## VS Code con IA de verdad integrada
+
+Cursor es un editor de código basado en VS Code (mismo ecosistema, mismas extensiones) que tiene IA integrada a nivel profundo, no como extensión añadida. La diferencia con Copilot es que Cursor entiende el contexto completo de tu codebase y puede editar múltiples archivos coordinadamente.
+
+## Las 3 funciones principales
+
+### 1. Tab — Autocompletado predictivo
+
+Más inteligente que Copilot: no solo completa la línea actual, sino que predice los próximos cambios que probablemente quieras hacer (ediciones en cascada, refactorizaciones relacionadas).
+
+```
+Escribes:  const user = await db.user.find
+Cursor:    const user = await db.user.findUnique({ where: { id: userId } })
+             ↑ Tab para aceptar
+```
+
+### 2. Ctrl+K — Edición inline con IA
+
+Selecciona código, pulsa `Ctrl+K`, describe el cambio en lenguaje natural:
+
+```
+"Añade manejo de errores con try/catch"
+"Convierte a async/await"
+"Extrae este bloque a una función separada"
+"Traduce los comentarios al inglés"
+```
+
+### 3. Ctrl+L — Chat con contexto
+
+Chat con Claude/GPT-4 que ve tu codebase, el archivo actual, los errores del terminal. Puedes añadir contexto con `@`:
+
+```
+@archivo.ts explícame qué hace esta función
+@Codebase ¿dónde se maneja la autenticación?
+@Terminal ¿por qué está fallando este test?
+@Docs ¿cómo se usa la API de Stripe?
+```
+
+## Modo agente (Composer)
+
+`Ctrl+Shift+I` abre el Composer: un agente que puede:
+- Crear y modificar múltiples archivos
+- Ejecutar comandos en terminal
+- Corregir errores iterativamente
+- Implementar features completas
+
+```
+"Implementa un sistema de autenticación JWT con
+ refresh tokens para la API Express. Crea los
+ middlewares, rutas y tests básicos."
+```
+
+## Migración desde VS Code
+
+1. Instala Cursor
+2. En configuración: **Import VS Code Settings** — importa extensiones, temas, keybindings
+3. Todo funciona igual + la IA encima
+
+## Privacidad
+
+Cursor tiene modo **Privacy Mode** que no envía tu código a servidores para entrenamiento. Activable en Settings → Privacy.
+
+## Precio
+
+- **Free**: 2000 completions/mes + 50 mensajes premium
+- **Pro** ($20/mes): uso ilimitado con modelos premium (Claude Sonnet, GPT-4)

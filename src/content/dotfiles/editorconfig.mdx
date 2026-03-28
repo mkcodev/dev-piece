@@ -1,0 +1,87 @@
+---
+name: EditorConfig
+description: Estándar universal para configurar indent, charset y estilo de código en cualquier editor. Un archivo .editorconfig que todos los editores entienden.
+category: dotfiles
+tags: [editor, config, indentation, standard, team]
+os: [windows, macos, linux]
+difficulty: beginner
+links:
+  website: https://editorconfig.org
+  repo: https://github.com/editorconfig/editorconfig
+addedAt: 2025-03-20
+---
+
+## Un estándar que todos los editores entienden
+
+EditorConfig es un archivo `.editorconfig` en la raíz de tu proyecto que define reglas básicas de formato: tamaño de indentación, tabs vs espacios, charset, saltos de línea. Todos los editores modernos lo soportan nativamente o con un plugin.
+
+Resultado: el equipo deja de pelearse por "tabs vs espacios" y el código siempre tiene el mismo estilo básico independientemente del editor de cada desarrollador.
+
+## Instalación en editores
+
+- **VS Code**: extensión `EditorConfig.EditorConfig`
+- **Neovim**: soporte nativo en versiones recientes
+- **JetBrains IDEs**: soporte nativo incorporado
+- **Emacs**: plugin `editorconfig-emacs`
+- **Vim**: plugin `editorconfig/editorconfig-vim`
+
+## Un .editorconfig completo para proyectos web
+
+```ini
+# .editorconfig — colócalo en la raíz del proyecto
+root = true
+
+# Configuración por defecto para todos los archivos
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# JavaScript / TypeScript
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+
+# Python — PEP8 usa 4 espacios
+[*.py]
+indent_size = 4
+max_line_length = 88
+
+# Makefiles requieren tabs obligatoriamente
+[Makefile]
+indent_style = tab
+
+# Go usa tabs por convención
+[*.go]
+indent_style = tab
+indent_size = 4
+
+# YAML es muy sensible a la indentación
+[*.{yml,yaml}]
+indent_size = 2
+
+# Markdown — no trim whitespace (dos espacios = <br>)
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+```
+
+## Opciones disponibles
+
+| Opción | Valores | Descripción |
+|--------|---------|-------------|
+| `indent_style` | `tab` / `space` | Tipo de indentación |
+| `indent_size` | número | Tamaño del indent en espacios |
+| `end_of_line` | `lf` / `crlf` / `cr` | Saltos de línea |
+| `charset` | `utf-8` / `utf-16` / `latin1` | Codificación |
+| `trim_trailing_whitespace` | `true` / `false` | Eliminar espacios al final |
+| `insert_final_newline` | `true` / `false` | Newline al final del archivo |
+| `max_line_length` | número / `off` | Longitud máxima de línea |
+
+## Para equipos
+
+La regla de oro: **commit el `.editorconfig`** en el repositorio. Así todos los colaboradores tienen la misma configuración sin tener que configurar su editor manualmente.
+
+Combínalo con un formateador (Prettier, Black, gofmt) para máximo consistencia: EditorConfig maneja el estilo básico en tiempo real mientras escribes; el formateador normaliza en el precommit.

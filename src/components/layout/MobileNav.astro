@@ -59,10 +59,8 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config]) => ({
   >
     <div class="p-4 border-b border-surface0 flex items-center justify-between">
       <a href="/" class="flex items-center gap-2" @click="open = false">
-        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-blue to-lavender flex items-center justify-center text-crust font-bold text-xs">
-          DV
-        </div>
-        <span class="font-bold text-text">DevVault</span>
+        <img src="/devpiece-logo.png" alt="DevPiece" class="w-10 h-10 object-contain" />
+        <span class="font-bold text-text">DevPiece</span>
       </a>
       <button
         @click="open = false"
@@ -88,6 +86,54 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config]) => ({
         ]}
       >
         Inicio
+      </a>
+
+      <a
+        href="/roadmaps"
+        @click="open = false"
+        class:list={[
+          "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
+          currentPath.startsWith('/roadmaps')
+            ? "sidebar-link-active font-medium"
+            : "text-subtext1 hover:text-text hover:bg-surface0/50"
+        ]}
+      >
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4"/>
+        </svg>
+        Roadmaps
+      </a>
+
+      <a
+        href="/guias"
+        @click="open = false"
+        class:list={[
+          "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
+          currentPath.startsWith('/guias')
+            ? "sidebar-link-active font-medium"
+            : "text-subtext1 hover:text-text hover:bg-surface0/50"
+        ]}
+      >
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        Guías
+      </a>
+
+      <a
+        href="/arsenal"
+        @click="open = false"
+        class:list={[
+          "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all",
+          currentPath.startsWith('/arsenal')
+            ? "sidebar-link-active font-medium"
+            : "text-subtext1 hover:text-text hover:bg-surface0/50"
+        ]}
+      >
+        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
+        </svg>
+        Mi Arsenal
       </a>
 
       {navItems.map((item) => (

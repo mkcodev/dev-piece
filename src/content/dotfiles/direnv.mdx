@@ -1,0 +1,99 @@
+---
+name: direnv
+description: Variables de entorno automáticas por directorio. Entra a un proyecto y las env vars se cargan solas; sal y desaparecen.
+category: dotfiles
+tags: [environment, variables, shell, automation, security]
+os: [macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install direnv
+  apt: sudo apt install direnv
+  manual: curl -sfL https://direnv.net/install.sh | bash
+links:
+  repo: https://github.com/direnv/direnv
+  docs: https://direnv.net/
+addedAt: 2025-03-20
+---
+
+## Variables de entorno que se cargan solas
+
+direnv lee un archivo `.envrc` en el directorio actual (y sus padres) y carga automáticamente las variables de entorno cuando entras al directorio. Cuando sales, las desactiva.
+
+Perfecto para: API keys por proyecto, versiones de Node/Python, configuración de DB local.
+
+## Setup
+
+```bash
+# 1. Instalar
+brew install direnv
+
+# 2. Añadir al shell (al final del .zshrc / .bashrc)
+eval "$(direnv hook zsh)"   # zsh
+eval "$(direnv hook bash)"  # bash
+```
+
+## Uso básico
+
+```bash
+# Crear el archivo de env vars del proyecto
+echo 'export DATABASE_URL="postgres://localhost/mi_proyecto_dev"' >> .envrc
+echo 'export API_KEY="tu_key_aqui"' >> .envrc
+
+# Autorizar el archivo (requerido por seguridad)
+direnv allow .
+
+# La próxima vez que entres al directorio, se cargan automáticamente
+cd mi-proyecto
+# direnv: loading .envrc
+# direnv: export +DATABASE_URL +API_KEY
+```
+
+## .envrc para proyectos Node
+
+```bash
+# .envrc
+export NODE_ENV=development
+export DATABASE_URL="postgres://localhost:5432/mi_proyecto_dev"
+export REDIS_URL="redis://localhost:6379"
+export JWT_SECRET="dev-secret-no-usar-en-produccion"
+export PORT=3000
+
+# Añadir node_modules/.bin al PATH (como npx pero permanente)
+PATH_add node_modules/.bin
+```
+
+## .envrc para proyectos Python
+
+```bash
+# .envrc — activa el virtualenv automáticamente
+layout python3
+
+# O con un venv existente
+source venv/bin/activate
+export DJANGO_SETTINGS_MODULE=config.settings.local
+export DATABASE_URL="postgres://localhost/mi_proyecto"
+```
+
+## Buenas prácticas
+
+```bash
+# .gitignore — nunca commitees .envrc con secretos reales
+.envrc
+
+# Sí commitea un .envrc.example con valores de ejemplo
+cp .envrc .envrc.example
+# Edita .envrc.example con valores de placeholder
+git add .envrc.example
+```
+
+## Integración con gestores de versiones
+
+```bash
+# .envrc — usa una versión específica de Node con nvm
+use node 20.11.0
+
+# Con mise/rtx (gestor de versiones moderno)
+use mise
+```
+
+direnv tiene integraciones para nvm, pyenv, rbenv, sdkman y mise, haciendo innecesario modificar el shell profile global para cambiar versiones entre proyectos.

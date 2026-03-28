@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RoadmapCanvas from '../../components/roadmaps/RoadmapCanvas';
+import { ROADMAPS, getRoadmapBySlug } from '../../data/roadmaps';
+
+export function getStaticPaths() {
+  return ROADMAPS.map((r) => ({ params: { slug: r.slug } }));
+}
+
+const { slug } = Astro.params;
+const roadmap = getRoadmapBySlug(slug);
+
+if (!roadmap) {
+  return Astro.redirect('/roadmaps');
+}
+
+const difficultyCount = {
+  beginner: roadmap.nodes.filter((n) => n.data.difficulty === 'beginner').length,
+  intermediate: roadmap.nodes.filter((n) => n.data.difficulty === 'intermediate').length,
+  advanced: roadmap.nodes.filter((n) => n.data.difficulty === 'advanced').length,
+};
+
+const maxPhase = Math.max(...roadmap.nodes.map((n) => n.data.phase));
+---
+
+<BaseLayout
+  title={roadmap.label}
+  description={roadmap.description}
+>
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-2 text-sm mb-6" aria-label="Migas de pan">
+    <a href="/" class="text-subtext0 hover:text-text transition-colors">Inicio</a>
+    <span class="text-overlay0" aria-hidden="true">/</span>
+    <a href="/roadmaps" class="text-subtext0 hover:text-text transition-colors">Roadmaps</a>
+    <span class="text-overlay0" aria-hidden="true">/</span>
+    <span class="text-text font-medium" aria-current="page">{roadmap.label}</span>
+  </nav>
+
+  <!-- Page header -->
+  <div class="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
+    <div class="flex items-center gap-4 flex-1 min-w-0">
+      <div
+        class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 border"
+        style={`background: ${roadmap.accent}18; border-color: ${roadmap.accent}40;`}
+        aria-hidden="true"
+      >
+        {roadmap.icon}
+      </div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2 flex-wrap mb-1">
+          <h1 class="text-2xl font-black text-text leading-tight">{roadmap.label}</h1>
+          <span
+            class="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border"
+            style={`background: ${roadmap.accent}18; color: ${roadmap.accent}; border-color: ${roadmap.accent}40;`}
+          >
+            {roadmap.type === 'tech' ? 'Tech' : 'Tools'}
+          </span>
+        </div>
+        <p class="text-sm text-subtext1 leading-relaxed">{roadmap.description}</p>
+      </div>
+    </div>
+
+    <a
+      href="/roadmaps"
+      class="inline-flex items-center gap-2 text-sm text-subtext1 hover:text-text bg-surface0 hover:bg-surface1 border border-surface1 px-4 py-2 rounded-lg transition-colors flex-shrink-0 self-start"
+    >
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Volver
+    </a>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+    <div class="flex items-center gap-1.5 text-xs text-subtext0 bg-surface0 border border-surface1 rounded-full px-3 py-1.5">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+      </svg>
+      {roadmap.nodes.length} nodos
+    </div>
+    <div class="flex items-center gap-1.5 text-xs text-subtext0 bg-surface0 border border-surface1 rounded-full px-3 py-1.5">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+      </svg>
+      {maxPhase} fases
+    </div>
+    {difficultyCount.beginner > 0 && (
+      <div class="flex items-center gap-1.5 text-xs bg-green/10 text-green border border-green/30 rounded-full px-3 py-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-green" aria-hidden="true" />
+        {difficultyCount.beginner} principiante
+      </div>
+    )}
+    {difficultyCount.intermediate > 0 && (
+      <div class="flex items-center gap-1.5 text-xs bg-yellow/10 text-yellow border border-yellow/30 rounded-full px-3 py-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-yellow" aria-hidden="true" />
+        {difficultyCount.intermediate} intermedio
+      </div>
+    )}
+    {difficultyCount.advanced > 0 && (
+      <div class="flex items-center gap-1.5 text-xs bg-red/10 text-red border border-red/30 rounded-full px-3 py-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-red" aria-hidden="true" />
+        {difficultyCount.advanced} avanzado
+      </div>
+    )}
+  </div>
+
+  <!-- Quick legend -->
+  <div class="flex flex-wrap gap-4 mb-4 text-xs text-subtext0">
+    <span class="flex items-center gap-1.5">
+      <span class="w-3 h-0.5 rounded" style="background: rgba(97,101,117,0.8); display: inline-block" aria-hidden="true"></span>
+      Conexión
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="w-3 h-0.5 rounded" style={`background: ${roadmap.accent}; display: inline-block`} aria-hidden="true"></span>
+      Conexión clave
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-green" aria-hidden="true"></span>
+      Principiante
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-yellow" aria-hidden="true"></span>
+      Intermedio
+    </span>
+    <span class="flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-red" aria-hidden="true"></span>
+      Avanzado
+    </span>
+  </div>
+
+  <!-- Canvas -->
+  <div
+    class="rounded-xl overflow-hidden border border-surface1"
+    style="height: calc(100vh - 340px); min-height: 500px;"
+  >
+    <RoadmapCanvas client:load roadmap={roadmap} slug={slug} />
+  </div>
+
+  <!-- Hint -->
+  <p class="text-xs text-subtext0 text-center mt-3">
+    Haz clic en un nodo para ver detalles y marcarlo como completado · Usa el scroll para hacer zoom · Arrastra para desplazarte
+  </p>
+</BaseLayout>

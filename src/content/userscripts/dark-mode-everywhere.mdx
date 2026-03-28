@@ -1,0 +1,114 @@
+---
+name: Dark Reader (userscript)
+description: Script alternativo a la extensión Dark Reader para aplicar modo oscuro personalizado en sitios específicos que la extensión no cubre bien.
+category: userscripts
+tags: [dark-mode, css, userscript, browser, customization]
+os: [windows, macos, linux]
+difficulty: intermediate
+addedAt: 2025-03-20
+---
+
+## Modo oscuro personalizado cuando la extensión no es suficiente
+
+La extensión Dark Reader funciona bien para el 90% de sitios. Pero algunos sitios con estilos complejos quedan feos o ilegibles. Un userscript te permite aplicar una hoja de estilos oscura hecha a medida para esos casos.
+
+## Instalar Tampermonkey o Violentmonkey
+
+Antes de instalar cualquier userscript necesitas un gestor:
+
+- **Tampermonkey**: la extensión más usada, disponible en Chrome/Firefox/Edge/Safari
+- **Violentmonkey**: alternativa open source
+
+## Userscript genérico de inversión de colores
+
+```javascript
+// ==UserScript==
+// @name         Dark Mode Custom
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Modo oscuro personalizado para sitios específicos
+// @match        https://docs.example.com/*
+// @match        https://legacy-app.company.com/*
+// @grant        GM_addStyle
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  GM_addStyle(`
+    :root {
+      color-scheme: dark;
+    }
+
+    html {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    img, video, iframe, svg, canvas {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    /* Fondo oscuro explícito para elementos problemáticos */
+    body {
+      background-color: #1e1e2e !important;
+      color: #cdd6f4 !important;
+    }
+  `);
+})();
+```
+
+## Userscript para documentación específica
+
+```javascript
+// ==UserScript==
+// @name         Docs Dark Theme
+// @namespace    http://tampermonkey.net/
+// @version      1.0
+// @description  Tema oscuro para documentación legacy sin modo oscuro oficial
+// @match        https://legacy-docs.example.com/*
+// @grant        GM_addStyle
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  GM_addStyle(`
+    body {
+      background: #1e1e2e !important;
+      color: #cdd6f4 !important;
+    }
+
+    a { color: #89b4fa !important; }
+    a:visited { color: #cba6f7 !important; }
+
+    code, pre {
+      background: #181825 !important;
+      color: #a6e3a1 !important;
+      border-color: #313244 !important;
+    }
+
+    table {
+      background: #181825 !important;
+      border-color: #313244 !important;
+    }
+
+    th {
+      background: #313244 !important;
+    }
+
+    input, select, textarea {
+      background: #313244 !important;
+      color: #cdd6f4 !important;
+      border-color: #45475a !important;
+    }
+  `);
+})();
+```
+
+## Cómo usar Tampermonkey
+
+1. Instala Tampermonkey desde la tienda de extensiones
+2. Haz clic en el icono de Tampermonkey → **Create a new script**
+3. Pega el script, ajusta los `@match` con las URLs que quieres cubrir
+4. Guarda (`Ctrl+S`)
+5. El script se activa automáticamente en las URLs configuradas
