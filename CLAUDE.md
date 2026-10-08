@@ -49,3 +49,5 @@ Catppuccin Frappé palette defined as CSS variables in `src/styles/globals.css` 
 ## Adding content
 
 New tool: create `src/content/<category>/<slug>.mdx` with frontmatter matching `toolSchema` (required: `name`, `description` ≤200 chars, `category`, `tags`, `os` from `windows|macos|linux|cross`, `addedAt`). Body is Markdown/MDX shown on the tool page. Run `pnpm build` to validate.
+
+`related` is a list of `category/slug` refs rendered as the "Relacionadas" block on the tool page; an unknown ref throws at build time. Brand icons for a new slug go in `SLUG_BRANDS` (`src/lib/tool-icons.ts`), otherwise the category's Lucide icon is used.

@@ -103,7 +103,7 @@ const formatDate = (d: Date) =>
             style={`background-color: ${accent}25; box-shadow: 0 0 32px ${accent}35; view-transition-name: tool-icon-active;`}
             aria-hidden="true"
           >
-            {data.name.charAt(0).toUpperCase()}
+            <span style={`color: ${accent};`} set:html={toolIconSvg(entry.id, category, 'w-8 h-8')} />
           </div>
           <div class="flex-1 min-w-0 pt-1">
             <div class="flex items-center gap-3 flex-wrap mb-2">
