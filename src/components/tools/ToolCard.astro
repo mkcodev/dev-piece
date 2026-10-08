@@ -1,4 +1,8 @@
 ---
+import InstallMenu from './InstallMenu';
+import Icon from '../common/Icon.astro';
+import { toolIconSvg } from '../../lib/tool-icons';
+
 interface Props {
   name: string;
   description: string;
@@ -9,6 +13,7 @@ interface Props {
   featured?: boolean;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   install?: Record<string, string | undefined>;
+  links?: { repo?: string; docs?: string; website?: string; video?: string };
   accent?: string;
 }
 
@@ -22,13 +27,13 @@ const {
   featured = false,
   difficulty,
   install,
+  links,
   accent = '#8caaee',
 } = Astro.props;
 
 const href = `/${category}/${slug}`;
 
 const installEntries = install ? Object.entries(install).filter(([, v]) => v) : [];
-const firstInstall = installEntries[0];
 
 const difficultyConfig = {
   beginner:     { label: 'Principiante', color: 'bg-green',  title: 'Nivel: Principiante' },
@@ -43,31 +48,15 @@ const osBadgeConfig: Record<string, { label: string; color: string }> = {
   cross:   { label: 'Cross', color: 'chip chip-green' },
 };
 
-const SLUG_ICONS: Record<string, string> = {
-  'claude-code': 'anthropic', 'github-copilot': 'githubcopilot', 'ollama': 'ollama',
-  'bitwarden': 'bitwarden', 'ublock-origin': 'ublockorigin', 'wappalyzer': 'wappalyzer',
-  'httpie': 'httpie', 'docker-compose-patterns': 'docker', 'gitconfig': 'git',
-  'jetbrains-mono': 'jetbrains', 'conventional-commits': 'conventionalcommits',
-  'git-bisect': 'git', 'git-reflog': 'git', 'git-worktree': 'git',
-  'docker-hacks': 'docker', 'git-aliases': 'git',
-  'shell-aliases': 'gnubash', 'alacritty': 'alacritty', 'ghostty': 'ghostty',
-  'nushell': 'nushell', 'starship': 'starship',
-  'warp': 'warp', 'wezterm': 'wezterm', 'catppuccin-vscode': 'vscodium',
-  'error-lens': 'vscodium', 'gitlens': 'gitkraken',
-  'todo-tree': 'vscodium', 'vscode-settings': 'vscodium',
-  'vscodevim': 'vim',
-  'roadmap-dev': 'roadmapdotsh', 'javascript-info': 'javascript',
-  'mdn-web-docs': 'mdnwebdocs',
-};
-
-const CATEGORY_ICONS: Record<string, string> = {
-  'neovim': 'neovim',
-  'scripts-ahk': 'autohotkey',
-  'learning': 'bookstack',
-  'web-resources': 'mdnwebdocs',
-};
-
-const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
+// Primary outbound link: repository first, then website, then docs
+const outbound = links?.repo
+  ? { href: links.repo, label: 'Repo', icon: 'github', aria: `Repo de ${name} (pestaña nueva)` }
+  : links?.website
+    ? { href: links.website, label: 'Web', icon: 'globe', aria: `Web de ${name} (pestaña nueva)` }
+    : links?.docs
+      ? { href: links.docs, label: 'Docs', icon: 'book-open', aria: `Docs de ${name} (pestaña nueva)` }
+      : null;
+const iconSvg = toolIconSvg(slug, category);
 ---
 
 <article
@@ -101,21 +90,7 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
           style={`background-color: ${accent}20;`}
           aria-hidden="true"
         >
-          {simpleIconSlug ? (
-            <img
-              src={`https://cdn.simpleicons.org/${simpleIconSlug}`}
-              alt=""
-              width="22"
-              height="22"
-              class="w-[22px] h-[22px] object-contain icon-img"
-              data-fallback={name.charAt(0).toUpperCase()}
-              data-accent={accent}
-            />
-          ) : (
-            <span class="font-bold text-sm" style={`color: ${accent};`}>
-              {name.charAt(0).toUpperCase()}
-            </span>
-          )}
+          <span style={`color: ${accent};`} set:html={iconSvg} />
         </div>
         <!-- Title — morphing target: card-title-el -->
         <h3 class="card-title-el font-semibold text-text text-base leading-tight truncate">{name}</h3>
@@ -147,6 +122,10 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
       </div>
     </div>
 
+    {installEntries.length > 0 && (
+      <InstallMenu client:visible name={name} install={Object.fromEntries(installEntries)} accent={accent} />
+    )}
+
     <!-- Description -->
     <p class="text-sm text-subtext1 line-clamp-2 leading-relaxed flex-1">
       {description}
@@ -165,37 +144,48 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
 
     <!-- Footer: install + favorite + link -->
     <div class="flex items-center justify-between gap-2 pt-1 border-t border-surface1/50">
-      {firstInstall ? (
-        <code class="text-xs text-sky bg-crust/50 px-2 py-1 rounded font-mono truncate max-w-[50%]">
-          {firstInstall[1]}
-        </code>
+      {outbound ? (
+        <a
+          href={outbound.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={outbound.aria}
+          class="inline-flex items-center gap-1.5 min-h-7 -ml-1.5 px-1.5 rounded-md text-xs text-subtext1 transition-colors hover:text-text hover:bg-crust/50"
+        >
+          {outbound.icon === 'github' ? (
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          ) : (
+            <Icon name={outbound.icon} class="w-3.5 h-3.5" />
+          )}
+          {outbound.label}
+        </a>
       ) : <span />}
 
       <div class="flex items-center gap-2 flex-shrink-0">
         <button
-          class="js-alt-btn p-1 rounded text-subtext1 hover:text-peach transition-colors"
+          class="js-alt-btn inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-crust/50 text-subtext1 hover:text-peach transition-colors"
           aria-label={`Marcar ${name} como alternativa conocida`}
           title="Marcar como alternativa"
         >
-          <svg class="w-3.5 h-3.5 js-alt-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg class="w-4 h-4 js-alt-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
           </svg>
         </button>
         <button
-          class="js-int-btn p-1 rounded text-subtext1 hover:text-yellow transition-colors"
+          class="js-int-btn inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-crust/50 text-subtext1 hover:text-yellow transition-colors"
           aria-label={`Marcar ${name} como integrado`}
           title="Marcar como integrado"
         >
-          <svg class="w-3.5 h-3.5 js-int-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg class="w-4 h-4 js-int-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
           </svg>
         </button>
         <button
-          class="js-fav-btn p-1 rounded text-subtext1 hover:text-red transition-colors"
+          class="js-fav-btn inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-crust/50 text-subtext1 hover:text-red transition-colors"
           aria-label={`Añadir ${name} a favoritos`}
           title="Añadir a favoritos"
         >
-          <svg class="w-3.5 h-3.5 js-fav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg class="w-4 h-4 js-fav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
           </svg>
         </button>
@@ -403,24 +393,4 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
     document.querySelectorAll<HTMLButtonElement>('.js-alt-btn').forEach(syncAltBtn);
   });
 
-  /* ---- Icon CDN fallback ---- */
-  function applyIconFallback(img: HTMLImageElement) {
-    const span = document.createElement('span');
-    span.className = 'font-bold text-sm';
-    span.style.color = img.dataset.accent ?? '#8caaee';
-    span.textContent = img.dataset.fallback ?? '?';
-    img.replaceWith(span);
-  }
-
-  function initIconFallbacks() {
-    document.querySelectorAll<HTMLImageElement>('img.icon-img').forEach((img) => {
-      if (img.dataset.fbInit) return;
-      img.dataset.fbInit = '1';
-      if (img.complete && img.naturalWidth === 0) applyIconFallback(img);
-      else img.addEventListener('error', () => applyIconFallback(img));
-    });
-  }
-
-  initIconFallbacks();
-  document.addEventListener('astro:page-load', initIconFallbacks);
 </script>
