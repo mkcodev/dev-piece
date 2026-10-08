@@ -273,10 +273,18 @@ html[data-transition-type="card-expand"] ::view-transition-old(page-main) {
   position: relative;
 }
 
+/* Once the pill exists it is the only active indicator: the link keeps its
+   border width (no text shift) but drops its own background and color. */
+.sidebar-pill-track:has(#sidebar-pill) .sidebar-link-active {
+  background-color: transparent;
+  border-left-color: transparent;
+}
+
 .sidebar-pill-indicator {
   position: absolute;
-  left: 0;
-  right: 0;
+  /* Match the nav's p-3 so the pill sits exactly behind the link */
+  left: 0.75rem;
+  right: 0.75rem;
   border-radius: 0.5rem;
   background-color: rgba(65, 69, 89, 0.5); /* surface0/50 */
   border-left: 2px solid #babbf1;          /* lavender */
