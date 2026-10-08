@@ -20,6 +20,11 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
   <div id="dv-progress-inner"></div>
 </div>
 
+<script>
+  import { initMotion } from '../../scripts/motion';
+  initMotion();
+</script>
+
 <script define:vars={{ CATEGORY_ORDER, CATEGORY_ACCENTS }}>
   /* -------------------------------------------------- */
   /*  Helpers                                           */
@@ -165,6 +170,27 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
   });
 
   /* -------------------------------------------------- */
+  /*  astro:before-swap — reverse morph detail → card    */
+  /*  The detail page names its icon/title statically;   */
+  /*  give the same names to that tool's card on the     */
+  /*  incoming page (first match only: names are unique) */
+  /* -------------------------------------------------- */
+  document.addEventListener('astro:before-swap', (e) => {
+    const from = e.from.pathname;
+    if (!isToolPath(from) || isToolPath(e.to.pathname)) return;
+    const [cat, slug] = from.replace(/^\//, '').split('/');
+    const card = e.newDocument.querySelector(
+      `article[data-fav-cat="${CSS.escape(cat)}"][data-fav-slug="${CSS.escape(slug)}"]`
+    );
+    if (!card) return;
+    assignName(card.querySelector('.card-icon-wrap'),  'tool-icon-active');
+    assignName(card.querySelector('.card-title-el'),   'tool-title-active');
+    /* Skip the staggered reveal so the morph lands on a visible card */
+    card.classList.add('is-in');
+    card.style.animation = 'none';
+  });
+
+  /* -------------------------------------------------- */
   /*  astro:after-swap — new DOM is in place             */
   /* -------------------------------------------------- */
   document.addEventListener('astro:after-swap', () => {
@@ -186,7 +212,8 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
   /* -------------------------------------------------- */
   document.addEventListener('astro:page-load', () => {
     progressHide();
-    clearTransitionNames();
+    /* Deferred: names on the new page may still be in use by the running transition */
+    setTimeout(clearTransitionNames, 600);
 
     /* Trigger stagger animations */
     document.querySelectorAll('.stagger-in').forEach((el) => {

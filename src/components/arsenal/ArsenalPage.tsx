@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useToolIcons } from '../../lib/useToolIcons';
 
 /* ── Types ───────────────────────────────────────────────────────────── */
@@ -40,6 +40,70 @@ const RANKS = [
 
 function getRank(power: number) {
   return [...RANKS].reverse().find(r => power >= r.min) ?? RANKS[0];
+}
+type Rank = typeof RANKS[number];
+
+/* Last rank index seen on this page, to celebrate only real rank-ups */
+const RANK_KEY = 'devpiece-arsenal-rank';
+
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── Count-up: eases from the last shown value, so updates continue smoothly ── */
+function useCountUp(target: number, duration = 900) {
+  const [value, setValue] = useState(0);
+  const shown = useRef(0);
+  useEffect(() => {
+    if (reducedMotion()) { shown.current = target; setValue(target); return; }
+    const from = shown.current;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1);
+      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t); // ease-out-expo
+      shown.current = Math.round(from + (target - from) * eased);
+      setValue(shown.current);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
+}
+
+/* ── Rank-up celebration ─────────────────────────────────────────────── */
+const BURST = ['#8caaee', '#ca9ee6', '#e5c890', '#a6d189', '#ef9f76', '#e78284'];
+
+function RankUpToast({ rank, onClose }: { rank: Rank; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 6500);
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => { clearTimeout(t); window.removeEventListener('keydown', onKey); };
+  }, [onClose]);
+  return (
+    <div className="rank-up fixed bottom-6 left-4 right-4 mx-auto max-w-sm z-50 flex items-center gap-3 rounded-2xl border bg-mantle p-4 shadow-2xl"
+      style={{ borderColor: `${rank.color}66`, boxShadow: `0 0 40px ${rank.color}33` }}>
+      <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl"
+        style={{ backgroundColor: `${rank.color}22` }} aria-hidden="true">
+        <span className="rank-up-emoji text-2xl">{rank.emoji}</span>
+        {Array.from({ length: 14 }, (_, i) => (
+          <span key={i} className="rank-up-spark"
+            style={{ ['--a' as string]: `${(360 / 14) * i}deg`, ['--d' as string]: `${44 + (i % 3) * 14}px`, backgroundColor: BURST[i % BURST.length] }} />
+        ))}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-bold uppercase tracking-widest" style={{ color: rank.color }}>¡Nuevo rango!</p>
+        <p className="font-black text-text leading-tight">{rank.title}</p>
+        <p className="text-xs text-subtext1">{rank.sub}</p>
+      </div>
+      <button onClick={onClose} aria-label="Cerrar aviso de nuevo rango"
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-subtext1 transition-colors hover:bg-surface0 hover:text-text">
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  );
 }
 
 /* ── Animated bars ───────────────────────────────────────────────────── */
@@ -757,6 +821,23 @@ export default function ArsenalPage({ categoryCounts, categoryLabels, categoryAc
     return Math.min(Math.round((pts / 120) * 100), 100);
   }, [favs, ints, core]);
   const rank = getRank(power);
+  const powerShown = useCountUp(power);
+  const favsShown  = useCountUp(favs.length, 700);
+  const intsShown  = useCountUp(ints.length, 700);
+  const coreShown  = useCountUp(core.length, 700);
+
+  /* Rank-up: compare with the last rank seen here; first visit only records it */
+  const [rankUp, setRankUp] = useState<Rank | null>(null);
+  const closeRankUp = useCallback(() => setRankUp(null), []);
+  useEffect(() => {
+    if (!mounted) return;
+    const idx = RANKS.indexOf(rank);
+    try {
+      const raw = localStorage.getItem(RANK_KEY);
+      if (raw !== null && idx > Number(raw)) setRankUp(rank);
+      localStorage.setItem(RANK_KEY, String(idx));
+    } catch {}
+  }, [mounted, rank]);
 
   /* Coverage bars */
   const coverageCats = useMemo(() => {
@@ -855,7 +936,32 @@ export default function ArsenalPage({ categoryCounts, categoryLabels, categoryAc
           100% { transform: translateX(400%); }
         }
         .animate-shimmer-bar { animation: shimmer-bar 2s ease-in-out infinite; }
+        @keyframes rank-up-in {
+          from { opacity: 0; transform: translateY(24px) scale(0.96); }
+          to   { opacity: 1; transform: none; }
+        }
+        @keyframes rank-up-pop {
+          0%   { transform: scale(0.4) rotate(-20deg); }
+          100% { transform: none; }
+        }
+        @keyframes rank-up-spark {
+          0%   { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(1); }
+          100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--d) * -1)) scale(0.3); }
+        }
+        .rank-up { animation: rank-up-in var(--dur-page) var(--ease-out-expo) both; }
+        .rank-up-emoji { animation: rank-up-pop 640ms var(--ease-spring) 120ms both; }
+        .rank-up-spark {
+          position: absolute; left: 50%; top: 50%;
+          width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 9999px;
+          opacity: 0; animation: rank-up-spark 900ms var(--ease-out-expo) 160ms both;
+        }
+        @media (prefers-reduced-motion: reduce) { .rank-up-spark { display: none; } }
       `}</style>
+
+      {/* Rank-up announcement: role=status stays mounted so screen readers catch the change */}
+      <div role="status" aria-live="polite">
+        {rankUp && <RankUpToast rank={rankUp} onClose={closeRankUp} />}
+      </div>
 
       {/* Share import banner */}
       {shareParam && (
@@ -888,7 +994,7 @@ export default function ArsenalPage({ categoryCounts, categoryLabels, categoryAc
                   <span className="text-lg">{rank.emoji}</span>
                   <span className="text-sm font-bold" style={{ color: rank.color }}>{rank.title}</span>
                 </div>
-                <span className="text-xs font-mono text-subtext1">{power}%</span>
+                <span className="text-xs font-mono tabular-nums text-subtext1">{powerShown}%</span>
               </div>
               <PowerBar power={power} color={rank.color} />
               <p className="text-xs text-subtext1 mt-1.5 italic">{rank.sub}</p>
@@ -896,15 +1002,15 @@ export default function ArsenalPage({ categoryCounts, categoryLabels, categoryAc
 
             <div className="flex gap-4 mt-4">
               <div className="text-center">
-                <div className="text-2xl font-black text-red leading-none">{favs.length}</div>
+                <div className="text-2xl font-black tabular-nums text-red leading-none">{favsShown}</div>
                 <div className="text-xs text-subtext1 mt-0.5">Favoritas</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-black leading-none" style={{ color: '#e5c890' }}>{ints.length}</div>
+                <div className="text-2xl font-black tabular-nums leading-none" style={{ color: '#e5c890' }}>{intsShown}</div>
                 <div className="text-xs text-subtext1 mt-0.5">Integradas</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-black text-mauve leading-none">{core.length}</div>
+                <div className="text-2xl font-black tabular-nums text-mauve leading-none">{coreShown}</div>
                 <div className="text-xs text-subtext1 mt-0.5">Core</div>
               </div>
             </div>

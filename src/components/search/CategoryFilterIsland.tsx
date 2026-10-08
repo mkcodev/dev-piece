@@ -306,24 +306,26 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {filtered.map((entry) => (
+              // Same hooks as ToolCard.astro: .tool-card (spotlight/tilt), .reveal (stagger),
+              // data-fav-* + card-icon-wrap/card-title-el (card ↔ detail morph)
               <article
                 key={entry.slug}
-                className="group relative bg-surface0 rounded-xl border border-surface1 hover:border-lavender/40 transition-all duration-200 flex flex-col overflow-hidden"
-                style={{ ['--accent' as string]: accent }}
+                className="tool-card reveal group relative bg-surface0 rounded-xl border border-surface1 flex flex-col overflow-hidden"
+                style={{ ['--card-accent' as string]: accent }}
+                data-fav-slug={entry.slug}
+                data-fav-cat={category}
               >
-                {entry.featured && (
-                  <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue via-lavender to-mauve" aria-hidden="true" />
-                )}
-                <div className="p-4 flex flex-col gap-3 flex-1">
+                <div className={entry.featured ? 'card-featured-bar' : 'card-accent-bar'} aria-hidden="true" />
+                <div className="relative z-10 p-4 flex flex-col gap-3 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                        className="card-icon-wrap w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
                         style={{ backgroundColor: `${accent}20`, color: accent }}
                         aria-hidden="true"
                         dangerouslySetInnerHTML={{ __html: entry.iconSvg }}
                       />
-                      <h2 className="font-semibold text-text text-base leading-tight truncate">{entry.name}</h2>
+                      <h2 className="card-title-el font-semibold text-text text-base leading-tight truncate">{entry.name}</h2>
                       <InUseBadge slug={entry.slug} category={category} />
                       <AltBadge slug={entry.slug} category={category} />
                     </div>
