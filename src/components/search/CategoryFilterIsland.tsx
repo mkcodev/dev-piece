@@ -1,76 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import FilterBar from './FilterBar';
-
-const SLUG_ICONS: Record<string, string> = {
-  'claude-code': 'anthropic',
-  'github-copilot': 'githubcopilot',
-  'ollama': 'ollama',
-  'bitwarden': 'bitwarden',
-  'ublock-origin': 'ublockorigin',
-  'wappalyzer': 'wappalyzer',
-  'httpie': 'httpie',
-  'docker-compose-patterns': 'docker',
-  'gitconfig': 'git',
-  'jetbrains-mono': 'jetbrains',
-  'conventional-commits': 'conventionalcommits',
-  'git-bisect': 'git',
-  'git-reflog': 'git',
-  'git-worktree': 'git',
-  'docker-hacks': 'docker',
-  'git-aliases': 'git',
-  'shell-aliases': 'gnubash',
-  'alacritty': 'alacritty',
-  'ghostty': 'ghostty',
-  'nushell': 'nushell',
-  'starship': 'starship',
-  'warp': 'warp',
-  'wezterm': 'wezterm',
-  'catppuccin-vscode': 'vscodium',
-  'error-lens': 'vscodium',
-  'gitlens': 'gitkraken',
-  'todo-tree': 'vscodium',
-  'vscode-settings': 'vscodium',
-  'vscodevim': 'vim',
-  'roadmap-dev': 'roadmapdotsh',
-  'javascript-info': 'javascript',
-  'mdn-web-docs': 'mdnwebdocs',
-  'regex101': 'gnubash',
-};
-
-const CATEGORY_ICONS: Record<string, string> = {
-  'neovim': 'neovim',
-  'scripts-ahk': 'autohotkey',
-  'learning': 'bookstack',
-  'web-resources': 'mdnwebdocs',
-};
-
-function ToolIcon({ name, slug, category, accent }: { name: string; slug: string; category: string; accent: string }) {
-  const [failed, setFailed] = useState(false);
-  const iconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
-
-  return (
-    <div
-      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
-      style={{ backgroundColor: `${accent}20` }}
-      aria-hidden="true"
-    >
-      {iconSlug && !failed ? (
-        <img
-          src={`https://cdn.simpleicons.org/${iconSlug}`}
-          alt=""
-          width={22}
-          height={22}
-          className="w-[22px] h-[22px] object-contain"
-          onError={() => setFailed(true)}
-        />
-      ) : (
-        <span className="font-bold text-sm" style={{ color: accent }}>
-          {name.charAt(0).toUpperCase()}
-        </span>
-      )}
-    </div>
-  );
-}
+import InstallMenu from '../tools/InstallMenu';
 
 interface ToolEntry {
   slug: string;
@@ -81,7 +11,39 @@ interface ToolEntry {
   featured: boolean;
   difficulty?: 'beginner' | 'intermediate' | 'advanced';
   install?: Record<string, string | undefined>;
+  links?: { repo?: string; docs?: string; website?: string };
+  iconSvg: string;
   addedAt: string;
+}
+
+const GITHUB_PATH = 'M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z';
+
+function OutboundLink({ entry }: { entry: ToolEntry }) {
+  const l = entry.links;
+  const target = l?.repo
+    ? { href: l.repo, label: 'Repo', github: true }
+    : l?.website
+      ? { href: l.website, label: 'Web', github: false }
+      : l?.docs
+        ? { href: l.docs, label: 'Docs', github: false }
+        : null;
+  if (!target) return <span />;
+  return (
+    <a
+      href={target.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${target.label} de ${entry.name} (pestaña nueva)`}
+      className="inline-flex items-center gap-1.5 min-h-7 -ml-1.5 px-1.5 rounded-md text-xs text-subtext1 transition-colors hover:text-text hover:bg-crust/50"
+    >
+      {target.github ? (
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={GITHUB_PATH} /></svg>
+      ) : (
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20M2 12h20" /></svg>
+      )}
+      {target.label}
+    </a>
+  );
 }
 
 interface Props {
@@ -147,10 +109,10 @@ function FavoriteButton({ entry, category, accent }: { entry: ToolEntry; categor
   }, [isFav, entry, category, accent]);
   return (
     <button onClick={toggle}
-      className={`p-1 rounded transition-colors ${isFav ? 'text-red' : 'text-subtext1 hover:text-red'}`}
+      className={`inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-crust/50 transition-colors ${isFav ? 'text-red' : 'text-subtext1 hover:text-red'}`}
       aria-label={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
       title={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}>
-      <svg className="w-3.5 h-3.5" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <svg className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
       </svg>
     </button>
@@ -180,10 +142,10 @@ function AlternativeButton({ entry, category }: { entry: ToolEntry; category: st
   }, [isAlt, entry, category]);
   return (
     <button onClick={toggle}
-      className={`p-1 rounded transition-colors ${isAlt ? 'text-peach' : 'text-subtext1 hover:text-peach'}`}
+      className={`inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-crust/50 transition-colors ${isAlt ? 'text-peach' : 'text-subtext1 hover:text-peach'}`}
       aria-label={isAlt ? 'Quitar alternativa' : 'Marcar como alternativa conocida'}
       title={isAlt ? 'Quitar alternativa' : 'Marcar como alternativa'}>
-      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
       </svg>
     </button>
@@ -216,11 +178,11 @@ function IntegrationButton({ entry, category, accent }: { entry: ToolEntry; cate
   }, [isInt, entry, category, accent]);
   return (
     <button onClick={toggle}
-      className={`p-1 rounded transition-colors ${isInt ? '' : 'text-subtext1 hover:text-yellow'}`}
+      className={`inline-flex items-center justify-center w-7 h-7 rounded-md hover:bg-crust/50 transition-colors ${isInt ? '' : 'text-subtext1 hover:text-yellow'}`}
       style={isInt ? { color: '#e5c890' } : {}}
       aria-label={isInt ? 'Quitar integración' : 'Marcar como integrado'}
       title={isInt ? 'Quitar integración' : 'Marcar como integrado'}>
-      <svg className="w-3.5 h-3.5" fill={isInt ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <svg className="w-4 h-4" fill={isInt ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z"/>
       </svg>
     </button>
@@ -323,11 +285,6 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
     return result;
   }, [entries, filters]);
 
-  const firstInstall = (install?: Record<string, string | undefined>) => {
-    if (!install) return null;
-    const entry = Object.entries(install).find(([, v]) => v);
-    return entry ? entry[1] : null;
-  };
 
   return (
     <div>
@@ -360,7 +317,12 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
                 <div className="p-4 flex flex-col gap-3 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <ToolIcon name={entry.name} slug={entry.slug} category={category} accent={accent} />
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: `${accent}20`, color: accent }}
+                        aria-hidden="true"
+                        dangerouslySetInnerHTML={{ __html: entry.iconSvg }}
+                      />
                       <h2 className="font-semibold text-text text-base leading-tight truncate">{entry.name}</h2>
                       <InUseBadge slug={entry.slug} category={category} />
                       <AltBadge slug={entry.slug} category={category} />
@@ -386,6 +348,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
                       )}
                     </div>
                   </div>
+                  {entry.install && <InstallMenu name={entry.name} install={entry.install} accent={accent} />}
                   <p className="text-sm text-subtext1 line-clamp-2 leading-relaxed flex-1">
                     {entry.description}
                   </p>
@@ -399,11 +362,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
                     </div>
                   )}
                   <div className="flex items-center justify-between gap-2 pt-1 border-t border-surface1/50">
-                    {firstInstall(entry.install) ? (
-                      <code className="text-xs text-sky bg-crust/50 px-2 py-1 rounded font-mono truncate max-w-[50%]">
-                        {firstInstall(entry.install)}
-                      </code>
-                    ) : <span />}
+                    <OutboundLink entry={entry} />
                     <div className="flex items-center gap-2 flex-shrink-0">
                       <AlternativeButton entry={entry} category={category} />
                       <IntegrationButton entry={entry} category={category} accent={accent} />

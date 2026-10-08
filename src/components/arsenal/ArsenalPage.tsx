@@ -1,24 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-
-/* ── Icon maps ───────────────────────────────────────────────────────── */
-const SLUG_ICONS: Record<string, string> = {
-  'claude-code': 'anthropic', 'github-copilot': 'githubcopilot', 'ollama': 'ollama',
-  'bitwarden': 'bitwarden', 'ublock-origin': 'ublockorigin', 'wappalyzer': 'wappalyzer',
-  'httpie': 'httpie', 'docker-compose-patterns': 'docker', 'gitconfig': 'git',
-  'jetbrains-mono': 'jetbrains', 'conventional-commits': 'conventionalcommits',
-  'git-bisect': 'git', 'git-reflog': 'git', 'git-worktree': 'git',
-  'docker-hacks': 'docker', 'git-aliases': 'git',
-  'shell-aliases': 'gnubash', 'alacritty': 'alacritty', 'ghostty': 'ghostty',
-  'nushell': 'nushell', 'starship': 'starship', 'warp': 'warp', 'wezterm': 'wezterm',
-  'catppuccin-vscode': 'vscodium', 'error-lens': 'vscodium', 'gitlens': 'gitkraken',
-  'todo-tree': 'vscodium', 'vscode-settings': 'vscodium', 'vscodevim': 'vim',
-  'roadmap-dev': 'roadmapdotsh', 'javascript-info': 'javascript',
-  'mdn-web-docs': 'mdnwebdocs', 'regex101': 'gnubash',
-};
-const CATEGORY_ICONS: Record<string, string> = {
-  neovim: 'neovim', 'scripts-ahk': 'autohotkey',
-  learning: 'bookstack', 'web-resources': 'mdnwebdocs',
-};
+import { useToolIcons } from '../../lib/useToolIcons';
 
 /* ── Types ───────────────────────────────────────────────────────────── */
 interface StoredTool {
@@ -93,18 +74,15 @@ function CoverageBar({ label, have, total, accent }: { label: string; have: numb
 
 /* ── Tool icon ───────────────────────────────────────────────────────── */
 function ToolIcon({ tool }: { tool: StoredTool }) {
-  const [failed, setFailed] = useState(false);
-  const iconSlug = SLUG_ICONS[tool.slug] ?? CATEGORY_ICONS[tool.category];
+  const icons = useToolIcons();
+  const svg = icons?.[`${tool.category}/${tool.slug}`];
   return (
-    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden"
-      style={{ backgroundColor: `${tool.accent}22` }} aria-hidden="true">
-      {iconSlug && !failed ? (
-        <img src={`https://cdn.simpleicons.org/${iconSlug}`} alt="" width={20} height={20}
-          className="w-5 h-5 object-contain" onError={() => setFailed(true)} />
+    <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+      style={{ backgroundColor: `${tool.accent}22`, color: tool.accent }} aria-hidden="true">
+      {svg ? (
+        <span className="block w-[18px] h-[18px]" dangerouslySetInnerHTML={{ __html: svg }} />
       ) : (
-        <span className="font-bold text-sm" style={{ color: tool.accent }}>
-          {tool.name.charAt(0).toUpperCase()}
-        </span>
+        <span className="font-bold text-sm">{tool.name.charAt(0).toUpperCase()}</span>
       )}
     </div>
   );

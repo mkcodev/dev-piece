@@ -241,7 +241,6 @@ const TOOLS_ROADMAPS = [
     <button
       id="open-palette-btn"
       class="flex items-center gap-2 px-3 py-1.5 bg-surface0 hover:bg-surface1 border border-surface1 hover:border-surface2 rounded-lg text-sm text-subtext1 hover:text-text transition-all duration-150"
-      aria-label="Buscar (Ctrl+K)"
       aria-keyshortcuts="Control+k Meta+k"
     >
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -249,7 +248,7 @@ const TOOLS_ROADMAPS = [
         <line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
       <span class="hidden sm:inline">Buscar</span>
-      <span class="hidden sm:flex items-center gap-0.5 ml-1">
+      <span class="hidden sm:flex items-center gap-0.5 ml-1" aria-hidden="true">
         <kbd class="text-xs bg-surface1 text-overlay2 px-1 py-0.5 rounded font-mono">⌘</kbd>
         <kbd class="text-xs bg-surface1 text-overlay2 px-1 py-0.5 rounded font-mono">K</kbd>
       </span>

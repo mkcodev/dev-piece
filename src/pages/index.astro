@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ToolCard from '../components/tools/ToolCard.astro';
+import { categoryIconSvg } from '../lib/tool-icons';
 import ArsenalBentoWidget from '../components/arsenal/ArsenalBentoWidget';
 import { getFeaturedTools, getRecentTools, getAllTools } from '../lib/content';
 import { CATEGORY_CONFIG } from '../lib/utils';
@@ -208,15 +209,7 @@ const categoryAccents: Record<string, string> = {
             style={`background-color: ${cat.accent}20;`}
             aria-hidden="true"
           >
-            <img
-              src={`https://cdn.simpleicons.org/${cat.icon}`}
-              alt=""
-              width="28"
-              height="28"
-              class="w-7 h-7 object-contain featured-cat-icon"
-              data-fallback={cat.label.charAt(0)}
-              data-accent={cat.accent}
-            />
+            <span style={`color: ${cat.accent};`} set:html={categoryIconSvg(cat.slug, 'w-7 h-7', cat.icon)} />
           </div>
           <div class="text-center">
             <p class="text-xs font-semibold text-text leading-tight">{cat.label}</p>
@@ -253,10 +246,11 @@ const categoryAccents: Record<string, string> = {
             tags={tool.data.tags}
             os={tool.data.os}
             category={tool.collectionName}
-            slug={tool.slug}
+            slug={tool.id}
             featured={tool.data.featured}
             difficulty={tool.data.difficulty}
             install={tool.data.install}
+            links={tool.data.links}
             accent={categoryAccents[tool.collectionName] ?? '#8caaee'}
           />
         ))}
@@ -317,10 +311,11 @@ const categoryAccents: Record<string, string> = {
             tags={tool.data.tags}
             os={tool.data.os}
             category={tool.collectionName}
-            slug={tool.slug}
+            slug={tool.id}
             featured={tool.data.featured}
             difficulty={tool.data.difficulty}
             install={tool.data.install}
+            links={tool.data.links}
             accent={categoryAccents[tool.collectionName] ?? '#8caaee'}
           />
         ))}
@@ -335,18 +330,6 @@ const categoryAccents: Record<string, string> = {
     window.dispatchEvent(new CustomEvent('open-command-palette'));
   });
 
-  // Featured category icon fallback
-  document.querySelectorAll<HTMLImageElement>('img.featured-cat-icon').forEach((img) => {
-    const fallback = () => {
-      const span = document.createElement('span');
-      span.className = 'font-bold text-base';
-      span.style.color = img.dataset.accent ?? '#8caaee';
-      span.textContent = img.dataset.fallback ?? '?';
-      img.replaceWith(span);
-    };
-    if (img.complete && img.naturalWidth === 0) fallback();
-    else img.addEventListener('error', fallback);
-  });
 
   // Typewriter
   const commands = [

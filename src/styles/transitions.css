@@ -304,3 +304,14 @@ html[data-transition-type="card-expand"] ::view-transition-old(page-main) {
     to   { opacity: 1; transform: translateY(0); }
   }
 }
+
+/* Copy confirmation — same deliberate spring as the favorite */
+.copy-pop {
+  animation: fav-pop 420ms var(--ease-spring);
+}
+
+/* An open install menu may overflow its card and sit above the neighbours */
+article:has(.install-trigger[aria-expanded='true']) {
+  overflow: visible;
+  z-index: 30;
+}

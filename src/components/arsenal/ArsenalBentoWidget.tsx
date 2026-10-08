@@ -1,24 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-
-/* ── Icon maps (CDN-verified slugs) ─────────────────────────────────── */
-const SLUG_ICONS: Record<string, string> = {
-  'claude-code': 'anthropic', 'github-copilot': 'githubcopilot', 'ollama': 'ollama',
-  'bitwarden': 'bitwarden', 'ublock-origin': 'ublockorigin', 'wappalyzer': 'wappalyzer',
-  'httpie': 'httpie', 'docker-compose-patterns': 'docker', 'gitconfig': 'git',
-  'jetbrains-mono': 'jetbrains', 'conventional-commits': 'conventionalcommits',
-  'git-bisect': 'git', 'git-reflog': 'git', 'git-worktree': 'git',
-  'docker-hacks': 'docker', 'git-aliases': 'git',
-  'shell-aliases': 'gnubash', 'alacritty': 'alacritty', 'ghostty': 'ghostty',
-  'nushell': 'nushell', 'starship': 'starship', 'warp': 'warp', 'wezterm': 'wezterm',
-  'catppuccin-vscode': 'vscodium', 'error-lens': 'vscodium', 'gitlens': 'gitkraken',
-  'todo-tree': 'vscodium', 'vscode-settings': 'vscodium', 'vscodevim': 'vim',
-  'roadmap-dev': 'roadmapdotsh', 'javascript-info': 'javascript',
-  'mdn-web-docs': 'mdnwebdocs', 'regex101': 'gnubash',
-};
-const CATEGORY_ICONS: Record<string, string> = {
-  neovim: 'neovim', 'scripts-ahk': 'autohotkey',
-  learning: 'bookstack', 'web-resources': 'mdnwebdocs',
-};
+import { useToolIcons } from '../../lib/useToolIcons';
 
 interface StoredTool { slug: string; category: string; name: string; accent: string; }
 
@@ -50,26 +31,18 @@ function useCounter(target: number, duration = 1400) {
 
 /* ── Single tool logo ────────────────────────────────────────────────── */
 function ToolLogo({ tool, size = 36 }: { tool: StoredTool; size?: number }) {
-  const [failed, setFailed] = useState(false);
-  const iconSlug = SLUG_ICONS[tool.slug] ?? CATEGORY_ICONS[tool.category];
-  const s = size;
-  const img = Math.round(s * 0.55);
+  const icons = useToolIcons();
+  const svg = icons?.[`${tool.category}/${tool.slug}`];
+  const img = Math.round(size * 0.55);
   return (
     <div
-      style={{ width: s, height: s, backgroundColor: `${tool.accent}22`, borderRadius: 10, flexShrink: 0 }}
-      className="flex items-center justify-center overflow-hidden"
+      style={{ width: size, height: size, backgroundColor: `${tool.accent}22`, color: tool.accent, borderRadius: 10, flexShrink: 0 }}
+      className="flex items-center justify-center"
     >
-      {iconSlug && !failed ? (
-        <img
-          src={`https://cdn.simpleicons.org/${iconSlug}`}
-          alt="" width={img} height={img}
-          style={{ width: img, height: img, objectFit: 'contain' }}
-          onError={() => setFailed(true)}
-        />
+      {svg ? (
+        <span style={{ width: img, height: img, display: 'block' }} dangerouslySetInnerHTML={{ __html: svg }} />
       ) : (
-        <span className="font-bold" style={{ fontSize: img * 0.7, color: tool.accent }}>
-          {tool.name.charAt(0).toUpperCase()}
-        </span>
+        <span className="font-bold" style={{ fontSize: img * 0.7 }}>{tool.name.charAt(0).toUpperCase()}</span>
       )}
     </div>
   );
@@ -77,8 +50,8 @@ function ToolLogo({ tool, size = 36 }: { tool: StoredTool; size?: number }) {
 
 /* ── Floating logo (background deco) ────────────────────────────────── */
 function FloatingLogo({ tool, style }: { tool: StoredTool; style: React.CSSProperties }) {
-  const [failed, setFailed] = useState(false);
-  const iconSlug = SLUG_ICONS[tool.slug] ?? CATEGORY_ICONS[tool.category];
+  const icons = useToolIcons();
+  const svg = icons?.[`${tool.category}/${tool.slug}`];
   return (
     <div
       className="absolute pointer-events-none"
@@ -89,11 +62,8 @@ function FloatingLogo({ tool, style }: { tool: StoredTool; style: React.CSSPrope
         style={{ width: 38, height: 38, backgroundColor: `${tool.accent}18`, borderRadius: 10, border: `1px solid ${tool.accent}25` }}
         className="flex items-center justify-center"
       >
-        {iconSlug && !failed ? (
-          <img src={`https://cdn.simpleicons.org/${iconSlug}`} alt="" width={20} height={20}
-            style={{ width: 20, height: 20, objectFit: 'contain', opacity: 0.7 }}
-            onError={() => setFailed(true)}
-          />
+        {svg ? (
+          <span style={{ width: 20, height: 20, display: 'block', color: tool.accent, opacity: 0.7 }} dangerouslySetInnerHTML={{ __html: svg }} />
         ) : (
           <span style={{ fontSize: 12, fontWeight: 700, color: tool.accent, opacity: 0.7 }}>
             {tool.name.charAt(0).toUpperCase()}
