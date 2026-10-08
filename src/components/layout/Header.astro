@@ -1,6 +1,8 @@
 ---
 import MobileNav from './MobileNav.astro';
 import LoginModal from './LoginModal';
+import GithubStar from './GithubStar.astro';
+import Icon from '../common/Icon.astro';
 import { getCollection } from 'astro:content';
 import { CATEGORY_CONFIG } from '../../lib/utils';
 
@@ -35,24 +37,6 @@ const TOOLS_ROADMAPS = [
   { slug: 'ninja-dev',  label: 'NinjaDev',  description: 'Terminal + Git + Windows + Unix power tools', accent: '#f4b8e4', icon: '🥷' },
 ];
 
-const CATEGORY_SIMPLE_ICONS: Record<string, string> = {
-  terminales: 'gnubash',
-  'cli-tools': 'gnubash',
-  snippets: 'git',
-  neovim: 'neovim',
-  vscode: 'visualstudiocode',
-  'browser-extensions': 'googlechrome',
-  'scripts-ahk': 'autohotkey',
-  userscripts: 'tampermonkey',
-  dotfiles: 'git',
-  docker: 'docker',
-  'git-hacks': 'git',
-  fonts: 'googlefonts',
-  'ai-tools': 'anthropic',
-  'windows-tools': 'windows',
-  learning: 'bookstack',
-  'web-resources': 'mdnwebdocs',
-};
 ---
 
 <header class="sticky top-0 z-30 bg-mantle/80 backdrop-blur-md border-b border-surface0 h-14 flex items-center px-4 md:px-6">
@@ -96,7 +80,6 @@ const CATEGORY_SIMPLE_ICONS: Record<string, string> = {
         </div>
         <div class="grid grid-cols-4 gap-2">
           {categories.map((cat) => {
-            const iconSlug = CATEGORY_SIMPLE_ICONS[cat.slug];
             return (
               <a
                 href={cat.href}
@@ -110,19 +93,7 @@ const CATEGORY_SIMPLE_ICONS: Record<string, string> = {
                   style={`background-color: ${cat.accent}20;`}
                   aria-hidden="true"
                 >
-                  {iconSlug ? (
-                    <img
-                      src={`https://cdn.simpleicons.org/${iconSlug}`}
-                      alt=""
-                      width="18"
-                      height="18"
-                      class="w-[18px] h-[18px] object-contain cat-menu-icon"
-                      data-fallback={cat.label.charAt(0)}
-                      data-accent={cat.accent}
-                    />
-                  ) : (
-                    <span class="font-bold text-xs" style={`color: ${cat.accent};`}>{cat.label.charAt(0)}</span>
-                  )}
+                  <span style={`color: ${cat.accent};`}><Icon name={cat.icon} class="w-4 h-4" /></span>
                 </div>
                 <div class="min-w-0 flex-1">
                   <p class="text-xs font-medium text-text leading-tight truncate">{cat.label}</p>
@@ -265,6 +236,7 @@ const CATEGORY_SIMPLE_ICONS: Record<string, string> = {
 
   <!-- Right side actions -->
   <div class="hidden lg:flex items-center gap-2 ml-auto">
+    <GithubStar variant="compact" />
     <!-- Cmd+K trigger -->
     <button
       id="open-palette-btn"
@@ -326,18 +298,6 @@ const CATEGORY_SIMPLE_ICONS: Record<string, string> = {
     });
   });
 
-  // Category menu icon fallback
-  document.querySelectorAll<HTMLImageElement>('img.cat-menu-icon').forEach((img) => {
-    const fallback = () => {
-      const span = document.createElement('span');
-      span.className = 'font-bold text-xs';
-      span.style.color = img.dataset.accent ?? '#8caaee';
-      span.textContent = img.dataset.fallback ?? '?';
-      img.replaceWith(span);
-    };
-    if (img.complete && img.naturalWidth === 0) fallback();
-    else img.addEventListener('error', fallback);
-  });
 </script>
 
 <style>
