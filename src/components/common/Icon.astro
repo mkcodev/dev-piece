@@ -1,0 +1,31 @@
+---
+// Inline Lucide icon rendered at build time (no client JS, no icon font).
+// `name` accepts the kebab-case names used in CATEGORY_CONFIG ("git-branch", "code-2").
+import * as icons from 'lucide-static';
+
+interface Props {
+  name: string;
+  class?: string;
+  strokeWidth?: number;
+}
+
+const { name, class: className = 'w-4 h-4', strokeWidth = 2 } = Astro.props;
+
+const pascal = name
+  .split('-')
+  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+  .join('');
+
+const raw = (icons as Record<string, unknown>)[pascal];
+const svg = typeof raw === 'string' ? raw : (icons as Record<string, string>).Circle;
+
+// Only the root <svg> tag loses its size/class: inner <rect> keep their width/height
+const html = svg.replace(/<svg[^>]*>/, (tag) =>
+  tag
+    .replace(/\s(class|width|height)="[^"]*"/g, '')
+    .replace('stroke-width="2"', `stroke-width="${strokeWidth}"`)
+    .replace('<svg', `<svg class="${className}" aria-hidden="true" focusable="false"`),
+);
+---
+
+<Fragment set:html={html} />

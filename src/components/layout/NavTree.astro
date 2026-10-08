@@ -1,0 +1,97 @@
+---
+// Navigation tree shared by the desktop sidebar and the mobile drawer.
+// Active state is synced client-side (the sidebar is transition:persist), so no
+// item is server-marked as active here except for no-JS first paint.
+import Icon from '../common/Icon.astro';
+import { getNav } from '../../lib/nav';
+
+interface Props {
+  variant: 'sidebar' | 'drawer';
+}
+
+const { variant } = Astro.props;
+const { explore, groups } = await getNav();
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
+const filterId = `nav-filter-${variant}`;
+---
+
+<div class:list={['nav-tree relative', variant === 'sidebar' && 'sidebar-pill-track']} data-variant={variant}>
+  <ul class="space-y-0.5" role="list">
+    {explore.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          class:list={['nav-link', isActive(item.href) && 'is-active']}
+          aria-current={isActive(item.href) ? 'page' : undefined}
+          data-nav-href={item.href}
+          data-cat-index={item.catIndex}
+          data-tip={item.label}
+        >
+          <Icon name={item.icon} class="nav-icon" />
+          <span class="rail-label truncate">{item.label}</span>
+          {item.href === '/arsenal' ? (
+            <span class="rail-label nav-count js-arsenal-count hidden" title="Herramientas en tu arsenal (favoritas e integradas)" />
+          ) : item.count ? (
+            <span class="rail-label nav-count">{item.count}</span>
+          ) : null}
+        </a>
+        {item.href === '/arsenal' && (
+          <ul class="js-arsenal-recents rail-hide hidden mt-0.5 mb-1 ml-[1.375rem] pl-3 border-l border-surface1 space-y-px" aria-label="Favoritos recientes" />
+        )}
+      </li>
+    ))}
+  </ul>
+
+  <div class="rail-hide mt-4 mb-2 px-1">
+    <label for={filterId} class="sr-only">Filtrar categorías</label>
+    <div class="relative">
+      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-overlay2" />
+      <input
+        id={filterId}
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Filtrar categorías"
+        class="js-nav-filter w-full rounded-md border border-surface1 bg-crust/50 py-1.5 pl-8 pr-2 text-sm text-text placeholder:text-overlay2 transition-colors hover:border-surface2 focus:border-lavender/60"
+      />
+    </div>
+  </div>
+
+  <div class="space-y-1">
+    {groups.map((group) => {
+      const total = group.items.reduce((n, i) => n + (i.count ?? 0), 0);
+      return (
+        <details class="nav-group" data-group={group.id} open>
+          <summary class="nav-group-summary">
+            <span class="truncate">{group.label}</span>
+            <span class="ml-auto font-mono tabular text-2xs text-overlay2">{total}</span>
+            <Icon name="chevron-down" class="nav-group-chevron w-3.5 h-3.5 text-overlay2" />
+          </summary>
+          <ul class="space-y-0.5 pb-1" role="list">
+            {group.items.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={['nav-link', isActive(item.href) && 'is-active']}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                  data-nav-href={item.href}
+                  data-cat-index={item.catIndex}
+                  data-nav-label={item.label}
+                  data-tip={`${item.label} · ${item.count}`}
+                  style={`--item-accent: ${item.accent};`}
+                >
+                  <Icon name={item.icon} class="nav-icon nav-icon-accent" />
+                  <span class="rail-label truncate">{item.label}</span>
+                  {item.count ? <span class="rail-label nav-count">{item.count}</span> : null}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      );
+    })}
+  </div>
+
+  <p class="js-nav-empty hidden px-3 py-4 text-sm text-subtext1">Ninguna categoría coincide.</p>
+</div>
