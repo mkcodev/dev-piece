@@ -1,4 +1,7 @@
 ---
+import '@fontsource-variable/onest/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import onestLatin from '@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url';
 import '../styles/globals.css';
 import '../styles/transitions.css';
 import Header from '../components/layout/Header.astro';
@@ -36,6 +39,9 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
 
     <!-- Canonical -->
     <link rel="canonical" href={canonicalUrl} />
+    <!-- Self-hosted UI font: preload the latin subset used above the fold -->
+    <link rel="preload" href={onestLatin} as="font" type="font/woff2" crossorigin />
+
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
