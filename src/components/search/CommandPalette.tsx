@@ -137,7 +137,7 @@ export default function CommandPalette() {
       <div className="relative w-full max-w-xl bg-mantle border border-surface1 rounded-xl shadow-2xl overflow-hidden">
         {/* Input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-surface0">
-          <svg className="w-4 h-4 text-subtext0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="w-4 h-4 text-lavender flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
           </svg>
@@ -148,11 +148,11 @@ export default function CommandPalette() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Buscar herramientas, comandos, configs..."
-            className="flex-1 bg-transparent text-text placeholder:text-subtext0 outline-none text-sm"
+            className="flex-1 bg-transparent text-text placeholder:text-subtext1 outline-none text-sm"
             aria-autocomplete="list"
             aria-controls="palette-results"
           />
-          <kbd className="text-xs bg-surface0 text-subtext0 px-1.5 py-0.5 rounded font-mono flex-shrink-0">
+          <kbd className="text-xs bg-surface0 text-subtext1 px-1.5 py-0.5 rounded font-mono flex-shrink-0">
             Esc
           </kbd>
         </div>
@@ -165,7 +165,7 @@ export default function CommandPalette() {
           className="max-h-[400px] overflow-y-auto py-2"
         >
           {results.length === 0 && (
-            <div className="px-4 py-8 text-center text-subtext0 text-sm">
+            <div className="px-4 py-8 text-center text-subtext1 text-sm">
               {query ? 'No se encontraron resultados' : 'Empieza a escribir para buscar...'}
             </div>
           )}
@@ -209,12 +209,12 @@ export default function CommandPalette() {
                           {item.name}
                         </span>
                         {item.featured && (
-                          <span className="text-xs bg-blue/20 text-blue px-1.5 py-0.5 rounded-full flex-shrink-0">
+                          <span className="text-xs chip chip-blue px-1.5 py-0.5 rounded-full flex-shrink-0">
                             Destacado
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-subtext0 truncate mt-0.5">
+                      <p className="text-xs text-subtext1 truncate mt-0.5">
                         {item.description}
                       </p>
                     </div>
@@ -231,7 +231,7 @@ export default function CommandPalette() {
         </div>
 
         {/* Footer */}
-        <div className="border-t border-surface0 px-4 py-2 flex items-center gap-4 text-xs text-subtext0">
+        <div className="border-t border-surface0 px-4 py-2 flex items-center gap-4 text-xs text-subtext1">
           <span className="flex items-center gap-1">
             <kbd className="bg-surface0 px-1 rounded font-mono">↑↓</kbd> navegar
           </span>

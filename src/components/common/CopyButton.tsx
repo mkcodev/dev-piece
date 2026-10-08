@@ -30,10 +30,10 @@ export default function CopyButton({ text, className = '', label = 'Copiar' }: C
   return (
     <button
       onClick={handleCopy}
-      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-200 ${
+      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors duration-fast ${
         copied
-          ? 'bg-green/20 text-green border border-green/30'
-          : 'bg-surface1 text-subtext1 border border-surface2 hover:bg-surface2 hover:text-text'
+          ? 'chip chip-green border border-green/30'
+          : 'bg-crust/60 text-subtext1 border border-surface1 hover:border-lavender/50 hover:text-text'
       } ${className}`}
       aria-label={copied ? 'Copiado' : label}
       title={copied ? 'Copiado al portapapeles' : 'Copiar al portapapeles'}

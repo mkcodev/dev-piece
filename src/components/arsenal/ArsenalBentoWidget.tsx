@@ -147,13 +147,13 @@ function SmallCard({
               </div>
             ))}
             {count > 5 && (
-              <div className="w-8 h-8 rounded-[10px] bg-surface1 flex items-center justify-center text-xs text-subtext0 font-medium">
+              <div className="w-8 h-8 rounded-[10px] bg-surface1 flex items-center justify-center text-xs text-subtext1 font-medium">
                 +{count - 5}
               </div>
             )}
           </div>
         ) : (
-          <p className="text-xs text-subtext0 italic">{emptyHint}</p>
+          <p className="text-xs text-subtext1 italic">{emptyHint}</p>
         )}
       </div>
     </a>
@@ -317,13 +317,13 @@ export default function ArsenalBentoWidget() {
                   <div className="text-4xl font-black text-red tabular-nums leading-none">
                     {favs.length}
                   </div>
-                  <p className="text-xs text-subtext0 mt-1">Guardadas</p>
+                  <p className="text-xs text-subtext1 mt-1">Guardadas</p>
                 </div>
                 <div>
                   <div className="text-4xl font-black tabular-nums leading-none" style={{ color: '#e5c890' }}>
                     {ints.length}
                   </div>
-                  <p className="text-xs text-subtext0 mt-1">Integradas</p>
+                  <p className="text-xs text-subtext1 mt-1">Integradas</p>
                 </div>
               </div>
 

@@ -29,10 +29,10 @@ function removeFavorite(slug: string, category: string) {
 }
 
 const OS_BADGE: Record<string, { label: string; color: string }> = {
-  windows: { label: 'Win', color: 'bg-blue/20 text-blue border-blue/30' },
-  macos: { label: 'Mac', color: 'bg-mauve/20 text-mauve border-mauve/30' },
-  linux: { label: 'Linux', color: 'bg-peach/20 text-peach border-peach/30' },
-  cross: { label: 'Cross', color: 'bg-green/20 text-green border-green/30' },
+  windows: { label: 'Win', color: 'chip chip-blue' },
+  macos: { label: 'Mac', color: 'chip chip-mauve' },
+  linux: { label: 'Linux', color: 'chip chip-peach' },
+  cross: { label: 'Cross', color: 'chip chip-green' },
 };
 
 export default function FavoritesSection() {
@@ -63,7 +63,7 @@ export default function FavoritesSection() {
           Mis Favoritos
         </h2>
         {favorites.length > 0 && (
-          <span className="text-xs text-subtext0">{favorites.length} guardada{favorites.length !== 1 ? 's' : ''}</span>
+          <span className="text-xs text-subtext1">{favorites.length} guardada{favorites.length !== 1 ? 's' : ''}</span>
         )}
       </div>
 
@@ -72,12 +72,12 @@ export default function FavoritesSection() {
           <div className="absolute inset-0 bg-gradient-to-br from-red/5 via-transparent to-pink/5 pointer-events-none" aria-hidden="true" />
           <div className="relative">
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-surface1 flex items-center justify-center">
-              <svg className="w-7 h-7 text-subtext0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-7 h-7 text-subtext1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
               </svg>
             </div>
             <p className="font-semibold text-text mb-1">Sin favoritos aún</p>
-            <p className="text-sm text-subtext0 mb-6 max-w-xs mx-auto">
+            <p className="text-sm text-subtext1 mb-6 max-w-xs mx-auto">
               Pulsa el <span className="text-red">❤</span> en cualquier herramienta para guardarla aquí
             </p>
             <a
@@ -125,7 +125,7 @@ export default function FavoritesSection() {
                   <div className="flex items-center justify-between pt-1 border-t border-surface1/50">
                     <a
                       href={`/${tool.category}/${tool.slug}`}
-                      className="text-xs text-blue hover:text-lavender font-medium transition-colors flex items-center gap-1"
+                      className="text-xs text-lavender hover:text-text font-medium transition-colors flex items-center gap-1"
                     >
                       Ver más
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -152,7 +152,7 @@ export default function FavoritesSection() {
             <div className="mt-4 text-center">
               <button
                 onClick={() => setShowAll((v) => !v)}
-                className="text-sm text-blue hover:text-lavender transition-colors font-medium"
+                className="text-sm text-lavender hover:text-text transition-colors font-medium"
               >
                 {showAll ? 'Ver menos' : `Ver ${favorites.length - 6} más`}
               </button>

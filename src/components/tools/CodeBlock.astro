@@ -38,14 +38,14 @@ const langLabel = langLabels[lang] ?? lang.toUpperCase();
   {(label || description) && (
     <div class="mb-2">
       {label && <span class="text-sm font-medium text-text">{label}</span>}
-      {description && <p class="text-xs text-subtext0 mt-0.5">{description}</p>}
+      {description && <p class="text-xs text-subtext1 mt-0.5">{description}</p>}
     </div>
   )}
 
   <div class="relative">
     <!-- Language badge + copy button -->
     <div class="flex items-center justify-between px-4 py-2 bg-crust rounded-t-lg border border-surface0 border-b-0">
-      <span class="text-xs font-mono text-subtext0 font-medium">{langLabel}</span>
+      <span class="text-xs font-mono text-subtext1 font-medium">{langLabel}</span>
       <CopyButton client:visible text={code} label="Copiar" />
     </div>
 

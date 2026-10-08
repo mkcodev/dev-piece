@@ -31,10 +31,10 @@ const config = CATEGORY_CONFIG[category as keyof typeof CATEGORY_CONFIG];
 const accent = config?.accent ?? '#8caaee';
 
 const osBadgeConfig: Record<string, { label: string; color: string }> = {
-  windows: { label: 'Windows', color: 'bg-blue/20 text-blue border-blue/30' },
-  macos: { label: 'macOS', color: 'bg-mauve/20 text-mauve border-mauve/30' },
-  linux: { label: 'Linux', color: 'bg-peach/20 text-peach border-peach/30' },
-  cross: { label: 'Cross-platform', color: 'bg-green/20 text-green border-green/30' },
+  windows: { label: 'Windows', color: 'chip chip-blue' },
+  macos: { label: 'macOS', color: 'chip chip-mauve' },
+  linux: { label: 'Linux', color: 'chip chip-peach' },
+  cross: { label: 'Cross-platform', color: 'chip chip-green' },
 };
 
 const difficultyConfig: Record<string, { label: string; color: string }> = {
@@ -66,7 +66,7 @@ const formatDate = (d: Date) =>
 
 <BaseLayout title={data.name} description={data.description}>
   <!-- Breadcrumb -->
-  <nav class="flex items-center gap-2 text-sm text-subtext0 mb-6 stagger-in" style="--i: 0" aria-label="Ruta de navegación">
+  <nav class="flex items-center gap-2 text-sm text-subtext1 mb-6 stagger-in" style="--i: 0" aria-label="Ruta de navegación">
     <a href="/" class="hover:text-text transition-colors">Inicio</a>
     <span aria-hidden="true">/</span>
     <a href={`/${category}`} class="hover:text-text transition-colors">{config?.label}</a>
@@ -74,7 +74,7 @@ const formatDate = (d: Date) =>
     <span class="text-text" aria-current="page">{data.name}</span>
   </nav>
 
-  <div class="grid grid-cols-1 xl:grid-cols-[1fr_280px] gap-8">
+  <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_280px] gap-8">
     <!-- Main content -->
     <div>
       <!-- Hero header — morphing target from card -->
@@ -98,7 +98,7 @@ const formatDate = (d: Date) =>
                 {data.name}
               </h1>
               {data.featured && (
-                <span class="text-xs bg-blue/20 text-blue border border-blue/30 px-2 py-0.5 rounded-full font-medium">
+                <span class="text-xs chip chip-blue border border-blue/30 px-2 py-0.5 rounded-full font-medium">
                   ★ Destacado
                 </span>
               )}
@@ -123,7 +123,7 @@ const formatDate = (d: Date) =>
             </span>
           )}
           {data.tags.slice(0, 6).map((tag: string) => (
-            <span class="text-xs px-2 py-0.5 rounded-full bg-surface1 text-subtext0 border border-surface1">
+            <span class="text-xs px-2 py-0.5 rounded-full bg-crust/50 text-subtext1 border border-surface1">
               #{tag}
             </span>
           ))}
@@ -178,11 +178,11 @@ const formatDate = (d: Date) =>
                   <div>
                     <span class="text-sm font-medium text-text">{cmd.label}</span>
                     {cmd.description && (
-                      <span class="text-xs text-subtext0 ml-2">{cmd.description}</span>
+                      <span class="text-xs text-subtext1 ml-2">{cmd.description}</span>
                     )}
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="text-xs text-subtext0 font-mono">{cmd.lang}</span>
+                    <span class="text-xs text-subtext1 font-mono">{cmd.lang}</span>
                     <CopyButton client:visible text={cmd.code} label="Copiar" />
                   </div>
                 </div>
@@ -205,7 +205,7 @@ const formatDate = (d: Date) =>
           </h2>
           <div class="rounded-lg border border-surface0 overflow-hidden">
             <div class="flex items-center justify-between px-4 py-2 bg-crust border-b border-surface0">
-              <span class="text-xs font-mono text-subtext0">{data.configLang ?? 'config'}</span>
+              <span class="text-xs font-mono text-subtext1">{data.configLang ?? 'config'}</span>
               <CopyButton client:visible text={data.config} label="Copiar config" />
             </div>
             <pre class="bg-crust/50 p-4 overflow-x-auto max-h-96"><code class="text-sm text-text font-mono">{data.config}</code></pre>
@@ -214,7 +214,7 @@ const formatDate = (d: Date) =>
       )}
 
       <!-- MDX content -->
-      <div class="stagger-in prose prose-invert prose-sm max-w-none prose-headings:text-text prose-headings:font-semibold prose-p:text-subtext1 prose-p:leading-relaxed prose-a:text-blue prose-a:no-underline hover:prose-a:text-lavender prose-code:text-sky prose-code:bg-surface0 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-[''] prose-pre:bg-crust prose-pre:border prose-pre:border-surface0 prose-pre:rounded-lg prose-strong:text-text prose-strong:font-semibold prose-ul:text-subtext1 prose-ol:text-subtext1 prose-li:marker:text-lavender prose-blockquote:border-l-lavender prose-blockquote:text-subtext0 prose-hr:border-surface1 prose-th:text-text prose-td:text-subtext1" style="--i: 4">
+      <div class="stagger-in prose prose-invert prose-sm max-w-none prose-headings:text-text prose-headings:font-semibold prose-p:text-subtext1 prose-p:leading-relaxed prose-a:text-blue prose-a:no-underline hover:prose-a:text-lavender prose-code:text-sky prose-code:bg-surface0 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-[''] prose-code:after:content-[''] prose-pre:bg-crust prose-pre:border prose-pre:border-surface0 prose-pre:rounded-lg prose-strong:text-text prose-strong:font-semibold prose-ul:text-subtext1 prose-ol:text-subtext1 prose-li:marker:text-lavender prose-blockquote:border-l-lavender prose-blockquote:text-subtext1 prose-hr:border-surface1 prose-th:text-text prose-td:text-subtext1" style="--i: 4">
         <Content />
       </div>
     </div>
@@ -236,7 +236,7 @@ const formatDate = (d: Date) =>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-text font-medium text-sm leading-tight">GitHub</p>
-                  <p class="text-subtext0 text-xs">Repositorio</p>
+                  <p class="text-subtext1 text-xs">Repositorio</p>
                 </div>
                 <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -253,7 +253,7 @@ const formatDate = (d: Date) =>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-text font-medium text-sm leading-tight">Documentación oficial</p>
-                  <p class="text-subtext0 text-xs">Guías y referencia</p>
+                  <p class="text-subtext1 text-xs">Guías y referencia</p>
                 </div>
                 <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -272,7 +272,7 @@ const formatDate = (d: Date) =>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-text font-medium text-sm leading-tight">Sitio web</p>
-                  <p class="text-subtext0 text-xs">Página oficial</p>
+                  <p class="text-subtext1 text-xs">Página oficial</p>
                 </div>
                 <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -290,7 +290,7 @@ const formatDate = (d: Date) =>
                 </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-text font-medium text-sm leading-tight">Video tutorial</p>
-                  <p class="text-subtext0 text-xs">Ver en video</p>
+                  <p class="text-subtext1 text-xs">Ver en video</p>
                 </div>
                 <svg class="w-3 h-3 text-overlay0 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
@@ -306,18 +306,18 @@ const formatDate = (d: Date) =>
         <h3 class="text-sm font-semibold text-text mb-3">Información</h3>
         <dl class="space-y-2 text-xs">
           <div class="flex justify-between">
-            <dt class="text-subtext0">Categoría</dt>
+            <dt class="text-subtext1">Categoría</dt>
             <dd class="text-subtext1 font-medium">
               <a href={`/${category}`} class="hover:text-text transition-colors">{config?.label}</a>
             </dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-subtext0">Añadido</dt>
+            <dt class="text-subtext1">Añadido</dt>
             <dd class="text-subtext1">{formatDate(data.addedAt)}</dd>
           </div>
           {data.updatedAt && (
             <div class="flex justify-between">
-              <dt class="text-subtext0">Actualizado</dt>
+              <dt class="text-subtext1">Actualizado</dt>
               <dd class="text-subtext1">{formatDate(data.updatedAt)}</dd>
             </div>
           )}
@@ -337,11 +337,11 @@ const formatDate = (d: Date) =>
 
       <!-- Feedback -->
       <div class="bg-surface0 rounded-xl border border-surface1 p-4 text-center" id="feedback-widget">
-        <p class="text-xs text-subtext0 mb-3" id="feedback-question">¿Te ha sido útil?</p>
+        <p class="text-xs text-subtext1 mb-3" id="feedback-question">¿Te ha sido útil?</p>
         <div class="flex items-center justify-center gap-2" id="feedback-buttons">
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green/10 text-green border border-green/20 hover:bg-green/20 hover:border-green/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg chip chip-green border border-green/20 hover:bg-green/20 hover:border-green/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
             aria-label="Sí, me ha sido útil"
             data-feedback="yes"
           >
@@ -349,7 +349,7 @@ const formatDate = (d: Date) =>
           </button>
           <button
             type="button"
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red/10 text-red border border-red/20 hover:bg-red/20 hover:border-red/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg chip chip-red border border-red/20 hover:bg-red/20 hover:border-red/40 hover:scale-110 transition-all duration-150 text-sm font-medium"
             aria-label="No, no me ha sido útil"
             data-feedback="no"
           >
@@ -358,7 +358,7 @@ const formatDate = (d: Date) =>
         </div>
         <div id="feedback-thanks" class="hidden">
           <p class="text-sm font-semibold text-text">¡Gracias por tu feedback!</p>
-          <p class="text-xs text-subtext0 mt-0.5">Nos ayuda a mejorar DevPiece</p>
+          <p class="text-xs text-subtext1 mt-0.5">Nos ayuda a mejorar DevPiece</p>
         </div>
       </div>
 
