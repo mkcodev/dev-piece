@@ -1,0 +1,75 @@
+---
+name: LazyVim
+description: Distribución de Neovim lista para usar sobre lazy.nvim. LSP, autocompletado, formateo y fuzzy finder configurados en cinco minutos.
+category: neovim
+tags: [neovim, distribution, starter, lsp, lazy-nvim]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  manual: git clone https://github.com/LazyVim/starter ~/.config/nvim
+links:
+  repo: https://github.com/LazyVim/LazyVim
+  docs: https://www.lazyvim.org/
+  website: https://www.lazyvim.org/
+related: [neovim/lazy-nvim, neovim/telescope, neovim/conform-nvim]
+addedAt: 2026-10-08
+---
+
+## Neovim completo sin semanas de config
+
+Montar Neovim desde cero es un gran ejercicio, pero lleva tiempo. LazyVim es una configuración base mantenida por el autor de lazy.nvim: arrancas con un IDE completo y vas sobrescribiendo solo lo que quieras cambiar.
+
+## Instalación
+
+Haz copia de tu configuración actual primero:
+
+```bash
+mv ~/.config/nvim{,.bak}
+mv ~/.local/share/nvim{,.bak}
+
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+nvim
+```
+
+```powershell
+# Windows
+Move-Item $env:LOCALAPPDATA\nvim $env:LOCALAPPDATA\nvim.bak
+git clone https://github.com/LazyVim/starter $env:LOCALAPPDATA\nvim
+Remove-Item $env:LOCALAPPDATA\nvim\.git -Recurse -Force
+nvim
+```
+
+Requisitos: Neovim 0.11 o superior, git, una Nerd Font, un compilador de C (para treesitter), ripgrep y fd.
+
+## Atajos clave (leader = espacio)
+
+```
+<leader><space>  → Buscar archivos
+<leader>/        → Buscar texto en el proyecto
+<leader>e        → Explorador de archivos
+<leader>gg       → lazygit (si está instalado)
+<leader>l        → Panel de lazy.nvim
+<leader>xx       → Lista de diagnósticos (Trouble)
+gd / gr          → Ir a definición / referencias
+<leader>cf       → Formatear
+```
+
+Pulsa `<leader>` y espera: which-key muestra todos los atajos disponibles.
+
+## Extras: lenguajes con un clic
+
+`:LazyExtras` abre un menú para activar soporte completo de un lenguaje (LSP, formatter, linter, treesitter) como `lang.typescript`, `lang.python` o `lang.rust`.
+
+## Personalizar
+
+```lua
+-- ~/.config/nvim/lua/plugins/tema.lua
+return {
+  { "catppuccin/nvim", name = "catppuccin" },
+  { "LazyVim/LazyVim", opts = { colorscheme = "catppuccin-frappe" } },
+}
+```
+
+Cualquier fichero en `lua/plugins/` se fusiona con la configuración de LazyVim.

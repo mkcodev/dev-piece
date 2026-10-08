@@ -1,0 +1,60 @@
+---
+name: xh
+description: Cliente HTTP rápido y amigable escrito en Rust. Sintaxis de HTTPie, un único binario y arranque instantáneo.
+category: cli-tools
+tags: [http, api, rest, rust, curl-alternative]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install ducaale.xh
+  brew: brew install xh
+  scoop: scoop install xh
+  cargo: cargo install xh --locked
+links:
+  repo: https://github.com/ducaale/xh
+related: [cli-tools/httpie, cli-tools/jq, apis-datos/bruno]
+addedAt: 2026-10-08
+---
+
+## HTTPie, pero en Rust
+
+xh reimplementa la sintaxis de HTTPie en un único binario sin dependencias. El resultado: la misma ergonomía (JSON por defecto, colores, cabeceras legibles) con un arranque casi instantáneo y sin necesitar Python instalado.
+
+## Sintaxis básica
+
+```bash
+# GET (el método se deduce)
+xh httpbin.org/json
+
+# POST con cuerpo JSON: clave=valor (string) y clave:=valor (JSON crudo)
+xh post httpbin.org/post name=Ada age:=36 admin:=true
+
+# Cabeceras con Nombre:valor y query params con ==
+xh get api.github.com/search/repositories q==ripgrep Accept:application/json
+
+# Autenticación bearer
+xh -A bearer -a "$TOKEN" api.example.com/me
+```
+
+## Trucos útiles
+
+```bash
+# Solo el cuerpo, perfecto para encadenar con jq
+xh -b api.github.com/repos/ducaale/xh | jq .stargazers_count
+
+# Ver la petición que se enviaría sin enviarla
+xh --offline post example.com/api name=test
+
+# Convertir la petición a un comando curl equivalente
+xh --curl post example.com/api name=test
+
+# Descargar un fichero con barra de progreso
+xh -d https://example.com/archivo.zip
+
+# localhost abreviado
+xh :3000/api/health
+```
+
+## ¿xh o HTTPie?
+
+Si ya usas HTTPie, xh es un reemplazo casi directo y mucho más rápido en scripts. HTTPie sigue teniendo más plugins y una app de escritorio; para la terminal, xh suele ganar.

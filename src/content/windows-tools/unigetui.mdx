@@ -1,0 +1,37 @@
+---
+name: UniGetUI
+description: Interfaz gráfica para winget, Scoop, Chocolatey, npm, pip y más. Busca, instala y actualiza todo tu software desde una sola ventana.
+category: windows-tools
+tags: [windows, package-manager, gui, updates, winget]
+os: [windows]
+difficulty: beginner
+install:
+  winget: winget install Devolutions.UniGetUI
+  scoop: scoop bucket add extras; scoop install extras/unigetui
+links:
+  repo: https://github.com/Devolutions/UniGetUI
+  website: https://www.marticliment.com/unigetui/
+related: [windows-tools/scoop, windows-tools/winget-tips, windows-tools/powertoys]
+addedAt: 2026-10-08
+---
+
+## Todos tus gestores en una app
+
+UniGetUI (antes WingetUI) une los gestores de paquetes de Windows en una interfaz: winget, Scoop, Chocolatey, pip, npm, .NET Tool, PowerShell Gallery y Cargo. Busca en todos a la vez, instala con un clic y te avisa cuando hay actualizaciones.
+
+## Lo más útil
+
+- **Actualizaciones en bloque:** la pestaña de actualizaciones lista todo lo desactualizado, venga del gestor que venga, y lo actualiza de una vez.
+- **Ignorar versiones:** fija un programa en una versión concreta para que no se actualice.
+- **Notificaciones:** se queda en la bandeja del sistema y avisa de nuevas versiones.
+- **Instalación desatendida:** opciones por paquete (ámbito de usuario o máquina, arquitectura, argumentos extra).
+
+## Bundles: tu setup en un fichero
+
+Selecciona tus programas y expórtalos como bundle (`.ubundle`). En un PC nuevo, importas el bundle e instalas todo de una vez, mezclando gestores sin problema.
+
+## ¿Y si prefiero la terminal?
+
+UniGetUI es solo una interfaz: todo lo que hace se puede hacer con `winget` o `scoop`. Es ideal para mantener el equipo al día de un vistazo y para quien no quiere recordar el gestor de cada programa.
+
+El proyecto lo creó Martí Climent y hoy se publica bajo el paraguas de Devolutions.

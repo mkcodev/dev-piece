@@ -1,0 +1,45 @@
+---
+name: crontab.guru
+description: Editor de expresiones cron que traduce cada línea a lenguaje humano al instante y te dice cuándo será la próxima ejecución.
+category: web-resources
+tags: [cron, scheduling, devops, reference, linux]
+os: [cross]
+difficulty: beginner
+links:
+  website: https://crontab.guru/
+related: [web-resources/it-tools, web-resources/regex101, git-hacks/act]
+addedAt: 2026-10-08
+---
+
+Nadie recuerda el orden de los cinco campos de cron. crontab.guru te deja escribir la expresión y la traduce al momento ("A las 04:05 los domingos"), resaltando el campo que estás editando y marcando los errores.
+
+## Los cinco campos
+
+```
+┌──────── minuto        (0-59)
+│ ┌────── hora          (0-23)
+│ │ ┌──── día del mes   (1-31)
+│ │ │ ┌── mes           (1-12)
+│ │ │ │ ┌ día semana    (0-6, 0 = domingo)
+│ │ │ │ │
+* * * * *  comando
+```
+
+## Expresiones que se usan siempre
+
+```
+*/5 * * * *     → cada 5 minutos
+0 * * * *       → cada hora en punto
+0 3 * * *       → todos los días a las 03:00
+0 9 * * 1-5     → de lunes a viernes a las 09:00
+0 0 1 * *       → el día 1 de cada mes
+30 2 * * 0      → los domingos a las 02:30
+```
+
+## Atajos en la URL
+
+Puedes enlazar directamente a una expresión, con los espacios como guiones bajos: `crontab.guru/#0_9_*_*_1-5`. Útil para pegar en una revisión de código o en la descripción de un PR.
+
+## Ojo con las zonas horarias
+
+cron usa la hora del servidor, y GitHub Actions (`on: schedule`) usa siempre UTC. Comprueba la diferencia con tu hora local antes de programar algo a "las 9".

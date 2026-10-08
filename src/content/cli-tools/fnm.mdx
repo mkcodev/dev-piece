@@ -1,0 +1,54 @@
+---
+name: fnm
+description: Fast Node Manager. Cambia de versión de Node al entrar en cada proyecto leyendo .nvmrc o .node-version. Rápido y multiplataforma.
+category: cli-tools
+tags: [nodejs, version-manager, rust, nvm-alternative]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install Schniz.fnm
+  brew: brew install fnm
+  scoop: scoop install fnm
+  cargo: cargo install fnm
+links:
+  repo: https://github.com/Schniz/fnm
+related: [cli-tools/mise, cli-tools/bun, cli-tools/uv]
+addedAt: 2026-10-08
+---
+
+## nvm sin la lentitud
+
+nvm es un script de bash enorme que ralentiza cada shell que abres y no funciona en Windows. fnm hace lo mismo en Rust: arranca en milisegundos y funciona igual en PowerShell, bash, zsh y fish.
+
+## Activarlo en tu shell
+
+```bash
+# bash / zsh (~/.bashrc o ~/.zshrc)
+eval "$(fnm env --use-on-cd --shell bash)"
+
+# fish (~/.config/fish/config.fish)
+fnm env --use-on-cd --shell fish | source
+```
+
+```powershell
+# PowerShell ($PROFILE)
+fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
+```
+
+`--use-on-cd` es la clave: al hacer `cd` a una carpeta con `.nvmrc` o `.node-version`, cambia de versión solo.
+
+## Comandos
+
+```bash
+fnm install --lts           # Última LTS
+fnm install 22              # Última 22.x
+fnm use 22
+fnm default 22              # Versión por defecto en shells nuevas
+fnm list                    # Instaladas
+fnm list-remote             # Disponibles
+echo "22" > .node-version   # Fijar la versión del proyecto
+```
+
+## ¿fnm o mise?
+
+fnm hace una cosa (Node) y la hace muy bien. Si además gestionas Python, Go o Java, mise lo cubre todo con un solo fichero de configuración.

@@ -1,0 +1,57 @@
+---
+name: sd
+description: Buscar y reemplazar intuitivo, alternativa a sed. Regex como en JavaScript o Python, sin escapar barras ni recordar flags.
+category: cli-tools
+tags: [text, regex, sed-alternative, rust, refactor]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install chmln.sd
+  brew: brew install sd
+  scoop: scoop install sd
+  cargo: cargo install sd
+links:
+  repo: https://github.com/chmln/sd
+related: [cli-tools/ripgrep, cli-tools/fd, cli-tools/jq]
+addedAt: 2026-10-08
+---
+
+## sed sin dolor
+
+`sed 's/\/usr\/local/\/opt/g'` es ilegible y además se comporta distinto en GNU y en BSD (macOS). sd usa la sintaxis de regex de siempre, separa patrón y reemplazo en dos argumentos y no necesita escapar nada.
+
+## Uso básico
+
+```bash
+# Reemplazar en un fichero (in-place por defecto)
+sd 'devvault' 'devpiece' README.md
+
+# Desde stdin
+echo "hola mundo" | sd mundo amigos
+
+# Literal, sin regex
+sd -F '$(pwd)' '$PWD' script.sh
+
+# Previsualizar sin escribir
+sd -p 'foo' 'bar' src/app.ts
+```
+
+## Grupos de captura
+
+```bash
+# Invertir "apellido, nombre"
+echo "Lovelace, Ada" | sd '(\w+), (\w+)' '$2 $1'
+
+# Grupos con nombre
+sd '(?P<key>\w+)=(?P<val>\w+)' '$key: $val' config.ini
+```
+
+## Combinado con fd o ripgrep
+
+```bash
+# Renombrar una función en todo el proyecto
+rg -l oldName src | xargs sd oldName newName
+
+# Solo en ficheros TypeScript
+fd -e ts -x sd 'console\.log' 'logger.debug' {}
+```

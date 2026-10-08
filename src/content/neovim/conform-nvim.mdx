@@ -1,0 +1,55 @@
+---
+name: conform.nvim
+description: Formateo de código ligero y fiable para Neovim. Un formatter por tipo de fichero, formateo al guardar y cambios aplicados sin mover el cursor.
+category: neovim
+tags: [neovim, formatting, prettier, plugin, lsp]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  manual: Via lazy.nvim
+links:
+  repo: https://github.com/stevearc/conform.nvim
+related: [neovim/lazyvim, vscode/prettier, neovim/lsp-zero]
+addedAt: 2026-10-08
+---
+
+## Formatear bien, sin pelear con el LSP
+
+El formateo vía LSP suele ser irregular: no todos los servidores formatean, y los que lo hacen a veces reescriben el buffer entero y mueven el cursor. conform.nvim llama directamente a formatters CLI (prettier, stylua, ruff, gofmt...) y aplica solo las diferencias.
+
+## Configuración con lazy.nvim
+
+```lua
+return {
+  "stevearc/conform.nvim",
+  event = "BufWritePre",
+  cmd = "ConformInfo",
+  opts = {
+    formatters_by_ft = {
+      lua = { "stylua" },
+      python = { "ruff_format" },
+      javascript = { "prettierd", "prettier", stop_after_first = true },
+      typescript = { "prettierd", "prettier", stop_after_first = true },
+      go = { "goimports", "gofmt" },
+      ["*"] = { "trim_whitespace" },
+    },
+    format_on_save = {
+      timeout_ms = 500,
+      lsp_format = "fallback",
+    },
+  },
+}
+```
+
+- Una lista ejecuta varios formatters en orden.
+- `stop_after_first` usa el primero que esté instalado.
+- `lsp_format = "fallback"` recurre al LSP si no hay formatter para ese tipo.
+
+## Comandos
+
+```vim
+:ConformInfo           " Qué formatters se aplican y si están instalados
+:lua require("conform").format()
+```
+
+Los formatters tienen que estar en el PATH. Con mason.nvim puedes instalarlos desde Neovim (`:MasonInstall prettierd stylua`).

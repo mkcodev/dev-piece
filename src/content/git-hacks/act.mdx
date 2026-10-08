@@ -1,0 +1,53 @@
+---
+name: act
+description: Ejecuta tus workflows de GitHub Actions en local con Docker. Prueba el CI antes de hacer push y deja de encadenar commits de "fix ci".
+category: git-hacks
+tags: [github-actions, ci, docker, testing, workflow]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install nektos.act
+  brew: brew install act
+  scoop: scoop install act
+  manual: gh extension install nektos/gh-act
+links:
+  repo: https://github.com/nektos/act
+  docs: https://nektosact.com/
+related: [cli-tools/gh, git-hacks/lefthook, docker/podman]
+addedAt: 2026-10-08
+---
+
+## Adiós a los commits "fix ci"
+
+Cada cambio en `.github/workflows/` suele acabar en una ristra de pushes para ver si el CI pasa. act lee tus workflows y ejecuta cada job dentro de un contenedor Docker que imita a los runners de GitHub, en tu máquina y en segundos.
+
+Necesita Docker (o Podman con el socket compatible) en marcha.
+
+## Uso
+
+```bash
+act                     # Simula un evento push
+act pull_request        # Simula un PR
+act -l                  # Lista jobs y eventos que los disparan
+act -j build            # Solo un job concreto
+act -W .github/workflows/ci.yml
+act -n                  # Dry run: muestra qué haría
+```
+
+La primera vez pregunta qué tamaño de imagen usar. **Medium** es el equilibrio habitual; **Large** es casi idéntica a GitHub pero pesa decenas de GB.
+
+## Secrets y variables
+
+```bash
+# Uno a uno
+act -s GITHUB_TOKEN="$(gh auth token)"
+
+# Desde ficheros (no los subas al repo)
+act --secret-file .secrets --var-file .vars
+```
+
+## Limitaciones a tener en cuenta
+
+- Corre en contenedores Linux: los jobs `runs-on: windows-latest` o `macos-latest` no se emulan.
+- Algunas acciones que dependen de servicios de GitHub (caché, artefactos) se comportan distinto.
+- Puedes saltarte pasos solo en local con `if: ${{ !env.ACT }}`.

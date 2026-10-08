@@ -1,0 +1,67 @@
+---
+name: just
+description: Un ejecutor de comandos de proyecto. Como make, pero sin sus rarezas, con recetas que aceptan argumentos, carga de .env y soporte multiplataforma.
+category: cli-tools
+tags: [task-runner, make, automation, rust, build]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install Casey.Just
+  brew: brew install just
+  scoop: scoop install just
+  cargo: cargo install just --locked
+links:
+  repo: https://github.com/casey/just
+  docs: https://just.systems/man/en/
+related: [snippets/makefile-patterns, git-hacks/lefthook, cli-tools/gum]
+addedAt: 2026-10-08
+---
+
+## make para comandos, no para compilar
+
+`make` es un sistema de builds que la gente usa como lanzador de comandos, con todas sus trampas (tabs obligatorios, `.PHONY`, variables raras). `just` está diseñado solo para eso: guardar los comandos de tu proyecto en un `justfile` y ejecutarlos con `just <receta>`.
+
+## Un justfile típico
+
+```just
+# Cargar variables de .env automáticamente
+set dotenv-load
+
+# Receta por defecto: listar las disponibles
+default:
+    @just --list
+
+# Instalar dependencias
+install:
+    pnpm install
+
+# Servidor de desarrollo (depende de install)
+dev: install
+    pnpm dev
+
+# Recetas con argumentos (y valor por defecto)
+deploy env="staging":
+    echo "Desplegando en {{env}}"
+    ./scripts/deploy.sh {{env}}
+
+# Recetas en otro lenguaje con shebang
+stats:
+    #!/usr/bin/env python3
+    import os
+    print(len(os.listdir("src")))
+```
+
+## Uso
+
+```bash
+just            # Ejecuta la receta por defecto
+just --list     # Lista recetas con sus comentarios
+just deploy prod
+just --choose   # Selector interactivo (usa fzf)
+```
+
+## Por qué gusta
+
+- Los errores dicen exactamente qué receta y línea fallaron.
+- Funciona en Windows: por defecto usa `sh` (Git Bash) o puedes fijar `set windows-shell := ["pwsh", "-c"]`.
+- Busca el `justfile` en directorios padre, así que funciona desde cualquier subcarpeta.

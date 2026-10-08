@@ -1,0 +1,59 @@
+---
+name: oil.nvim
+description: Edita el sistema de archivos como si fuera un buffer. Renombra, mueve y borra ficheros editando texto y guardando con :w.
+category: neovim
+tags: [neovim, file-explorer, file-management, plugin]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  manual: Via lazy.nvim
+links:
+  repo: https://github.com/stevearc/oil.nvim
+related: [neovim/telescope, neovim/harpoon, neovim/mini-nvim]
+addedAt: 2026-10-08
+---
+
+## Un directorio es un buffer
+
+oil.nvim abre una carpeta como un buffer de texto normal: una línea por fichero. Para renombrar, editas el nombre. Para borrar, borras la línea. Para mover, cortas y pegas en otra carpeta. Al guardar con `:w`, oil te enseña los cambios y los aplica.
+
+Todo lo que ya sabes de Vim (macros, `:s`, modo visual, `.`) sirve para gestionar ficheros.
+
+## Instalación con lazy.nvim
+
+```lua
+return {
+  "stevearc/oil.nvim",
+  dependencies = { "nvim-tree/nvim-web-devicons" },
+  lazy = false,
+  opts = {
+    view_options = { show_hidden = true },
+    skip_confirm_for_simple_edits = true,
+  },
+  keys = {
+    { "-", "<cmd>Oil<cr>", desc = "Abrir directorio padre" },
+  },
+}
+```
+
+## Uso
+
+```
+-        → Abrir el directorio del fichero actual (y subir un nivel)
+Enter    → Entrar en carpeta o abrir fichero
+g?       → Ayuda con todos los atajos
+g.       → Mostrar u ocultar ficheros ocultos
+Ctrl+p   → Previsualizar
+:w       → Aplicar los cambios
+```
+
+## Renombrar en bloque
+
+Abre una carpeta, selecciona las líneas y aplica una sustitución:
+
+```vim
+:%s/\.jsx$/.tsx/
+:w
+```
+
+Diez ficheros renombrados en dos comandos.

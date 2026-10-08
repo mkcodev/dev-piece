@@ -1,0 +1,44 @@
+---
+name: tokei
+description: Cuenta líneas de código por lenguaje en segundos, separando código, comentarios y líneas en blanco. Ideal para medir un repo.
+category: cli-tools
+tags: [statistics, code-analysis, rust, loc]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install XAMPPRocky.Tokei
+  brew: brew install tokei
+  scoop: scoop install tokei
+  cargo: cargo install tokei
+links:
+  repo: https://github.com/XAMPPRocky/tokei
+related: [cli-tools/hyperfine, cli-tools/ripgrep, cli-tools/dust]
+addedAt: 2026-10-08
+---
+
+## ¿Cuánto código hay aquí?
+
+tokei recorre un proyecto, respeta `.gitignore` y te da una tabla por lenguaje: ficheros, líneas totales, código, comentarios y blancos. Reconoce más de 200 lenguajes y es lo bastante rápido para repos enormes.
+
+## Uso
+
+```bash
+tokei                      # Proyecto actual
+tokei src/                 # Solo una carpeta
+tokei --exclude "*.min.js" --exclude dist
+tokei --sort code          # Ordenar por líneas de código
+tokei --files              # Desglose por fichero
+tokei --types TypeScript,Rust
+```
+
+## Salida para scripts
+
+```bash
+tokei --output json | jq '.TypeScript.code'
+```
+
+## Casos de uso
+
+- Hacerte una idea del tamaño de un repo antes de contribuir.
+- Ver la proporción de tests frente a código.
+- Incluir estadísticas en un README o en un informe.

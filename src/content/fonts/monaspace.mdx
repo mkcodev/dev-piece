@@ -1,0 +1,57 @@
+---
+name: Monaspace
+description: Superfamilia de cinco fuentes monoespaciadas de GitHub Next, compatibles entre sí, con texture healing y ligaduras de código.
+category: fonts
+tags: [font, monospace, ligatures, github, variable-font]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  brew: brew install --cask font-monaspace
+  scoop: scoop bucket add nerd-fonts; scoop install nerd-fonts/Monaspace
+  manual: https://github.com/githubnext/monaspace/releases
+links:
+  repo: https://github.com/githubnext/monaspace
+  website: https://monaspace.githubnext.com/
+related: [fonts/jetbrains-mono, fonts/maple-mono, fonts/nerd-fonts]
+addedAt: 2026-10-08
+---
+
+## Cinco voces, una métrica
+
+Monaspace son cinco familias con exactamente las mismas medidas, así que puedes mezclarlas en el mismo editor sin que nada se descuadre:
+
+```
+Neon      → neogrotesca, limpia y moderna
+Argon     → humanista, más cálida
+Xenon     → con remates (slab serif)
+Radon     → manuscrita, para comentarios
+Krypton   → mecánica, técnica
+```
+
+Un uso popular: Neon para el código y Radon en cursiva para los comentarios.
+
+## Texture healing
+
+En una fuente monoespaciada, la "m" se aprieta y la "i" sobra espacio. Monaspace ajusta el ancho de las letras según sus vecinas (sin romper la rejilla), lo que da una textura de texto más uniforme.
+
+## VS Code
+
+```jsonc
+// settings.json
+{
+  "editor.fontFamily": "'Monaspace Neon', monospace",
+  "editor.fontLigatures": "'calt', 'liga', 'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'ss07', 'ss08', 'ss09'",
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment",
+        "settings": { "fontStyle": "italic" }
+      }
+    ]
+  }
+}
+```
+
+`calt` activa el texture healing y los `ss0X` son grupos de ligaduras opcionales (flechas, comparadores, etc.).
+
+Hay versiones con iconos Nerd Font (Monaspice) en el proyecto Nerd Fonts.

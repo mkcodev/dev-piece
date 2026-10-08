@@ -1,0 +1,61 @@
+---
+name: Gemini CLI
+description: El agente open source de Google para la terminal. Usa los modelos Gemini con un contexto enorme, herramientas MCP y un plan gratuito generoso.
+category: ai-tools
+tags: [ai, agent, cli, google, gemini, mcp]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  brew: brew install gemini-cli
+  npm: npm install -g @google/gemini-cli
+  manual: npx @google/gemini-cli
+links:
+  repo: https://github.com/google-gemini/gemini-cli
+  docs: https://geminicli.com/docs/
+related: [ai-tools/claude-code, ai-tools/codex-cli, ai-tools/ollama]
+addedAt: 2026-10-08
+---
+
+## Gemini en la terminal
+
+Gemini CLI es un agente que lee y edita ficheros, ejecuta comandos, busca en la web y se conecta a servidores MCP. Su punto fuerte es la ventana de contexto muy grande de los modelos Gemini, útil para preguntar sobre repos enteros, y que con una cuenta de Google personal tiene un nivel gratuito.
+
+## Primeros pasos
+
+```bash
+gemini                       # Sesión interactiva (pide login la primera vez)
+gemini -p "resume los cambios del último commit"   # Modo no interactivo
+```
+
+## Referenciar ficheros y comandos
+
+```
+@src/lib/utils.ts explica esta función
+@docs/ resume esta carpeta
+!git status                  → ejecuta un comando de shell
+/tools                       → herramientas disponibles
+/mcp                         → servidores MCP conectados
+/memory show                 → contexto cargado desde GEMINI.md
+```
+
+## GEMINI.md
+
+Como `CLAUDE.md` o `AGENTS.md`: un fichero `GEMINI.md` en el proyecto (o en `~/.gemini/`) con instrucciones persistentes que el agente carga en cada sesión.
+
+## Servidores MCP
+
+```json
+// ~/.gemini/settings.json
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    }
+  }
+}
+```
+
+## Sandbox
+
+`gemini --sandbox` ejecuta las herramientas dentro de un contenedor (Docker o Podman), útil cuando dejas que el agente lance comandos sin supervisión.

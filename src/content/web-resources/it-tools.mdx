@@ -1,0 +1,43 @@
+---
+name: IT-Tools
+description: Navaja suiza online con más de 80 utilidades para devs. Codificadores, generadores de UUID, JWT, cron, hashes y conversores, todo en el navegador.
+category: web-resources
+tags: [utilities, converter, encoder, jwt, self-hosted, open-source]
+os: [cross]
+featured: true
+difficulty: beginner
+install:
+  manual: docker run -d --name it-tools -p 8080:80 corentinth/it-tools:latest
+links:
+  repo: https://github.com/CorentinTh/it-tools
+  website: https://it-tools.tech/
+related: [web-resources/regex101, web-resources/crontab-guru, web-resources/devdocs]
+addedAt: 2026-10-08
+---
+
+IT-Tools reúne en una sola web las pequeñas utilidades que normalmente buscas en Google una por una: cada herramienta se ejecuta en tu navegador, sin anuncios y sin enviar datos a un servidor.
+
+## Las más útiles
+
+```
+Crypto      → Hash (MD5, SHA…), bcrypt, generador de tokens, UUID/ULID
+Conversores → JSON ↔ YAML ↔ TOML, Base64, fechas y timestamps, colores, bases numéricas
+Web         → Decodificador de JWT, URL encode, parser de User-Agent, códigos HTTP
+Red         → Calculadora de subredes IPv4, generador de MAC
+Texto       → Diff de textos, contador, conversor de mayúsculas, Lorem ipsum
+Dev         → Generador de crontab, formateador SQL, chmod calculator, Docker run → Compose
+```
+
+## Autoalojado
+
+Al ser una web estática, puedes tenerla en tu propia máquina o red interna (útil cuando trabajas con datos que no deberían salir de la empresa):
+
+```bash
+docker run -d --name it-tools --restart unless-stopped -p 8080:80 corentinth/it-tools:latest
+```
+
+Y abre `http://localhost:8080`.
+
+## Truco
+
+Marca como favoritas las herramientas que más uses: aparecen arriba del todo en la página de inicio. La barra de búsqueda (atajo `Ctrl+K`) encuentra cualquier herramienta por nombre.

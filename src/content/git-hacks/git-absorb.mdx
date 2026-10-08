@@ -1,0 +1,54 @@
+---
+name: git-absorb
+description: git commit --fixup automático. Reparte tus cambios en stage entre los commits que tocaron esas líneas, listos para un autosquash.
+category: git-hacks
+tags: [git, fixup, rebase, history, rust]
+os: [windows, macos, linux]
+difficulty: advanced
+install:
+  winget: winget install tummychow.git-absorb
+  brew: brew install git-absorb
+  scoop: scoop install git-absorb
+  cargo: cargo install git-absorb
+links:
+  repo: https://github.com/tummychow/git-absorb
+related: [git-hacks/git-reflog, cli-tools/lazygit, git-hacks/git-bisect]
+addedAt: 2026-10-08
+---
+
+## El problema
+
+Tienes una rama con cinco commits y la revisión del PR pide pequeños cambios que afectan a tres de ellos. Lo limpio es crear un `--fixup` para cada commit afectado y hacer un rebase con autosquash, pero buscar a mano qué commit tocó cada línea es tedioso.
+
+## La solución
+
+```bash
+# 1. Haz los cambios y añádelos al stage
+git add -A
+
+# 2. git-absorb crea los commits fixup! apuntando al commit correcto
+git absorb
+
+# 3. Aplica los fixups
+git rebase -i --autosquash main
+```
+
+O todo de una vez:
+
+```bash
+git absorb --and-rebase
+```
+
+## Cómo decide
+
+Para cada trozo en stage, git-absorb busca el commit más reciente de la rama que modificó esas mismas líneas y con el que el cambio conmuta sin conflictos. Si un trozo no encaja claramente con ninguno, lo deja en stage para que decidas tú.
+
+## Opciones útiles
+
+```bash
+git absorb --dry-run          # Ver qué haría sin crear commits
+git absorb --base main        # Limitar la búsqueda a commits desde main
+git absorb --force-author     # Incluir commits de otros autores
+```
+
+**Red de seguridad:** si algo sale mal, `git reset --soft PRE_ABSORB_HEAD` deshace la operación.

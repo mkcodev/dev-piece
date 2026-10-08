@@ -1,0 +1,57 @@
+---
+name: Codex CLI
+description: El agente de programación de OpenAI para la terminal. Lee tu repo, edita ficheros y ejecuta comandos dentro de un sandbox con aprobación.
+category: ai-tools
+tags: [ai, agent, cli, openai, coding-assistant]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install OpenAI.Codex
+  brew: brew install --cask codex
+  npm: npm install -g @openai/codex
+links:
+  repo: https://github.com/openai/codex
+  docs: https://developers.openai.com/codex/cli
+related: [ai-tools/claude-code, ai-tools/gemini-cli, ai-tools/aider]
+addedAt: 2026-10-08
+---
+
+## Un agente en tu terminal
+
+Codex CLI es el agente de código open source de OpenAI. Le describes una tarea en lenguaje natural y él explora el repositorio, propone cambios, edita ficheros y ejecuta tests, pidiéndote permiso según el modo que elijas.
+
+## Primeros pasos
+
+```bash
+codex                 # Sesión interactiva en el directorio actual
+codex login           # Iniciar sesión con tu cuenta de ChatGPT o una API key
+codex "explica la arquitectura de este repo"
+```
+
+## Modos de aprobación
+
+Controlan cuánta autonomía tiene el agente:
+
+```bash
+codex --sandbox read-only            # Solo lee, propone cambios
+codex --full-auto                    # Edita y ejecuta dentro del workspace con sandbox
+codex --ask-for-approval on-request  # Pide permiso cuando lo considera necesario
+```
+
+Dentro de la sesión, `/approvals` cambia el modo y `/model` el modelo.
+
+## Uso no interactivo
+
+```bash
+# Ideal para scripts y CI
+codex exec "actualiza las dependencias y arregla los tests que fallen"
+```
+
+## AGENTS.md
+
+Codex lee un fichero `AGENTS.md` en la raíz del repo con instrucciones del proyecto: cómo se ejecutan los tests, convenciones de estilo, carpetas que no tocar. Es el equivalente al `CLAUDE.md` de Claude Code y vale la pena mantenerlo corto y concreto.
+
+## Consejos
+
+- Trabaja en una rama limpia para revisar el diff con `git diff` antes de aceptar.
+- Pide tareas acotadas ("añade validación al endpoint X") mejor que objetivos vagos.
