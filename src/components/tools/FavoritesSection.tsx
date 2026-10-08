@@ -11,7 +11,7 @@ interface FavoriteTool {
   difficulty?: string;
 }
 
-const STORAGE_KEY = 'devvault-favorites';
+const STORAGE_KEY = 'devpiece-favorites';
 
 function loadFavorites(): FavoriteTool[] {
   try {

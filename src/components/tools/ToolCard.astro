@@ -215,7 +215,7 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
 
 <script>
   /* ---- Favorites ---- */
-  const FAV_KEY = 'devvault-favorites';
+  const FAV_KEY = 'devpiece-favorites';
 
   function getFavs(): Array<Record<string, unknown>> {
     try { return JSON.parse(localStorage.getItem(FAV_KEY) ?? '[]'); } catch { return []; }
@@ -274,7 +274,7 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
   document.addEventListener('astro:page-load', initFavBtns);
 
   /* ---- Integrations ---- */
-  const INT_KEY = 'devvault-integrations';
+  const INT_KEY = 'devpiece-integrations';
 
   function getInts(): Array<Record<string, unknown>> {
     try { return JSON.parse(localStorage.getItem(INT_KEY) ?? '[]'); } catch { return []; }
@@ -328,7 +328,7 @@ const simpleIconSlug = SLUG_ICONS[slug] ?? CATEGORY_ICONS[category];
   document.addEventListener('astro:page-load', initIntBtns);
 
   /* ---- Alternatives ---- */
-  const ALT_KEY = 'devvault-alternatives';
+  const ALT_KEY = 'devpiece-alternatives';
 
   function getAlts(): Array<Record<string, unknown>> {
     try { return JSON.parse(localStorage.getItem(ALT_KEY) ?? '[]'); } catch { return []; }

@@ -22,7 +22,7 @@ const {
   canonical,
 } = Astro.props;
 
-const siteUrl = 'https://devvault.dev';
+const siteUrl = 'https://devpiece.vercel.app';
 const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
 ---
 
@@ -43,13 +43,13 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
     <!-- OpenGraph -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:title" content={`${title} | DevVault`} />
+    <meta property="og:title" content={`${title} | DevPiece`} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={`${siteUrl}${ogImage}`} />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={`${title} | DevVault`} />
+    <meta name="twitter:title" content={`${title} | DevPiece`} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${siteUrl}${ogImage}`} />
 
@@ -60,10 +60,24 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
     <script type="application/ld+json" set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'DevVault',
+      name: 'DevPiece',
       url: siteUrl,
       description: 'El hub definitivo de productividad para desarrolladores',
     })} />
+
+    <!-- Migrate localStorage keys from the old DevVault name (runs before islands hydrate) -->
+    <script is:inline>
+      try {
+        for (const oldKey of Object.keys(localStorage)) {
+          if (!oldKey.startsWith('devvault-')) continue;
+          const newKey = 'devpiece-' + oldKey.slice('devvault-'.length);
+          if (localStorage.getItem(newKey) === null) {
+            localStorage.setItem(newKey, localStorage.getItem(oldKey));
+          }
+          localStorage.removeItem(oldKey);
+        }
+      } catch {}
+    </script>
   </head>
   <body class="min-h-screen bg-base text-text">
     <!-- Transition manager + progress bar -->

@@ -22,8 +22,8 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 interface StoredTool { slug: string; category: string; name: string; accent: string; }
 
-const FAV_KEY  = 'devvault-favorites';
-const INT_KEY  = 'devvault-integrations';
+const FAV_KEY  = 'devpiece-favorites';
+const INT_KEY  = 'devpiece-integrations';
 
 function load(key: string): StoredTool[] {
   try { return JSON.parse(localStorage.getItem(key) ?? '[]'); } catch { return []; }

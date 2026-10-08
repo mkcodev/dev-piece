@@ -35,10 +35,10 @@ interface Props {
 type Tab = 'favoritos' | 'integraciones' | 'core';
 
 /* ── Storage ─────────────────────────────────────────────────────────── */
-const FAV_KEY       = 'devvault-favorites';
-const INT_KEY       = 'devvault-integrations';
-const PROFILES_KEY  = 'devvault-profiles';
-const PROFILE_CUR   = 'devvault-current-profile';
+const FAV_KEY       = 'devpiece-favorites';
+const INT_KEY       = 'devpiece-integrations';
+const PROFILES_KEY  = 'devpiece-profiles';
+const PROFILE_CUR   = 'devpiece-current-profile';
 
 function load(key: string): StoredTool[] {
   try { return JSON.parse(localStorage.getItem(key) ?? '[]'); } catch { return []; }
@@ -801,7 +801,7 @@ export default function ArsenalPage({ categoryCounts, categoryLabels, categoryAc
   /* Username */
   const username = useMemo(() => {
     try {
-      const u = JSON.parse(localStorage.getItem('devvault-user') ?? 'null');
+      const u = JSON.parse(localStorage.getItem('devpiece-user') ?? 'null');
       return u?.name ?? null;
     } catch { return null; }
   }, [mounted]);

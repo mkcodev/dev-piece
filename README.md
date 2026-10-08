@@ -30,7 +30,7 @@
 
 <br/>
 
-**[🌐 devvault.dev](https://devvault.dev)** &nbsp;·&nbsp; Creado por **[@mkcodev](https://github.com/mkcodev)**
+**[🌐 devpiece.vercel.app](https://devpiece.vercel.app)** &nbsp;·&nbsp; Creado por **[@mkcodev](https://github.com/mkcodev)**
 
 </div>
 
@@ -142,8 +142,8 @@ El Arsenal tiene tres tabs:
 
 | Tab | Descripción | Storage key |
 |:---|:---|:---|
-| **Favoritos** | Tools que te gustan o quieres explorar | `devvault-favorites` |
-| **Integraciones** | Tools que usas activamente en tu día a día | `devvault-integrations` |
+| **Favoritos** | Tools que te gustan o quieres explorar | `devpiece-favorites` |
+| **Integraciones** | Tools que usas activamente en tu día a día | `devpiece-integrations` |
 | **Core Setup** | Tools presentes en ambas listas — tu stack real | calculado en runtime |
 
 Además puedes:
@@ -468,17 +468,17 @@ Usuario visita DevPiece
         │                    └──▶  Fuse.js fuzzy search en cliente
         │
         ├──▶  Tool Card ─── "Añadir a Arsenal" ──────────────────────────────▶
-        │          └──▶  localStorage['devvault-favorites']
-        │          └──▶  localStorage['devvault-integrations']
-        │          └──▶  localStorage['devvault-alternatives']
+        │          └──▶  localStorage['devpiece-favorites']
+        │          └──▶  localStorage['devpiece-integrations']
+        │          └──▶  localStorage['devpiece-alternatives']
         │
         ├──▶  GuideIsland ─── checkbox click ───────────────────────────────▶
-        │          └──▶  localStorage['devvault-guide-steps-{slug}']
-        │          └──▶  localStorage['devvault-guides-favorites']
+        │          └──▶  localStorage['devpiece-guide-steps-{slug}']
+        │          └──▶  localStorage['devpiece-guides-favorites']
         │
         └──▶  ArsenalPage ─── calcular Arsenal Power ───────────────────────▶
                    └──▶  (favoritos.length + integraciones.length) / totalTools × 100
-                   └──▶  localStorage['devvault-profiles']
+                   └──▶  localStorage['devpiece-profiles']
 ```
 
 **Sin servidor. Sin base de datos. Sin cookies. Sin analytics. Sin tracking.**
