@@ -1,0 +1,76 @@
+---
+name: uv
+description: El gestor de Python de Astral, escrito en Rust. Reemplaza pip, venv, pipx y pyenv con una sola herramienta muchísimo más rápida.
+category: cli-tools
+tags: [python, package-manager, venv, rust, pip]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install astral-sh.uv
+  brew: brew install uv
+  scoop: scoop install uv
+  pip: pip install uv
+  manual: curl -LsSf https://astral.sh/uv/install.sh | sh
+links:
+  repo: https://github.com/astral-sh/uv
+  docs: https://docs.astral.sh/uv/
+related: [cli-tools/mise, cli-tools/fnm, cli-tools/bun]
+addedAt: 2026-10-08
+---
+
+## Un gestor para todo Python
+
+uv junta en un binario lo que antes eran cinco herramientas: instalar versiones de Python, crear entornos virtuales, gestionar dependencias con lockfile, instalar CLIs globales y ejecutar scripts sueltos. Y lo hace con una caché global que hace que reinstalar sea casi instantáneo.
+
+## Proyectos
+
+```bash
+uv init mi-api          # Crea pyproject.toml, .python-version y main.py
+cd mi-api
+uv add fastapi httpx    # Añade dependencias y actualiza uv.lock
+uv add --dev pytest     # Dependencias de desarrollo
+uv run main.py          # Ejecuta dentro del entorno (lo crea si falta)
+uv sync                 # Deja el entorno igual que el lockfile
+```
+
+## Versiones de Python
+
+```bash
+uv python install 3.13  # Descarga una versión concreta
+uv python list          # Versiones disponibles e instaladas
+uv python pin 3.12      # Fija la versión del proyecto
+```
+
+## Herramientas globales (adiós pipx)
+
+```bash
+uvx ruff check .              # Ejecuta una CLI sin instalarla
+uv tool install httpie        # La instala de forma aislada y global
+uv tool upgrade --all
+```
+
+## Scripts con dependencias inline
+
+```python
+# /// script
+# dependencies = ["requests", "rich"]
+# ///
+import requests
+from rich import print
+print(requests.get("https://api.github.com").json())
+```
+
+```bash
+uv run script.py   # uv lee la cabecera e instala lo necesario
+```
+
+## Migrar desde pip
+
+`uv pip install -r requirements.txt` funciona como pip, solo que mucho más rápido. Es la forma más suave de empezar.
+
+En Windows, el instalador oficial sin gestor de paquetes es:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```

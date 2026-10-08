@@ -1,0 +1,59 @@
+---
+name: yq
+description: jq para YAML (y también JSON, XML, TOML y CSV). Lee y edita configs de Kubernetes, Compose o CI desde la terminal.
+category: cli-tools
+tags: [yaml, json, toml, parsing, devops]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install MikeFarah.yq
+  brew: brew install yq
+  scoop: scoop install yq
+links:
+  repo: https://github.com/mikefarah/yq
+  docs: https://mikefarah.gitbook.io/yq/
+related: [cli-tools/jq, docker/k9s, docker/docker-compose-patterns]
+addedAt: 2026-10-08
+---
+
+## jq para el mundo YAML
+
+Media infraestructura moderna vive en YAML: Compose, Kubernetes, GitHub Actions, OpenAPI. yq (la versión de Mike Farah, en Go) usa una sintaxis muy parecida a la de jq y conserva comentarios y formato al editar.
+
+## Leer
+
+```bash
+yq '.services.web.image' docker-compose.yml
+yq '.jobs[].runs-on' .github/workflows/ci.yml
+yq '.spec.template.spec.containers[0].image' deployment.yaml
+```
+
+## Editar en sitio
+
+```bash
+# Cambiar un valor
+yq -i '.services.web.image = "nginx:1.27"' docker-compose.yml
+
+# Usar una variable de entorno
+TAG=v2 yq -i '.image.tag = strenv(TAG)' values.yaml
+
+# Borrar una clave
+yq -i 'del(.services.debug)' docker-compose.yml
+```
+
+## Convertir entre formatos
+
+```bash
+yq -o=json config.yaml          # YAML → JSON
+yq -P config.json               # JSON → YAML legible
+yq -p=toml -o=yaml Cargo.toml   # TOML → YAML
+```
+
+## Combinar ficheros
+
+```bash
+# Fusionar un override sobre una base
+yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' base.yml override.yml
+```
+
+**Ojo:** existe otro `yq` en Python (un envoltorio de jq) con sintaxis distinta. Los ejemplos de aquí son del de mikefarah, que es el que instalan winget, brew y scoop.

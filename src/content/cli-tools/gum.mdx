@@ -1,0 +1,52 @@
+---
+name: gum
+description: Componentes de interfaz para scripts de shell. Inputs, selectores, confirmaciones y spinners con estilo, sin escribir una línea de Go.
+category: cli-tools
+tags: [shell, tui, scripting, interactive, charm]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install charmbracelet.gum
+  brew: brew install gum
+  scoop: scoop install gum
+links:
+  repo: https://github.com/charmbracelet/gum
+related: [cli-tools/fzf, cli-tools/just, snippets/bash-functions]
+addedAt: 2026-10-08
+---
+
+## Scripts que parecen apps
+
+gum es de Charm (los de Glow y Bubble Tea). Expone sus componentes como comandos sueltos para que cualquier script de bash o PowerShell tenga prompts bonitos e interactivos en una línea.
+
+## Componentes principales
+
+```bash
+gum input --placeholder "Nombre del proyecto"
+gum write --placeholder "Descripción larga (Ctrl+D para terminar)"
+gum choose "feat" "fix" "docs" "chore"
+gum filter < lista.txt                 # Búsqueda difusa
+gum confirm "¿Borrar la rama?" && git branch -D vieja
+gum spin --title "Instalando..." -- pnpm install
+gum style --border rounded --padding "1 2" "Hecho"
+```
+
+## Ejemplo: commits convencionales guiados
+
+```bash
+#!/usr/bin/env bash
+TYPE=$(gum choose "feat" "fix" "docs" "refactor" "chore")
+SCOPE=$(gum input --placeholder "scope (opcional)")
+SUMMARY=$(gum input --value "$TYPE${SCOPE:+($SCOPE)}: " --placeholder "resumen")
+BODY=$(gum write --placeholder "Detalles del cambio")
+
+gum confirm "¿Hacer commit?" && git commit -m "$SUMMARY" -m "$BODY"
+```
+
+## Ejemplo: cambiar de rama con filtro
+
+```bash
+git switch "$(git branch --format='%(refname:short)' | gum filter)"
+```
+
+Cada componente tiene flags de color y tamaño (`--cursor.foreground`, `--height`...) que también se pueden fijar con variables de entorno, por ejemplo `GUM_INPUT_CURSOR_FOREGROUND`.

@@ -122,4 +122,22 @@ export const CATEGORY_CONFIG: Record<string, {
     accent: '#81c8be',
     icon: 'globe-2',
   },
+  'macos-tools': {
+    label: 'macOS Power Tools',
+    description: 'Launchers, gestores de ventanas y utilidades para exprimir macOS',
+    accent: '#eebebe',
+    icon: 'laptop',
+  },
+  'apis-datos': {
+    label: 'APIs & Datos',
+    description: 'Clientes HTTP, exploradores de APIs y herramientas para bases de datos',
+    accent: '#ea999c',
+    icon: 'database',
+  },
+  productividad: {
+    label: 'Productividad',
+    description: 'Editores, notas y apps que aceleran tu día a día como desarrollador',
+    accent: '#f2d5cf',
+    icon: 'notebook-pen',
+  },
 };

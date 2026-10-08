@@ -38,24 +38,6 @@ const FEATURED_CATEGORIES = [
   { slug: 'neovim', label: 'Neovim', description: 'Plugins y configuraciones', icon: 'neovim', accent: '#a6d189' },
 ];
 
-const categoryAccents: Record<string, string> = {
-  terminales: '#8caaee',
-  'cli-tools': '#a6d189',
-  snippets: '#ef9f76',
-  neovim: '#a6d189',
-  vscode: '#8caaee',
-  'browser-extensions': '#e5c890',
-  'scripts-ahk': '#ca9ee6',
-  userscripts: '#81c8be',
-  dotfiles: '#babbf1',
-  docker: '#85c1dc',
-  'git-hacks': '#ef9f76',
-  fonts: '#f4b8e4',
-  'ai-tools': '#babbf1',
-  'windows-tools': '#99d1db',
-  learning: '#a6d189',
-  'web-resources': '#81c8be',
-};
 ---
 
 <BaseLayout title="Inicio" description="DevPiece — El hub definitivo de productividad para desarrolladores. CLI tools, configs, scripts, y más.">
@@ -251,7 +233,7 @@ const categoryAccents: Record<string, string> = {
             difficulty={tool.data.difficulty}
             install={tool.data.install}
             links={tool.data.links}
-            accent={categoryAccents[tool.collectionName] ?? '#8caaee'}
+            accent={CATEGORY_CONFIG[tool.collectionName]?.accent ?? '#8caaee'}
           />
         ))}
       </div>
@@ -316,7 +298,7 @@ const categoryAccents: Record<string, string> = {
             difficulty={tool.data.difficulty}
             install={tool.data.install}
             links={tool.data.links}
-            accent={categoryAccents[tool.collectionName] ?? '#8caaee'}
+            accent={CATEGORY_CONFIG[tool.collectionName]?.accent ?? '#8caaee'}
           />
         ))}
       </div>

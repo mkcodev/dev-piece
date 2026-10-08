@@ -1,0 +1,79 @@
+---
+name: GitHub CLI (gh)
+description: GitHub desde la terminal. Crea issues y PRs, revisa checks de CI, haz merge y clona repos sin abrir el navegador.
+category: cli-tools
+tags: [git, github, cli, pull-requests, ci, workflow]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install GitHub.cli
+  brew: brew install gh
+  scoop: scoop install gh
+links:
+  repo: https://github.com/cli/cli
+  docs: https://cli.github.com/manual/
+  website: https://cli.github.com/
+related: [git-hacks/act, cli-tools/lazygit, git-hacks/conventional-commits]
+addedAt: 2026-10-08
+---
+
+## ¿Qué es gh?
+
+`gh` es la CLI oficial de GitHub. Todo lo que haces en la web (issues, pull requests, Actions, releases, gists) se puede hacer desde la terminal, y además se puede **scriptear**. Es la pieza que convierte el flujo "issue → rama → PR → merge" en cuatro comandos.
+
+## Primeros pasos
+
+```bash
+# Autenticarse (abre el navegador o pide un token)
+gh auth login
+
+# Comprobar con qué cuenta estás
+gh auth status
+
+# Clonar un repo sin escribir la URL completa
+gh repo clone cli/cli
+```
+
+## El flujo completo desde la terminal
+
+```bash
+# 1. Crear el issue
+gh issue create --title "feat: modo oscuro" --label enhancement
+
+# 2. Rama y commits como siempre
+git switch -c feat/12-modo-oscuro
+
+# 3. Abrir el PR enlazado al issue
+gh pr create --fill --body "Closes #12"
+
+# 4. Ver el estado de CI en vivo
+gh pr checks --watch
+
+# 5. Squash merge y borrar la rama
+gh pr merge --squash --delete-branch
+```
+
+## Comandos que más se usan
+
+```bash
+gh pr list                 # PRs abiertos del repo
+gh pr checkout 42          # Traer el PR 42 a local para probarlo
+gh pr view --web           # Abrir el PR actual en el navegador
+gh run list                # Últimas ejecuciones de GitHub Actions
+gh run view --log-failed   # Solo el log de los pasos que fallaron
+gh release create v1.2.0 --generate-notes
+gh browse                  # Abrir el repo en el navegador
+```
+
+## Pro tips
+
+**`gh api`** da acceso autenticado a toda la API REST y GraphQL de GitHub:
+
+```bash
+gh api repos/cli/cli/pulls --jq '.[].title'
+```
+
+**Alias propios:** `gh alias set prs 'pr list --author @me'` y a partir de ahí `gh prs`.
+
+**Extensiones:** `gh extension install dlvhdr/gh-dash` añade un dashboard TUI de PRs e issues.

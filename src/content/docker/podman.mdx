@@ -1,0 +1,67 @@
+---
+name: Podman
+description: Motor de contenedores sin daemon y rootless, compatible con la CLI de Docker. Alternativa libre a Docker Desktop, con pods al estilo Kubernetes.
+category: docker
+tags: [containers, docker-alternative, rootless, oci, kubernetes]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install RedHat.Podman
+  brew: brew install podman
+  scoop: scoop install podman
+  apt: sudo apt install podman
+links:
+  repo: https://github.com/containers/podman
+  docs: https://docs.podman.io/
+  website: https://podman.io/
+related: [docker/lazydocker, docker/k9s, docker/dockerfile-patterns]
+addedAt: 2026-10-08
+---
+
+## Docker sin daemon
+
+Podman ejecuta contenedores OCI sin un proceso root siempre encendido: cada contenedor es un proceso hijo de tu usuario. Eso lo hace más seguro por defecto y evita depender de la licencia de Docker Desktop en empresas grandes.
+
+## Misma CLI que Docker
+
+```bash
+podman run -d -p 8080:80 --name web nginx
+podman ps
+podman logs -f web
+podman exec -it web sh
+podman build -t mi-app .
+```
+
+Si tienes scripts con `docker`, un alias basta:
+
+```bash
+alias docker=podman
+```
+
+## En Windows y macOS: la máquina virtual
+
+En estos sistemas los contenedores corren en una VM Linux ligera que se gestiona así:
+
+```bash
+podman machine init      # Crear la VM (una vez)
+podman machine start
+podman machine list
+```
+
+Si prefieres una interfaz gráfica, **Podman Desktop** (`winget install RedHat.Podman-Desktop` o `brew install --cask podman-desktop`) hace lo mismo con ventanas.
+
+## Pods: agrupar contenedores
+
+```bash
+# Un pod comparte red entre sus contenedores, como en Kubernetes
+podman pod create --name stack -p 8080:80
+podman run -d --pod stack nginx
+podman run -d --pod stack redis
+
+# Exportar el pod a YAML de Kubernetes
+podman kube generate stack > stack.yaml
+```
+
+## Compose
+
+`podman compose up` usa tu `docker-compose.yml` delegando en un proveedor de compose instalado (docker-compose o podman-compose).

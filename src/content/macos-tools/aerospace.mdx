@@ -1,0 +1,72 @@
+---
+name: AeroSpace
+description: Tiling window manager para macOS inspirado en i3. Espacios de trabajo virtuales propios, configuración en TOML y sin desactivar SIP.
+category: macos-tools
+tags: [macos, tiling, window-manager, i3, keyboard, productivity]
+os: [macos]
+difficulty: intermediate
+install:
+  brew: brew install --cask nikitabobko/tap/aerospace
+links:
+  repo: https://github.com/nikitabobko/AeroSpace
+  docs: https://nikitabobko.github.io/AeroSpace/guide
+related: [macos-tools/raycast, windows-tools/glazewm, terminales/tmux]
+addedAt: 2026-10-08
+---
+
+## i3 en tu Mac
+
+AeroSpace organiza las ventanas en mosaico automáticamente: abres una app y las demás se reparten el espacio. Todo se controla con el teclado. A diferencia de yabai, no necesita desactivar la protección SIP de macOS, porque implementa sus propios espacios de trabajo en lugar de usar los de Mission Control.
+
+## Configuración
+
+Copia la configuración por defecto y edítala:
+
+```bash
+cp /Applications/AeroSpace.app/Contents/Resources/default-config.toml ~/.aerospace.toml
+```
+
+```toml
+# ~/.aerospace.toml
+start-at-login = true
+
+[gaps]
+inner.horizontal = 8
+inner.vertical = 8
+outer.left = 8
+outer.right = 8
+outer.top = 8
+outer.bottom = 8
+
+[mode.main.binding]
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
+alt-shift-h = 'move left'
+alt-shift-l = 'move right'
+alt-slash = 'layout tiles horizontal vertical'
+alt-comma = 'layout accordion horizontal vertical'
+alt-1 = 'workspace 1'
+alt-2 = 'workspace 2'
+alt-shift-1 = 'move-node-to-workspace 1'
+alt-shift-2 = 'move-node-to-workspace 2'
+
+# Asignar apps a espacios automáticamente
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace 1'
+```
+
+## Comandos útiles
+
+```bash
+aerospace reload-config
+aerospace list-apps        # Ver el app-id de cada aplicación
+aerospace list-windows --all
+```
+
+## Consejos
+
+- Empieza con pocos atajos (foco, mover y cambiar de workspace) y añade más cuando los tengas memorizados.
+- Combínalo con Raycast para lanzar apps y con un terminal como Ghostty o WezTerm.

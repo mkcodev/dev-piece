@@ -1,0 +1,68 @@
+---
+name: k9s
+description: TUI para Kubernetes. Navega pods, logs, deployments y eventos del clúster con atajos de teclado, en tiempo real y sin teclear kubectl.
+category: docker
+tags: [kubernetes, k8s, tui, devops, monitoring]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install Derailed.k9s
+  brew: brew install k9s
+  scoop: scoop install k9s
+links:
+  repo: https://github.com/derailed/k9s
+  website: https://k9scli.io/
+related: [docker/lazydocker, docker/podman, cli-tools/yq]
+addedAt: 2026-10-08
+---
+
+## kubectl con interfaz
+
+k9s es a Kubernetes lo que lazydocker es a Docker: una interfaz de terminal que observa el clúster en tiempo real. Lee tu `~/.kube/config`, así que funciona con cualquier contexto que ya uses con `kubectl`.
+
+## Arrancar
+
+```bash
+k9s                       # Contexto actual
+k9s --context produccion  # Otro contexto
+k9s -n backend            # Arrancar en un namespace
+k9s --readonly            # Sin acciones destructivas (ideal para prod)
+```
+
+## Navegación por comandos
+
+Escribe `:` y el recurso, como en Vim:
+
+```
+:pods          → Pods
+:deploy        → Deployments
+:svc           → Services
+:ns            → Namespaces
+:events        → Eventos del clúster
+:ctx           → Cambiar de contexto
+:xray deploy   → Árbol de dependencias de los deployments
+:pulses        → Dashboard general del clúster
+```
+
+## Atajos sobre un recurso
+
+```
+l          → Logs (0 para todos los contenedores)
+s          → Shell dentro del contenedor
+d          → describe
+e          → Editar el YAML en tu $EDITOR
+y          → Ver el YAML
+Shift+f    → Port-forward
+Ctrl+d     → Borrar
+Ctrl+k     → Matar (forzar)
+/          → Filtrar la lista
+?          → Ayuda con todos los atajos
+```
+
+## Pro tips
+
+**Skins:** k9s tiene temas en `~/.config/k9s/skins/` (hay uno oficial de Catppuccin).
+
+**Plugins:** puedes añadir atajos propios que ejecuten comandos sobre el recurso seleccionado, por ejemplo abrir los logs con `stern`.
+
+**`--readonly` en producción** evita un `Ctrl+d` accidental en el contexto equivocado.

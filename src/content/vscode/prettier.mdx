@@ -1,0 +1,73 @@
+---
+name: Prettier
+description: El formateador de código opinionado. Deja de discutir sobre estilo en las revisiones, formatea al guardar y unifica todo el equipo.
+category: vscode
+tags: [vscode, formatter, javascript, typescript, css, code-style]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  npm: npm install -D prettier
+  pnpm: pnpm add -D prettier
+  manual: code --install-extension esbenp.prettier-vscode
+links:
+  repo: https://github.com/prettier/prettier
+  docs: https://prettier.io/docs/
+  website: https://prettier.io/
+related: [vscode/eslint, git-hacks/lefthook, neovim/conform-nvim]
+addedAt: 2026-10-08
+---
+
+Prettier reescribe tu código con un estilo consistente: comillas, punto y coma, saltos de línea, sangría. Tiene pocas opciones a propósito, así que la discusión sobre estilo termina en cuanto se instala. Soporta JS, TS, JSX, CSS, SCSS, HTML, JSON, YAML, Markdown, GraphQL y más.
+
+## Instalación recomendada
+
+Instálalo en el proyecto (para que todo el equipo use la misma versión) y añade la extensión de VS Code:
+
+```bash
+pnpm add -D prettier
+code --install-extension esbenp.prettier-vscode
+```
+
+**ID de extensión:** `esbenp.prettier-vscode`
+
+## Configuración del proyecto
+
+```json
+// .prettierrc
+{
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100
+}
+```
+
+```bash
+# Formatear todo / comprobar en CI
+npx prettier --write .
+npx prettier --check .
+```
+
+Añade un `.prettierignore` para `dist/`, lockfiles y código generado.
+
+## Formatear al guardar en VS Code
+
+```jsonc
+// settings.json
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "prettier.requireConfig": true
+}
+```
+
+`prettier.requireConfig` evita formatear proyectos que no usan Prettier.
+
+## Plugins populares
+
+```bash
+pnpm add -D prettier-plugin-tailwindcss   # Ordena clases de Tailwind
+pnpm add -D prettier-plugin-astro         # Ficheros .astro
+```
+
+Con ESLint, desactiva sus reglas de estilo con `eslint-config-prettier` para que no choquen.

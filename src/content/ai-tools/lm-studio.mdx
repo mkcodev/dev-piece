@@ -1,0 +1,57 @@
+---
+name: LM Studio
+description: App de escritorio para descargar y ejecutar LLMs en local. Buscador de modelos, chat y un servidor compatible con la API de OpenAI.
+category: ai-tools
+tags: [ai, local-llm, privacy, gui, offline, openai-compatible]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install ElementLabs.LMStudio
+  brew: brew install --cask lm-studio
+  manual: https://lmstudio.ai/download
+links:
+  website: https://lmstudio.ai/
+  docs: https://lmstudio.ai/docs
+related: [ai-tools/ollama, ai-tools/continue, ai-tools/aider]
+addedAt: 2026-10-08
+---
+
+## Modelos locales con interfaz gráfica
+
+LM Studio hace lo mismo que Ollama (ejecutar modelos en tu máquina, sin enviar datos fuera) pero con una app de escritorio: buscas un modelo, ves si cabe en tu RAM o VRAM antes de descargarlo y chateas con él. En Mac con Apple Silicon usa el motor MLX, muy eficiente.
+
+## Elegir modelo
+
+En la pestaña de búsqueda, cada modelo muestra variantes cuantizadas (Q4, Q5, Q8...). Regla práctica:
+
+```
+Q4_K_M  → buen equilibrio calidad / memoria (punto de partida)
+Q8_0    → casi sin pérdida, el doble de memoria
+Tamaño  → el fichero debe caber en VRAM (GPU) o RAM con margen
+```
+
+## Servidor local compatible con OpenAI
+
+Activa el servidor en la pestaña Developer, o desde la CLI `lms` que se instala con la app:
+
+```bash
+lms server start            # http://localhost:1234
+lms ls                      # Modelos descargados
+lms load qwen2.5-coder-7b-instruct
+```
+
+Cualquier cliente de OpenAI funciona cambiando la URL base:
+
+```ts
+import OpenAI from 'openai';
+
+const client = new OpenAI({ baseURL: 'http://localhost:1234/v1', apiKey: 'lm-studio' });
+const res = await client.chat.completions.create({
+  model: 'qwen2.5-coder-7b-instruct',
+  messages: [{ role: 'user', content: 'Escribe un debounce en TypeScript' }],
+});
+```
+
+## ¿LM Studio u Ollama?
+
+LM Studio si prefieres una interfaz para explorar y comparar modelos; Ollama si lo quieres todo desde la terminal o en un servidor. Ambos pueden alimentar a Continue, Aider u otras herramientas mediante su API local.

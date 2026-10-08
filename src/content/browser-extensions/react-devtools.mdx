@@ -1,0 +1,43 @@
+---
+name: React Developer Tools
+description: Extensión oficial para inspeccionar el árbol de componentes React, sus props, estado y hooks, y medir qué re-renderiza y por qué.
+category: browser-extensions
+tags: [react, debugging, devtools, performance, components]
+os: [cross]
+difficulty: intermediate
+links:
+  repo: https://github.com/facebook/react/tree/main/packages/react-devtools
+  docs: https://react.dev/learn/react-developer-tools
+  website: https://chromewebstore.google.com/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi
+related: [browser-extensions/json-viewer, browser-extensions/wappalyzer, vscode/eslint]
+addedAt: 2026-10-08
+---
+
+React DevTools añade dos pestañas a las herramientas de desarrollo del navegador: **Components** y **Profiler**. Está disponible para Chrome, Firefox y Edge.
+
+## Components
+
+- Árbol de componentes tal y como React lo ve (no el DOM).
+- Props, estado, contexto y hooks del componente seleccionado, editables en vivo.
+- Botón de "ojo" para saltar del componente al nodo del DOM y viceversa.
+- El icono `<>` abre el código fuente del componente en la pestaña Sources.
+
+Truco: tras seleccionar un componente, en la consola puedes usar `$r` para acceder a su instancia.
+
+## Profiler: por qué va lento
+
+1. Pulsa grabar y haz la interacción lenta.
+2. Detén la grabación y revisa el flame graph: cada barra es un componente, su ancho es lo que tardó en renderizar.
+3. En los ajustes activa **"Record why each component rendered"** para que diga si fue por props, estado, hooks o el padre.
+
+## Resaltar renders
+
+En los ajustes de Components, activa **"Highlight updates when components render"**. Cada re-render parpadea en pantalla: si al escribir en un input se ilumina media página, ya sabes dónde empezar a optimizar.
+
+## React Native y otros entornos
+
+Para apps fuera del navegador existe la versión standalone:
+
+```bash
+npx react-devtools
+```

@@ -1,0 +1,70 @@
+---
+name: ESLint
+description: El linter de JavaScript y TypeScript. Detecta bugs y malas prácticas mientras escribes y corrige muchos problemas automáticamente al guardar.
+category: vscode
+tags: [vscode, linter, javascript, typescript, code-quality]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  npm: npm init @eslint/config@latest
+  manual: code --install-extension dbaeumer.vscode-eslint
+links:
+  repo: https://github.com/eslint/eslint
+  docs: https://eslint.org/docs/latest/
+  website: https://eslint.org/
+related: [vscode/prettier, vscode/error-lens, git-hacks/lefthook]
+addedAt: 2026-10-08
+---
+
+ESLint analiza tu código sin ejecutarlo y avisa de errores reales (variables sin usar, promesas sin `await`, hooks de React mal usados) y de patrones peligrosos. Con la extensión de VS Code, los avisos aparecen subrayados en el editor y muchos se arreglan solos al guardar.
+
+## Empezar en un proyecto
+
+```bash
+npm init @eslint/config@latest   # Asistente: crea eslint.config.js
+npx eslint .
+npx eslint . --fix
+```
+
+**ID de extensión:** `dbaeumer.vscode-eslint`
+
+## Flat config (eslint.config.js)
+
+Desde ESLint 9 la configuración es un array en `eslint.config.js`:
+
+```js
+// eslint.config.js
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import globals from 'globals';
+
+export default [
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    languageOptions: { globals: globals.browser },
+    rules: {
+      'no-console': 'warn',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    },
+  },
+  { ignores: ['dist/', 'coverage/'] },
+];
+```
+
+## Arreglar al guardar en VS Code
+
+```jsonc
+// settings.json
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
+```
+
+## Con Prettier
+
+ESLint para la calidad, Prettier para el formato. Añade `eslint-config-prettier` al final del array para desactivar las reglas de estilo que chocarían.
+
+Combinado con Error Lens, el mensaje de cada regla aparece al final de la línea, sin hover.

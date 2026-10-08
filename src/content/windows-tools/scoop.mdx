@@ -1,0 +1,60 @@
+---
+name: Scoop
+description: Gestor de paquetes para Windows desde la terminal. Instala herramientas CLI en tu usuario, sin UAC ni instaladores, y las actualiza de golpe.
+category: windows-tools
+tags: [windows, package-manager, cli, portable, homebrew-alternative]
+os: [windows]
+featured: true
+difficulty: beginner
+install:
+  manual: irm get.scoop.sh | iex
+links:
+  repo: https://github.com/ScoopInstaller/Scoop
+  website: https://scoop.sh/
+related: [windows-tools/winget-tips, windows-tools/unigetui, cli-tools/fzf]
+addedAt: 2026-10-08
+---
+
+## El Homebrew de Windows
+
+Scoop instala programas en `~/scoop`, sin pedir permisos de administrador y sin ensuciar el registro. Cada herramienta queda en el PATH mediante un shim y se puede cambiar de versión o desinstalar limpiamente. Es especialmente bueno para herramientas de desarrollo y CLIs que winget no tiene o tiene desactualizadas.
+
+## Instalación
+
+En PowerShell, sin ejecutar como administrador:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+```
+
+## Comandos básicos
+
+```powershell
+scoop install git ripgrep fd bat   # Varios a la vez
+scoop search lazygit
+scoop update                       # Actualiza Scoop y los buckets
+scoop update *                     # Actualiza todas las apps
+scoop list
+scoop uninstall fd
+scoop cleanup *                    # Borra versiones antiguas
+scoop checkup                      # Diagnóstico de problemas
+```
+
+## Buckets: repositorios extra
+
+```powershell
+scoop bucket add extras       # Apps con interfaz (Zed, Obsidian, Bruno...)
+scoop bucket add nerd-fonts   # Fuentes parcheadas
+scoop bucket add versions     # Versiones antiguas o alternativas
+scoop install extras/vscode
+```
+
+## Exportar e importar tu setup
+
+```powershell
+scoop export > scoopfile.json      # Guardar lista de apps y buckets
+scoop import scoopfile.json        # Reinstalar todo en otra máquina
+```
+
+Guarda `scoopfile.json` en tus dotfiles y montar un PC nuevo pasa a ser un comando.

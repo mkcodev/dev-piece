@@ -1,0 +1,66 @@
+---
+name: Bun
+description: Runtime de JavaScript todo en uno. Ejecuta TypeScript sin compilar, instala paquetes, hace bundling y tests, todo en un binario muy rápido.
+category: cli-tools
+tags: [javascript, typescript, runtime, package-manager, bundler, testing]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install Oven-sh.Bun
+  brew: brew install bun
+  scoop: scoop install bun
+  npm: npm install -g bun
+  manual: curl -fsSL https://bun.sh/install | bash
+links:
+  repo: https://github.com/oven-sh/bun
+  docs: https://bun.sh/docs
+  website: https://bun.sh/
+related: [cli-tools/fnm, cli-tools/uv, vscode/pretty-ts-errors]
+addedAt: 2026-10-08
+---
+
+## Un runtime, cuatro herramientas
+
+Bun es a la vez runtime (alternativa a Node), gestor de paquetes (alternativa a npm o pnpm), bundler y test runner. Es compatible con la mayoría de APIs de Node y con `package.json`, así que puedes adoptarlo por partes.
+
+## Como gestor de paquetes
+
+```bash
+bun install              # Lee package.json y crea bun.lock
+bun add zod              # Añadir dependencia
+bun add -d @types/node   # Dependencia de desarrollo
+bun remove zod
+bunx cowsay hola         # Equivalente a npx
+```
+
+Aunque tu proyecto siga corriendo en Node, `bun install` suele ser bastante más rápido.
+
+## Como runtime
+
+```bash
+bun run index.ts         # TypeScript y JSX sin configuración
+bun --watch server.ts    # Recarga al guardar
+bun run dev              # Ejecuta scripts de package.json
+```
+
+```ts
+// server.ts: servidor HTTP nativo
+Bun.serve({
+  port: 3000,
+  fetch(req) {
+    return Response.json({ ok: true, path: new URL(req.url).pathname });
+  },
+});
+```
+
+## Tests y bundling
+
+```bash
+bun test                       # API compatible con Jest
+bun build ./src/index.ts --outdir ./dist --target browser
+bun build ./cli.ts --compile --outfile mycli   # Ejecutable standalone
+```
+
+## Cuándo usarlo
+
+Ideal para scripts, CLIs, prototipos y tests rápidos. En producción con dependencias nativas complejas, prueba antes la compatibilidad.

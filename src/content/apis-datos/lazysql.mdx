@@ -1,0 +1,52 @@
+---
+name: lazysql
+description: Cliente de bases de datos en la terminal, al estilo lazygit. Explora tablas, edita filas y lanza consultas en PostgreSQL, MySQL, SQLite y MSSQL.
+category: apis-datos
+tags: [database, sql, tui, postgres, mysql, sqlite]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install lazysql
+  scoop: scoop bucket add extras; scoop install extras/lazysql
+  manual: go install github.com/jorgerojas26/lazysql@latest
+links:
+  repo: https://github.com/jorgerojas26/lazysql
+related: [cli-tools/lazygit, docker/lazydocker, apis-datos/bruno]
+addedAt: 2026-10-08
+---
+
+## Bases de datos sin salir de la terminal
+
+lazysql aplica la idea de lazygit a las bases de datos: un panel con las tablas, otro con los datos y un editor de consultas, todo navegable con el teclado. Útil para echar un vistazo rápido a una base de datos local o de desarrollo sin abrir DBeaver ni pgAdmin.
+
+## Conectarse
+
+```bash
+lazysql                                            # Gestor de conexiones guardadas
+lazysql postgres://user:pass@localhost:5432/app   # Conexión directa
+lazysql mysql://root:pass@localhost:3306/app
+lazysql ./dev.db                                   # SQLite
+```
+
+Las conexiones guardadas viven en `config.toml`: `~/.config/lazysql/` en Linux, `~/Library/Application Support/lazysql/` en macOS y `%APPDATA%\lazysql\` en Windows.
+
+## Atajos principales
+
+```
+H / L          → Cambiar entre panel de tablas y de datos
+j / k          → Moverse por filas
+/              → Buscar
+Ctrl+E         → Abrir el editor de consultas SQL
+Ctrl+R         → Ejecutar la consulta
+c              → Editar la celda seleccionada
+o              → Insertar fila
+d              → Borrar fila
+Ctrl+S         → Guardar los cambios pendientes
+?              → Ayuda
+```
+
+Los cambios en celdas quedan pendientes hasta que los guardas, así que puedes revisar antes de escribir en la base de datos.
+
+## Consejo
+
+Úsalo con bases de datos de desarrollo. Para producción, conecta con un usuario de solo lectura.

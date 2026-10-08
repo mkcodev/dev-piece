@@ -1,0 +1,60 @@
+---
+name: git-cliff
+description: Genera el CHANGELOG automáticamente a partir de tus commits convencionales. Plantillas configurables y versión siguiente calculada sola.
+category: git-hacks
+tags: [git, changelog, conventional-commits, release, automation]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  winget: winget install orhun.git-cliff
+  brew: brew install git-cliff
+  scoop: scoop install git-cliff
+  cargo: cargo install git-cliff
+  npm: npx git-cliff@latest
+links:
+  repo: https://github.com/orhun/git-cliff
+  docs: https://git-cliff.org/docs/
+  website: https://git-cliff.org/
+related: [git-hacks/conventional-commits, cli-tools/gh, git-hacks/lefthook]
+addedAt: 2026-10-08
+---
+
+## Changelogs sin escribirlos
+
+Si tus commits siguen Conventional Commits (`feat:`, `fix:`, `docs:`...), ya tienes toda la información de un changelog. git-cliff la agrupa por tipo y versión y la vuelca a Markdown con la plantilla que quieras.
+
+## Uso
+
+```bash
+git cliff --init                 # Crea cliff.toml con la config por defecto
+git cliff -o CHANGELOG.md        # Changelog completo
+git cliff --unreleased           # Solo lo que aún no tiene tag
+git cliff --latest               # Solo la última versión
+git cliff --bump -o CHANGELOG.md # Calcula la siguiente versión semver
+git cliff --bumped-version       # Solo imprime esa versión
+```
+
+## Flujo de release
+
+```bash
+NEXT=$(git cliff --bumped-version)
+git cliff --bump -o CHANGELOG.md
+git commit -am "chore(release): $NEXT"
+git tag "$NEXT"
+git push --follow-tags
+gh release create "$NEXT" --notes "$(git cliff --latest --strip header)"
+```
+
+## Personalizar grupos
+
+```toml
+# cliff.toml
+[git]
+conventional_commits = true
+commit_parsers = [
+  { message = "^feat", group = "Novedades" },
+  { message = "^fix", group = "Correcciones" },
+  { message = "^docs", group = "Documentación" },
+  { message = "^chore\\(release\\)", skip = true },
+]
+```

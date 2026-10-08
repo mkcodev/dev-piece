@@ -1,0 +1,42 @@
+---
+name: Pretty TypeScript Errors
+description: Convierte los errores kilométricos de TypeScript en mensajes legibles, con tipos formateados y resaltados, y enlaces a la documentación.
+category: vscode
+tags: [vscode, typescript, errors, diagnostics, dx]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  manual: code --install-extension yoavbls.pretty-ts-errors
+links:
+  repo: https://github.com/yoavbls/pretty-ts-errors
+  website: https://marketplace.visualstudio.com/items?itemName=yoavbls.pretty-ts-errors
+related: [vscode/error-lens, vscode/eslint, cli-tools/bun]
+addedAt: 2026-10-08
+---
+
+Los errores de TypeScript con tipos complejos (genéricos, uniones, objetos anidados de librerías como Zod o tRPC) aparecen como un bloque de texto plano imposible de leer. Pretty TypeScript Errors los reformatea en el hover: tipos con sangría y resaltado de sintaxis, la parte relevante destacada y un enlace a la explicación del código de error.
+
+## Instalación
+
+**ID de extensión:** `yoavbls.pretty-ts-errors`
+
+```bash
+code --install-extension yoavbls.pretty-ts-errors
+```
+
+## Antes y después
+
+Sin la extensión:
+
+```
+Type '{ name: string; age: string; }' is not assignable to type 'User'. Types of property 'age' are incompatible. Type 'string' is not assignable to type 'number'.
+```
+
+Con la extensión, el mismo error se muestra con cada tipo en su bloque de código, los nombres de propiedades destacados y un enlace a typescript.tv con la explicación del error.
+
+## Combinaciones
+
+- **Error Lens:** muestra el resumen en línea; Pretty TS Errors el detalle en el hover.
+- Funciona también con errores en ficheros `.vue`, `.svelte` y `.astro` que usen el servicio de TypeScript.
+
+No cambia nada de tu proyecto: solo es presentación dentro de VS Code.

@@ -1,0 +1,49 @@
+---
+name: Maple Mono
+description: Fuente monoespaciada redondeada con cursiva manuscrita, ligaduras inteligentes y variante con iconos Nerd Font incluida. Open source.
+category: fonts
+tags: [font, monospace, ligatures, cursive, nerd-font]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  brew: brew install --cask font-maple-mono
+  scoop: scoop bucket add nerd-fonts; scoop install nerd-fonts/Maple-Mono
+  manual: https://github.com/subframe7536/maple-font/releases
+links:
+  repo: https://github.com/subframe7536/maple-font
+  website: https://font.subf.dev/
+related: [fonts/monaspace, fonts/iosevka, fonts/nerd-fonts]
+addedAt: 2026-10-08
+---
+
+## Suave y legible
+
+Maple Mono tiene esquinas redondeadas y una cursiva con trazo manuscrito que queda muy bien en comentarios y palabras clave. Mantiene una proporción 2:1 exacta con caracteres CJK, así que alinea bien texto en chino o japonés.
+
+## Variantes
+
+En la página de releases verás varias versiones del mismo diseño:
+
+```
+MapleMono          → sin ligaduras
+MapleMono-NF       → con iconos Nerd Font (para terminal y prompts)
+MapleMono-CN       → con glifos chinos
+-unhinted / TTF / variable
+```
+
+Para el editor y la terminal, la variante **NF** es la más práctica: un solo tipo de letra para todo.
+
+## Personalizar antes de descargar
+
+En la web oficial (font.subf.dev) hay un configurador para activar o desactivar ligaduras y variantes de caracteres concretos y descargar una versión hecha a tu gusto.
+
+## VS Code
+
+```jsonc
+// settings.json
+{
+  "editor.fontFamily": "'Maple Mono NF', monospace",
+  "editor.fontLigatures": "'calt', 'cv01', 'ss01'",
+  "terminal.integrated.fontFamily": "'Maple Mono NF'"
+}
+```

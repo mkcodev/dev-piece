@@ -1,0 +1,58 @@
+---
+name: hyperfine
+description: Benchmarks de comandos con rigor estadístico. Calienta la caché, repite ejecuciones y compara alternativas con media y desviación.
+category: cli-tools
+tags: [benchmark, performance, rust, measurement]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install sharkdp.hyperfine
+  brew: brew install hyperfine
+  scoop: scoop install hyperfine
+  apt: sudo apt install hyperfine
+  cargo: cargo install --locked hyperfine
+links:
+  repo: https://github.com/sharkdp/hyperfine
+related: [cli-tools/fd, cli-tools/ripgrep, cli-tools/tokei]
+addedAt: 2026-10-08
+---
+
+## Mide de verdad, no con `time`
+
+`time comando` te da una sola medida, contaminada por la caché del disco y por lo que hiciera el sistema en ese instante. hyperfine ejecuta el comando muchas veces, descarta ruido y te da media, desviación, mínimo y máximo.
+
+## Uso básico
+
+```bash
+# Medir un comando
+hyperfine 'sleep 0.3'
+
+# Comparar alternativas: hyperfine dice cuál es más rápida y cuánto
+hyperfine 'find . -name "*.ts"' 'fd -e ts'
+
+# Rondas de calentamiento para llenar cachés
+hyperfine --warmup 3 'rg TODO'
+```
+
+## Opciones útiles
+
+```bash
+# Preparar el estado antes de cada ejecución
+hyperfine --prepare 'rm -rf node_modules' 'pnpm install' 'bun install'
+
+# Barrido de parámetros
+hyperfine -P threads 1 8 'make -j {threads}'
+
+# Exportar resultados
+hyperfine --export-markdown bench.md 'cmd1' 'cmd2'
+hyperfine --export-json bench.json 'cmd1'
+
+# Número fijo de ejecuciones
+hyperfine --runs 20 'node script.js'
+```
+
+## Para qué sirve en el día a día
+
+- Decidir entre dos herramientas con datos, no con sensaciones.
+- Comprobar si una optimización mejora algo de verdad.
+- Detectar regresiones de rendimiento en CI exportando a JSON.

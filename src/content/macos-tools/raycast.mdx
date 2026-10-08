@@ -1,0 +1,58 @@
+---
+name: Raycast
+description: Launcher para macOS que sustituye a Spotlight. Abre apps, gestiona ventanas, guarda el portapapeles y ejecuta scripts y extensiones.
+category: macos-tools
+tags: [macos, launcher, productivity, clipboard, window-management, extensions]
+os: [macos]
+featured: true
+difficulty: beginner
+install:
+  brew: brew install --cask raycast
+  manual: https://www.raycast.com/
+links:
+  website: https://www.raycast.com/
+  docs: https://manual.raycast.com/
+related: [macos-tools/aerospace, windows-tools/flow-launcher, windows-tools/powertoys]
+addedAt: 2026-10-08
+---
+
+## Spotlight con superpoderes
+
+Raycast se abre con un atajo (normalmente se reasigna `⌘ Space`) y desde ahí haces casi todo sin tocar el ratón: abrir apps, buscar ficheros, convertir unidades, cambiar de ventana o lanzar comandos de las extensiones de la comunidad.
+
+## Lo que viene de serie
+
+```
+Clipboard History   → historial del portapapeles con búsqueda
+Window Management   → mitades, tercios y pantallas con atajos
+Snippets            → expansor de texto (;email → tu email)
+Quicklinks          → búsquedas parametrizadas (gh {query})
+Calculator          → cálculos, divisas y unidades en la barra
+Floating Notes      → nota rápida siempre visible
+```
+
+Asigna hotkeys propios a los comandos que más uses en Settings → Extensions.
+
+## Extensiones para devs
+
+La Store tiene cientos de extensiones gratuitas: GitHub (PRs e issues), Docker, Brew, Kill Process, Port Manager, color picker, generadores de UUID, documentación de MDN y muchas más. Se instalan con un clic desde el propio Raycast.
+
+## Script Commands
+
+Cualquier script de bash, Python o Node puede ser un comando:
+
+```bash
+#!/bin/bash
+# @raycast.schemaVersion 1
+# @raycast.title Abrir proyecto actual
+# @raycast.mode silent
+# @raycast.packageName Dev
+
+code ~/proyectos/devpiece
+```
+
+Guárdalo en una carpeta y añádela en Settings → Extensions → Script Commands.
+
+## Gratis y de pago
+
+El núcleo es gratuito y cubre todo lo anterior. La suscripción Pro añade IA integrada, sincronización en la nube y temas personalizados.

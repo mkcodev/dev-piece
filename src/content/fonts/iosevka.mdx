@@ -1,0 +1,61 @@
+---
+name: Iosevka
+description: Fuente monoespaciada estrecha y totalmente personalizable. Cabe más código en pantalla y puedes compilar tu propia variante glifo a glifo.
+category: fonts
+tags: [font, monospace, ligatures, narrow, customizable]
+os: [windows, macos, linux]
+difficulty: intermediate
+install:
+  brew: brew install --cask font-iosevka
+  scoop: scoop bucket add nerd-fonts; scoop install nerd-fonts/Iosevka-NF
+  manual: https://github.com/be5invis/Iosevka/releases
+links:
+  repo: https://github.com/be5invis/Iosevka
+  website: https://typeof.net/Iosevka/
+related: [fonts/maple-mono, fonts/monaspace, fonts/nerd-fonts]
+addedAt: 2026-10-08
+---
+
+## Más columnas en la misma pantalla
+
+Iosevka es notablemente más estrecha que la mayoría de fuentes de código. Con dos paneles lado a lado o en un portátil, se nota: más caracteres por línea sin bajar el tamaño de letra.
+
+## Variantes listas para usar
+
+```
+Iosevka            → con ligaduras
+Iosevka Term       → flechas y símbolos ajustados a una celda, ideal en terminales
+Iosevka Fixed      → como Term, pero sin ligaduras
+Iosevka Aile/Etoile → versiones proporcionales para texto
+SS01…SS18          → estilos que imitan otras fuentes (Menlo, Fira, JetBrains...)
+```
+
+## Tu propia Iosevka
+
+La web oficial tiene un configurador para elegir la forma de cada glifo (la "g", el cero con barra o punto, la "l"...). Genera un `private-build-plans.toml` que compilas tú:
+
+```toml
+[buildPlans.IosevkaCustom]
+family = "Iosevka Custom"
+spacing = "normal"
+serifs = "sans"
+
+[buildPlans.IosevkaCustom.variants.design]
+zero = "dotted"
+g = "single-storey-serifless"
+```
+
+```bash
+git clone --depth 1 https://github.com/be5invis/Iosevka
+cd Iosevka && npm install
+npm run build -- ttf::IosevkaCustom
+```
+
+## VS Code
+
+```jsonc
+{
+  "editor.fontFamily": "'Iosevka', monospace",
+  "editor.fontLigatures": true
+}
+```

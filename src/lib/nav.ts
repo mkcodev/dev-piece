@@ -22,8 +22,8 @@ export interface NavGroup {
 const GROUPS: { id: string; label: string; categories: string[] }[] = [
   { id: 'terminal', label: 'Terminal y CLI', categories: ['terminales', 'cli-tools', 'snippets', 'dotfiles', 'git-hacks', 'docker'] },
   { id: 'editores', label: 'Editores e IA', categories: ['neovim', 'vscode', 'ai-tools', 'fonts'] },
-  { id: 'web', label: 'Navegador y web', categories: ['browser-extensions', 'userscripts', 'web-resources', 'learning'] },
-  { id: 'sistema', label: 'Sistema', categories: ['windows-tools', 'scripts-ahk', 'macos-tools'] },
+  { id: 'web', label: 'Navegador y web', categories: ['browser-extensions', 'userscripts', 'web-resources', 'apis-datos', 'learning'] },
+  { id: 'sistema', label: 'Sistema', categories: ['windows-tools', 'scripts-ahk', 'macos-tools', 'productividad'] },
 ];
 
 let navPromise: Promise<{ explore: NavItem[]; groups: NavGroup[] }> | null = null;
