@@ -3,23 +3,6 @@ import Fuse from 'fuse.js';
 import type { SearchItem } from '../../lib/search';
 import { fuseOptions } from '../../lib/search';
 
-const CATEGORY_LABELS: Record<string, string> = {
-  terminales: 'Terminales & Shells',
-  'cli-tools': 'CLI Tools',
-  snippets: 'Snippets & Aliases',
-  neovim: 'Neovim',
-  vscode: 'VS Code',
-  'browser-extensions': 'Extensiones de Navegador',
-  'scripts-ahk': 'AutoHotkey Scripts',
-  userscripts: 'UserScripts',
-  dotfiles: 'Dotfiles & Configs',
-  docker: 'Docker Hacks',
-  'git-hacks': 'Git Power Moves',
-  fonts: 'Fuentes para Devs',
-  'ai-tools': 'IA para Devs',
-  'windows-tools': 'Windows Power Tools',
-};
-
 export default function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -183,7 +166,7 @@ export default function CommandPalette() {
               {query && (
                 <div className="px-3 py-1 mt-2">
                   <span className="text-xs font-semibold text-overlay2 uppercase tracking-wider">
-                    {CATEGORY_LABELS[cat] ?? cat}
+                    {catItems[0]?.categoryLabel ?? cat}
                   </span>
                 </div>
               )}
@@ -220,7 +203,7 @@ export default function CommandPalette() {
                     </div>
                     {!query && (
                       <span className="text-xs text-overlay1 flex-shrink-0">
-                        {CATEGORY_LABELS[item.category] ?? item.category}
+                        {item.categoryLabel}
                       </span>
                     )}
                   </a>
