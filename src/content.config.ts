@@ -135,6 +135,18 @@ export const collections = {
     loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/web-resources' }),
     schema: toolSchema,
   }),
+  'macos-tools': defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/macos-tools' }),
+    schema: toolSchema,
+  }),
+  'apis-datos': defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/apis-datos' }),
+    schema: toolSchema,
+  }),
+  'productividad': defineCollection({
+    loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/productividad' }),
+    schema: toolSchema,
+  }),
   guias: defineCollection({
     loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guias' }),
     schema: guiaSchema,
