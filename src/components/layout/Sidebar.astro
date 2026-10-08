@@ -109,12 +109,12 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/>
       </svg>
       <span>Mi Arsenal</span>
-      <!-- Three circles: red=favs, yellow=ints, green=core -->
-      <div id="sidebar-arsenal-dots" class="ml-auto flex items-center gap-1 hidden">
-        <span id="dot-fav"  class="w-2 h-2 rounded-full bg-red   opacity-80" title="Favoritos"   />
-        <span id="dot-int"  class="w-2 h-2 rounded-full opacity-80" style="background:#e5c890" title="Integradas"  />
-        <span id="dot-core" class="w-2 h-2 rounded-full bg-green  opacity-0"  title="Core Setup"  />
-      </div>
+      <!-- Unique tools in favorites ∪ integrations, filled client-side -->
+      <span
+        id="sidebar-arsenal-count"
+        class="ml-auto text-xs bg-lavender/20 text-lavender px-1.5 py-0.5 rounded-full font-mono hidden"
+        title="Herramientas en tu arsenal"
+      ></span>
     </a>
 
     <div class="pt-2 pb-1 px-3">
@@ -174,28 +174,23 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
 </aside>
 
 <script>
-  function updateArsenalDots() {
-    const dots = document.getElementById('sidebar-arsenal-dots');
-    const dotFav  = document.getElementById('dot-fav');
-    const dotInt  = document.getElementById('dot-int');
-    const dotCore = document.getElementById('dot-core');
-    if (!dots) return;
+  function updateArsenalCount() {
+    const badge = document.getElementById('sidebar-arsenal-count');
+    if (!badge) return;
     try {
       const favs = JSON.parse(localStorage.getItem('devpiece-favorites')     ?? '[]');
       const ints = JSON.parse(localStorage.getItem('devpiece-integrations')  ?? '[]');
-      const hasFav  = Array.isArray(favs) && favs.length > 0;
-      const hasInt  = Array.isArray(ints) && ints.length > 0;
-      const hasCore = hasFav && hasInt && favs.some((f: any) =>
-        ints.some((i: any) => i.slug === f.slug && i.category === f.category)
+      const unique = new Set(
+        [...(Array.isArray(favs) ? favs : []), ...(Array.isArray(ints) ? ints : [])]
+          .map((t: any) => `${t.category}/${t.slug}`)
       );
-      dots.classList.toggle('hidden', !hasFav && !hasInt);
-      if (dotFav)  dotFav.style.opacity  = hasFav  ? '0.85' : '0.2';
-      if (dotInt)  dotInt.style.opacity  = hasInt  ? '0.85' : '0.2';
-      if (dotCore) dotCore.style.opacity = hasCore ? '0.85' : '0.0';
+      badge.textContent = String(unique.size);
+      badge.classList.toggle('hidden', unique.size === 0);
     } catch {}
   }
-  updateArsenalDots();
-  window.addEventListener('favorites-updated',    updateArsenalDots);
-  window.addEventListener('integrations-updated', updateArsenalDots);
-  document.addEventListener('astro:page-load',    updateArsenalDots);
+  updateArsenalCount();
+  window.addEventListener('favorites-updated',    updateArsenalCount);
+  window.addEventListener('integrations-updated', updateArsenalCount);
+  window.addEventListener('storage',              updateArsenalCount);
+  document.addEventListener('astro:page-load',    updateArsenalCount);
 </script>
