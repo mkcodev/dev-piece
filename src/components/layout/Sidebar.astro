@@ -32,10 +32,10 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
   <!-- Logo -->
   <div class="p-5 border-b border-surface0">
     <a href="/" class="flex items-center gap-2 group">
-      <img src="/devpiece-logo.png" alt="DevPiece" class="w-11 h-11 object-contain flex-shrink-0 group-hover:scale-105 transition-transform duration-200" />
+      <img src="/devpiece-logo.png" alt="" class="w-11 h-11 object-contain flex-shrink-0 group-hover:scale-105 transition-transform duration-200" />
       <div>
         <span class="font-bold text-text text-base leading-tight block">DevPiece</span>
-        <span class="text-xs text-subtext0 leading-tight block">Tu arsenal dev</span>
+        <span class="text-xs text-subtext1 leading-tight block">Tu arsenal dev</span>
       </div>
     </a>
   </div>
@@ -74,7 +74,7 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 4"/>
       </svg>
       <span>Roadmaps</span>
-      <span class="ml-auto text-xs bg-lavender/20 text-lavender px-1.5 py-0.5 rounded-full font-mono">5</span>
+      <span class="ml-auto text-xs chip chip-lavender px-1.5 py-0.5 rounded-full font-mono">5</span>
     </a>
 
     <!-- Guías link -->
@@ -112,7 +112,7 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
       <!-- Unique tools in favorites ∪ integrations, filled client-side -->
       <span
         id="sidebar-arsenal-count"
-        class="ml-auto text-xs bg-lavender/20 text-lavender px-1.5 py-0.5 rounded-full font-mono hidden"
+        class="ml-auto text-xs chip chip-lavender px-1.5 py-0.5 rounded-full font-mono hidden"
         title="Herramientas en tu arsenal"
       ></span>
     </a>
@@ -136,7 +136,7 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
         {item.count > 0 && (
           <span class:list={[
             "text-xs px-1.5 py-0.5 rounded-full font-mono flex-shrink-0 ml-2 transition-colors duration-300 accent-morph",
-            item.active ? "bg-surface1 text-text" : "bg-surface0/60 text-subtext0"
+            item.active ? "bg-surface1 text-text" : "bg-surface0/60 text-subtext1"
           ]}>
             {item.count}
           </span>

@@ -98,10 +98,10 @@ type SortBy = 'name' | 'recent' | 'featured';
 const DIFF_ORDER: Record<string, number> = { beginner: 0, intermediate: 1, advanced: 2 };
 
 const OS_BADGE: Record<string, { label: string; color: string }> = {
-  windows: { label: 'Win', color: 'bg-blue/20 text-blue border-blue/30' },
-  macos: { label: 'Mac', color: 'bg-mauve/20 text-mauve border-mauve/30' },
-  linux: { label: 'Linux', color: 'bg-peach/20 text-peach border-peach/30' },
-  cross: { label: 'Cross', color: 'bg-green/20 text-green border-green/30' },
+  windows: { label: 'Win', color: 'chip chip-blue' },
+  macos: { label: 'Mac', color: 'chip chip-mauve' },
+  linux: { label: 'Linux', color: 'chip chip-peach' },
+  cross: { label: 'Cross', color: 'chip chip-green' },
 };
 
 const DIFF_CONFIG: Record<string, { label: string; dotColor: string }> = {
@@ -147,7 +147,7 @@ function FavoriteButton({ entry, category, accent }: { entry: ToolEntry; categor
   }, [isFav, entry, category, accent]);
   return (
     <button onClick={toggle}
-      className={`p-1 rounded transition-colors ${isFav ? 'text-red' : 'text-subtext0 hover:text-red'}`}
+      className={`p-1 rounded transition-colors ${isFav ? 'text-red' : 'text-subtext1 hover:text-red'}`}
       aria-label={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}
       title={isFav ? 'Quitar de favoritos' : 'Añadir a favoritos'}>
       <svg className="w-3.5 h-3.5" fill={isFav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -180,7 +180,7 @@ function AlternativeButton({ entry, category }: { entry: ToolEntry; category: st
   }, [isAlt, entry, category]);
   return (
     <button onClick={toggle}
-      className={`p-1 rounded transition-colors ${isAlt ? 'text-peach' : 'text-subtext0 hover:text-peach'}`}
+      className={`p-1 rounded transition-colors ${isAlt ? 'text-peach' : 'text-subtext1 hover:text-peach'}`}
       aria-label={isAlt ? 'Quitar alternativa' : 'Marcar como alternativa conocida'}
       title={isAlt ? 'Quitar alternativa' : 'Marcar como alternativa'}>
       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -216,7 +216,7 @@ function IntegrationButton({ entry, category, accent }: { entry: ToolEntry; cate
   }, [isInt, entry, category, accent]);
   return (
     <button onClick={toggle}
-      className={`p-1 rounded transition-colors ${isInt ? '' : 'text-subtext0 hover:text-yellow'}`}
+      className={`p-1 rounded transition-colors ${isInt ? '' : 'text-subtext1 hover:text-yellow'}`}
       style={isInt ? { color: '#e5c890' } : {}}
       aria-label={isInt ? 'Quitar integración' : 'Marcar como integrado'}
       title={isInt ? 'Quitar integración' : 'Marcar como integrado'}>
@@ -334,7 +334,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
       <FilterBar tags={tags} onFilterChange={setFilters} />
 
       {filtered.length === 0 ? (
-        <div className="text-center py-16 text-subtext0">
+        <div className="text-center py-16 text-subtext1">
           <svg className="w-12 h-12 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="11" cy="11" r="8"/>
             <line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -344,7 +344,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
         </div>
       ) : (
         <>
-          <p className="text-xs text-subtext0 mb-4">
+          <p className="text-xs text-subtext1 mb-4">
             Mostrando {filtered.length} de {entries.length} herramienta{entries.length !== 1 ? 's' : ''}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -361,7 +361,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <ToolIcon name={entry.name} slug={entry.slug} category={category} accent={accent} />
-                      <h3 className="font-semibold text-text text-base leading-tight truncate">{entry.name}</h3>
+                      <h2 className="font-semibold text-text text-base leading-tight truncate">{entry.name}</h2>
                       <InUseBadge slug={entry.slug} category={category} />
                       <AltBadge slug={entry.slug} category={category} />
                     </div>
@@ -392,7 +392,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
                   {entry.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 overflow-hidden max-h-6">
                       {entry.tags.slice(0, 5).map((tag) => (
-                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-surface1 text-subtext0 border border-surface1 flex-shrink-0">
+                        <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-crust/50 text-subtext1 border border-surface1 flex-shrink-0">
                           #{tag}
                         </span>
                       ))}
@@ -410,7 +410,7 @@ export default function CategoryFilterIsland({ tags, entries, category, accent }
                       <FavoriteButton entry={entry} category={category} accent={accent} />
                       <a
                         href={`/${category}/${entry.slug}`}
-                        className="text-xs text-blue hover:text-lavender font-medium transition-colors flex items-center gap-1"
+                        className="text-xs text-lavender hover:text-text font-medium transition-colors flex items-center gap-1"
                       >
                         Ver más
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

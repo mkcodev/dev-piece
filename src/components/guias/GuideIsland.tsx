@@ -136,7 +136,7 @@ export default function GuideIsland({ slug, steps }: Props) {
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Favorite button */}
             <button onClick={toggleFav}
-              className={`p-2 rounded-lg border transition-all ${fav ? 'text-red border-red/30 bg-red/10' : 'text-subtext0 border-surface1 hover:text-red hover:border-red/30 hover:bg-red/5'}`}
+              className={`p-2 rounded-lg border transition-all ${fav ? 'text-red border-red/30 bg-red/10' : 'text-subtext1 border-surface1 hover:text-red hover:border-red/30 hover:bg-red/5'}`}
               title={fav ? 'Quitar de favoritos' : 'Guardar guía como favorita'}>
               <svg className="w-4 h-4" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
@@ -145,7 +145,7 @@ export default function GuideIsland({ slug, steps }: Props) {
 
             {/* Quick guide toggle */}
             <button onClick={() => setShowQuick(v => !v)}
-              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${showQuick ? 'bg-lavender/20 text-lavender border-lavender/30' : 'bg-surface0 text-subtext1 border-surface1 hover:bg-surface1'}`}>
+              className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${showQuick ? 'chip chip-lavender' : 'bg-surface0 text-subtext1 border-surface1 hover:bg-surface1'}`}>
               ⚡ Guía rápida
             </button>
           </div>
@@ -154,24 +154,24 @@ export default function GuideIsland({ slug, steps }: Props) {
         {/* Quick guide accordion */}
         {showQuick && (
           <div className="border border-surface1 rounded-xl bg-crust/50 p-4 mb-4">
-            <p className="text-xs font-bold text-subtext0 uppercase tracking-wider mb-3">Solo los comandos</p>
+            <p className="text-xs font-bold text-subtext1 uppercase tracking-wider mb-3">Solo los comandos</p>
             <div className="space-y-4">
               {steps.map((step, i) => (
                 <div key={step.id}>
                   <p className="text-xs font-semibold text-text mb-1.5">
-                    <span className="text-subtext0 mr-1">{i + 1}.</span> {step.title}
+                    <span className="text-subtext1 mr-1">{i + 1}.</span> {step.title}
                   </p>
                   {step.quickCommands.length > 0 ? (
                     <div className="space-y-1">
                       {step.quickCommands.map((cmd, ci) => (
                         <div key={ci} className="flex items-center gap-2 group">
-                          <code className={`flex-1 text-[11px] font-mono px-2.5 py-1 rounded-lg border ${cmd.startsWith('#') ? 'text-subtext0 bg-transparent border-transparent italic' : 'text-green bg-surface0 border-surface1'}`}>
+                          <code className={`flex-1 text-[11px] font-mono px-2.5 py-1 rounded-lg border ${cmd.startsWith('#') ? 'text-subtext1 bg-transparent border-transparent italic' : 'text-green bg-surface0 border-surface1'}`}>
                             {cmd}
                           </code>
                           {!cmd.startsWith('#') && (
                             <button
                               onClick={() => navigator.clipboard.writeText(cmd)}
-                              className="opacity-0 group-hover:opacity-100 p-1 rounded text-subtext0 hover:text-text transition-all"
+                              className="opacity-0 group-hover:opacity-100 p-1 rounded text-subtext1 hover:text-text transition-all"
                               title="Copiar">
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
@@ -182,7 +182,7 @@ export default function GuideIsland({ slug, steps }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-subtext0 italic">Ver artículo para detalles</p>
+                    <p className="text-xs text-subtext1 italic">Ver artículo para detalles</p>
                   )}
                 </div>
               ))}
@@ -212,7 +212,7 @@ export default function GuideIsland({ slug, steps }: Props) {
                   )}
                 </div>
                 {/* Step number */}
-                <span className={`text-xs font-mono font-bold flex-shrink-0 ${isComplete ? 'text-green' : 'text-subtext0'}`}>
+                <span className={`text-xs font-mono font-bold flex-shrink-0 ${isComplete ? 'text-green' : 'text-subtext1'}`}>
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 {/* Title */}
@@ -221,7 +221,7 @@ export default function GuideIsland({ slug, steps }: Props) {
                 </span>
                 {/* Tools count */}
                 {step.tools.length > 0 && (
-                  <span className="text-[10px] text-subtext0 font-mono flex-shrink-0">
+                  <span className="text-[10px] text-subtext1 font-mono flex-shrink-0">
                     {step.tools.length} tool{step.tools.length > 1 ? 's' : ''}
                   </span>
                 )}
@@ -326,14 +326,14 @@ function BottomProgressBar({ steps, stepsDone, onToggle, done }: {
               )}
             </div>
             <span className="text-xs font-medium truncate">
-              <span className="text-subtext0 mr-1">Paso {currentIdx + 1}/{steps.length}:</span>
+              <span className="text-subtext1 mr-1">Paso {currentIdx + 1}/{steps.length}:</span>
               {currentStep.title}
             </span>
           </button>
         )}
 
         {/* Progress text */}
-        <span className="text-xs text-subtext0 font-mono flex-shrink-0">{progressPct}%</span>
+        <span className="text-xs text-subtext1 font-mono flex-shrink-0">{progressPct}%</span>
 
         <button onClick={() => { next(); scrollToStep(currentIdx + 1); }}
           disabled={currentIdx === steps.length - 1}

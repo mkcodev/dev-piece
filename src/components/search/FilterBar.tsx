@@ -127,7 +127,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
     <div className="bg-mantle/50 border border-surface0 rounded-xl p-4 space-y-4 mb-6">
       {/* Search input */}
       <div className="relative">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-subtext0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-subtext1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
@@ -136,7 +136,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder="Filtrar en esta categoría..."
-          className="w-full pl-9 pr-4 py-2 bg-surface0 border border-surface1 rounded-lg text-sm text-text placeholder:text-subtext0 outline-none focus:border-blue/50 transition-colors"
+          className="w-full pl-9 pr-4 py-2 bg-surface0 border border-surface1 rounded-lg text-sm text-text placeholder:text-subtext1 focus:border-blue/50 transition-colors"
           aria-label="Filtrar herramientas"
         />
       </div>
@@ -149,7 +149,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
             onClick={() => { setSelectedOS([]); emit([], selectedDifficulty, sort, activeTags, search); }}
             className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${
               selectedOS.length === 0
-                ? 'bg-blue/20 text-blue border-blue/30'
+                ? 'chip chip-blue'
                 : 'text-subtext1 border-surface1 hover:border-surface2'
             }`}
           >
@@ -161,7 +161,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
               onClick={() => toggleOS(opt.value)}
               className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${
                 selectedOS.includes(opt.value)
-                  ? 'bg-blue/20 text-blue border-blue/30'
+                  ? 'chip chip-blue'
                   : 'text-subtext1 border-surface1 hover:border-surface2'
               }`}
             >
@@ -177,7 +177,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
             onClick={() => { setSelectedDifficulty([]); emit(selectedOS, [], sort, activeTags, search); }}
             className={`px-2.5 py-1 rounded-lg text-xs border transition-all ${
               selectedDifficulty.length === 0
-                ? 'bg-blue/20 text-blue border-blue/30'
+                ? 'chip chip-blue'
                 : 'text-subtext1 border-surface1 hover:border-surface2'
             }`}
           >
@@ -204,7 +204,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
           <select
             value={sort}
             onChange={(e) => handleSort(e.target.value as SortBy)}
-            className="px-2.5 py-1 bg-surface0 border border-surface1 rounded-lg text-xs text-subtext1 outline-none focus:border-blue/50 transition-colors cursor-pointer"
+            className="px-2.5 py-1 bg-surface0 border border-surface1 rounded-lg text-xs text-subtext1 focus:border-blue/50 transition-colors cursor-pointer"
             aria-label="Ordenar por"
           >
             {SORT_OPTIONS.map((opt) => (
@@ -234,8 +234,8 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
               onClick={() => toggleTag(tag)}
               className={`px-2 py-0.5 rounded-full text-xs border transition-all ${
                 activeTags.includes(tag)
-                  ? 'bg-mauve/20 text-mauve border-mauve/30'
-                  : 'text-subtext0 border-surface1 hover:border-surface2 hover:text-subtext1'
+                  ? 'chip chip-mauve'
+                  : 'text-subtext1 border-surface1 hover:border-surface2 hover:text-text'
               }`}
             >
               #{tag}
@@ -244,7 +244,7 @@ export default function FilterBar({ tags, onFilterChange }: FilterBarProps) {
           {tags.length > 12 && (
             <button
               onClick={() => setShowAllTags((v) => !v)}
-              className="text-xs text-blue hover:text-lavender transition-colors ml-1"
+              className="text-xs text-lavender hover:text-text transition-colors ml-1"
             >
               {showAllTags ? 'Ver menos' : `+${tags.length - 12} más`}
             </button>

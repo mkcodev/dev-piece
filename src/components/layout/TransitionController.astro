@@ -46,17 +46,17 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
     const b = bar(); const i = inner();
     if (!b || !i) return;
     b.classList.add('visible');
-    i.style.width = '18%';
+    i.style.transform = 'scaleX(0.18)';
     clearTimeout(progressTimer);
-    progressTimer = setTimeout(() => { i.style.width = '55%'; }, 120);
-    progressTimer = setTimeout(() => { i.style.width = '78%'; }, 400);
+    progressTimer = setTimeout(() => { i.style.transform = 'scaleX(0.55)'; }, 120);
+    progressTimer = setTimeout(() => { i.style.transform = 'scaleX(0.78)'; }, 400);
   }
 
   function progressFinish() {
     const i = inner();
     if (!i) return;
     clearTimeout(progressTimer);
-    i.style.width = '100%';
+    i.style.transform = 'scaleX(1)';
   }
 
   function progressHide() {
@@ -64,7 +64,7 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
     if (!b || !i) return;
     setTimeout(() => {
       b.classList.remove('visible');
-      setTimeout(() => { i.style.width = '0%'; }, 220);
+      setTimeout(() => { i.style.transform = 'scaleX(0)'; }, 220);
     }, 120);
   }
 

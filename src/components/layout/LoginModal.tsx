@@ -126,7 +126,7 @@ export default function LoginModal() {
           )}
           <span className="text-sm font-medium text-text hidden sm:block max-w-[120px] truncate">{user.name}</span>
           <svg
-            className={`w-3 h-3 text-subtext0 hidden sm:block transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
+            className={`w-3 h-3 text-subtext1 hidden sm:block transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m6 9 6 6 6-6" />
@@ -158,7 +158,7 @@ export default function LoginModal() {
             /* Logged-in menu */
             <div className="w-48 bg-mantle border border-surface1 rounded-xl overflow-hidden">
               <div className="px-4 py-3 border-b border-surface0">
-                <p className="text-xs text-subtext0">Sesión local</p>
+                <p className="text-xs text-subtext1">Sesión local</p>
                 <p className="text-sm font-semibold text-text truncate">{user!.name}</p>
               </div>
               <button
@@ -188,11 +188,11 @@ export default function LoginModal() {
                   <h2 className="text-base font-bold text-text">
                     {user ? 'Editar perfil' : 'Tu perfil'}
                   </h2>
-                  <p className="text-xs text-subtext0 mt-0.5">Guardado en tu navegador</p>
+                  <p className="text-xs text-subtext1 mt-0.5">Guardado en tu navegador</p>
                 </div>
                 <button
                   onClick={close}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface0 text-subtext0 hover:text-text transition-colors"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface0 text-subtext1 hover:text-text transition-colors"
                   aria-label="Cerrar"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -209,7 +209,7 @@ export default function LoginModal() {
                       {preview ? (
                         <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                       ) : (
-                        <svg className="w-6 h-6 text-subtext0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <svg className="w-6 h-6 text-subtext1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       )}
@@ -231,7 +231,7 @@ export default function LoginModal() {
                       onChange={(e) => setFormName(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSave()}
                       placeholder="Ej: Carlos Dev"
-                      className="w-full bg-surface0 border border-surface1 focus:border-blue rounded-lg px-3 py-2 text-sm text-text placeholder-subtext0 outline-none transition-colors"
+                      className="w-full bg-surface0 border border-surface1 focus:border-blue rounded-lg px-3 py-2 text-sm text-text placeholder-subtext1 transition-colors"
                       autoFocus
                     />
                   </div>
