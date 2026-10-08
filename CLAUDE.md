@@ -36,9 +36,11 @@ Astro 6 (`output: 'static'`) + MDX + React 19 islands + Tailwind CSS **3.4** (`t
 **Interactivity = React islands with `client:load`/`client:visible`** (CommandPalette, ArsenalPage, ArsenalBentoWidget, GuideIsland, RoadmapCanvas, LoginModal, CopyButton, filter islands). Astro pages/components are static; any state must go through an island.
 
 **Client state contract (localStorage keys, shared across islands — keep names stable or users lose data):**
-`devpiece-favorites`, `devpiece-integrations`, `devpiece-alternatives`, `devpiece-profiles`, `devpiece-current-profile`, `devpiece-guide-steps-{slug}`, `devpiece-guides-completed`, `devpiece-guides-favorites`, `devpiece-roadmap-{slug}`, `devpiece-user`, `devpiece-sidebar-collapsed`, `devpiece-sidebar-groups`, `devpiece-preferred-pm`. Tools are stored as objects keyed by `category` + `slug` (deduped as `${category}/${slug}`), and each island/inline `<script>` (ToolCard, Sidebar, GuideIsland, ArsenalPage…) redeclares the key string itself — grep before renaming. Renaming an MDX file or category breaks saved arsenals.
+`devpiece-favorites`, `devpiece-integrations`, `devpiece-alternatives`, `devpiece-profiles`, `devpiece-current-profile`, `devpiece-guide-steps-{slug}`, `devpiece-guides-completed`, `devpiece-guides-favorites`, `devpiece-roadmap-{slug}`, `devpiece-user`, `devpiece-sidebar-collapsed`, `devpiece-sidebar-groups`, `devpiece-preferred-pm`, `devpiece-arsenal-rank`. Tools are stored as objects keyed by `category` + `slug` (deduped as `${category}/${slug}`), and each island/inline `<script>` (ToolCard, Sidebar, GuideIsland, ArsenalPage…) redeclares the key string itself — grep before renaming. Renaming an MDX file or category breaks saved arsenals.
 
-**Arsenal Power** (gamified rank in `ArsenalPage`): `(favorites + integrations) / totalTools × 100`, +15 per completed guide, mapped to 6 One Piece-themed ranks (Rookie Dev → Pirate King).
+**Arsenal Power** (gamified rank in `ArsenalPage`): `(favorites × 1 + integrations × 2 + core × 3) / 120 × 100`, capped at 100, mapped to 6 One Piece-themed ranks (Rookie Dev → Pirate King). `devpiece-arsenal-rank` stores the last rank index seen so a rank-up toast fires only on a real increase.
+
+**Motion:** `src/scripts/motion.ts` (loaded from `TransitionController`) staggers `.reveal` cards in with an IntersectionObserver and drives the pointer spotlight/tilt on `.tool-card`; an inline script in `BaseLayout` sets `html[data-motion]` so CSS can hide cards before first paint. Both `ToolCard.astro` and the React cards in `CategoryFilterIsland` must keep `tool-card reveal`, `data-fav-slug`/`data-fav-cat`, `card-icon-wrap` and `card-title-el`: the card ↔ detail morph depends on them.
 
 ## Styling
 
