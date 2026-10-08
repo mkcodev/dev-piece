@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import CategoryFilterIsland from '../components/search/CategoryFilterIsland';
 import { CATEGORY_CONFIG } from '../lib/utils';
+import { toolIconSvg, categoryIconSvg } from '../lib/tool-icons';
 import type { CollectionEntry } from 'astro:content';
 
 interface Props {
@@ -25,6 +26,8 @@ const serializedEntries = entries.map((e) => ({
   featured: e.data.featured,
   difficulty: e.data.difficulty,
   install: e.data.install,
+  links: e.data.links,
+  iconSvg: toolIconSvg(e.id, category),
   addedAt: e.data.addedAt.toISOString(),
 }));
 
@@ -51,21 +54,7 @@ const iconSlug = CATEGORY_SIMPLE_ICONS[category];
         style={`background-color: ${config.accent}25; box-shadow: 0 0 24px ${config.accent}30; view-transition-name: cat-icon-active;`}
         aria-hidden="true"
       >
-        {iconSlug ? (
-          <img
-            src={`https://cdn.simpleicons.org/${iconSlug}`}
-            alt=""
-            width="32"
-            height="32"
-            class="w-8 h-8 object-contain cat-layout-icon"
-            data-fallback={config.label.charAt(0)}
-            data-accent={config.accent}
-          />
-        ) : (
-          <span class="font-black text-xl" style={`color: ${config.accent};`}>
-            {config.label.charAt(0)}
-          </span>
-        )}
+        <span style={`color: ${config.accent};`} set:html={categoryIconSvg(category, 'w-8 h-8', iconSlug)} />
       </div>
 
       <div>
@@ -104,23 +93,3 @@ const iconSlug = CATEGORY_SIMPLE_ICONS[category];
   </div>
 </BaseLayout>
 
-<script>
-  // Icon fallback for category header
-  function initCatLayoutIcons() {
-    document.querySelectorAll<HTMLImageElement>('img.cat-layout-icon').forEach((img) => {
-      if (img.dataset.fbInit) return;
-      img.dataset.fbInit = '1';
-      const fallback = () => {
-        const span = document.createElement('span');
-        span.className = 'font-black text-xl';
-        span.style.color = img.dataset.accent ?? '#8caaee';
-        span.textContent = img.dataset.fallback ?? '?';
-        img.replaceWith(span);
-      };
-      if (img.complete && img.naturalWidth === 0) fallback();
-      else img.addEventListener('error', fallback);
-    });
-  }
-  initCatLayoutIcons();
-  document.addEventListener('astro:page-load', initCatLayoutIcons);
-</script>
