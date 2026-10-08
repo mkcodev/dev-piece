@@ -15,7 +15,7 @@ export default function LoginModal() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem('devvault-user');
+    const stored = localStorage.getItem('devpiece-user');
     if (stored) {
       try { setUser(JSON.parse(stored)); } catch {}
     }
@@ -79,14 +79,14 @@ export default function LoginModal() {
   const handleSave = () => {
     if (!formName.trim()) return;
     const userData: UserData = { name: formName.trim(), photo: formPhoto };
-    localStorage.setItem('devvault-user', JSON.stringify(userData));
+    localStorage.setItem('devpiece-user', JSON.stringify(userData));
     setUser(userData);
     close();
     window.dispatchEvent(new CustomEvent('user-updated', { detail: userData }));
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('devvault-user');
+    localStorage.removeItem('devpiece-user');
     setUser(null);
     close();
     window.dispatchEvent(new CustomEvent('user-updated', { detail: null }));

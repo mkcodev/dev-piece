@@ -3,7 +3,7 @@ export interface RoadmapNodeData {
   description: string;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   type: 'start' | 'tool' | 'concept' | 'milestone';
-  devvaultLink?: string;
+  devpieceLink?: string;
   resources?: { label: string; url: string }[];
   phase: number;
 }
@@ -661,7 +661,7 @@ const juniorDevNodes: RoadmapNode[] = [
       difficulty: 'beginner',
       type: 'start',
       phase: 1,
-      devvaultLink: '/terminales',
+      devpieceLink: '/terminales',
       resources: [
         { label: 'The Missing Semester', url: 'https://missing.csail.mit.edu' },
         { label: 'Linux Command', url: 'https://linuxcommand.org' },
@@ -677,7 +677,7 @@ const juniorDevNodes: RoadmapNode[] = [
       difficulty: 'beginner',
       type: 'concept',
       phase: 1,
-      devvaultLink: '/git-hacks',
+      devpieceLink: '/git-hacks',
       resources: [
         { label: 'Pro Git Book', url: 'https://git-scm.com/book/es/v2' },
         { label: 'Learn Git Branching', url: 'https://learngitbranching.js.org/?locale=es_ES' },
@@ -693,7 +693,7 @@ const juniorDevNodes: RoadmapNode[] = [
       difficulty: 'beginner',
       type: 'tool',
       phase: 2,
-      devvaultLink: '/vscode',
+      devpieceLink: '/vscode',
       resources: [
         { label: 'VS Code Docs', url: 'https://code.visualstudio.com/docs' },
       ],
@@ -723,7 +723,7 @@ const juniorDevNodes: RoadmapNode[] = [
       difficulty: 'beginner',
       type: 'tool',
       phase: 2,
-      devvaultLink: '/cli-tools',
+      devpieceLink: '/cli-tools',
       resources: [
         { label: 'bat', url: 'https://github.com/sharkdp/bat' },
         { label: 'eza', url: 'https://eza.rocks' },
@@ -755,7 +755,7 @@ const juniorDevNodes: RoadmapNode[] = [
       difficulty: 'beginner',
       type: 'concept',
       phase: 3,
-      devvaultLink: '/git-hacks',
+      devpieceLink: '/git-hacks',
       resources: [
         { label: 'Conventional Commits', url: 'https://www.conventionalcommits.org/es/v1.0.0/' },
         { label: 'commitlint', url: 'https://commitlint.js.org' },
@@ -771,7 +771,7 @@ const juniorDevNodes: RoadmapNode[] = [
       difficulty: 'intermediate',
       type: 'milestone',
       phase: 3,
-      devvaultLink: '/dotfiles',
+      devpieceLink: '/dotfiles',
       resources: [
         { label: 'dotfiles.github.io', url: 'https://dotfiles.github.io' },
         { label: 'chezmoi', url: 'https://www.chezmoi.io' },
@@ -864,7 +864,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'intermediate',
       type: 'tool',
       phase: 1,
-      devvaultLink: '/terminales',
+      devpieceLink: '/terminales',
       resources: [
         { label: 'Ghostty', url: 'https://ghostty.org' },
         { label: 'Alacritty', url: 'https://alacritty.org' },
@@ -896,7 +896,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'advanced',
       type: 'tool',
       phase: 2,
-      devvaultLink: '/neovim',
+      devpieceLink: '/neovim',
       resources: [
         { label: 'LazyVim', url: 'https://www.lazyvim.org' },
         { label: 'Neovim Docs', url: 'https://neovim.io/doc/' },
@@ -912,7 +912,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'intermediate',
       type: 'tool',
       phase: 2,
-      devvaultLink: '/cli-tools',
+      devpieceLink: '/cli-tools',
       resources: [
         { label: 'Modern Unix', url: 'https://github.com/ibraheemdev/modern-unix' },
         { label: 'zoxide', url: 'https://github.com/ajeetdsouza/zoxide' },
@@ -928,7 +928,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'advanced',
       type: 'concept',
       phase: 2,
-      devvaultLink: '/git-hacks',
+      devpieceLink: '/git-hacks',
       resources: [
         { label: 'Git Power Tools', url: 'https://git-scm.com/book/es/v2' },
         { label: 'Lazygit', url: 'https://github.com/jesseduffield/lazygit' },
@@ -944,7 +944,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'advanced',
       type: 'tool',
       phase: 3,
-      devvaultLink: '/docker',
+      devpieceLink: '/docker',
       resources: [
         { label: 'Docker Best Practices', url: 'https://docs.docker.com/build/building/best-practices/' },
         { label: 'Dive Tool', url: 'https://github.com/wagoodman/dive' },
@@ -975,7 +975,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'intermediate',
       type: 'tool',
       phase: 3,
-      devvaultLink: '/ai-tools',
+      devpieceLink: '/ai-tools',
       resources: [
         { label: 'Claude Code', url: 'https://claude.ai/code' },
         { label: 'GitHub Copilot', url: 'https://github.com/features/copilot' },
@@ -991,7 +991,7 @@ const ninjaDevNodes: RoadmapNode[] = [
       difficulty: 'advanced',
       type: 'milestone',
       phase: 3,
-      devvaultLink: '/dotfiles',
+      devpieceLink: '/dotfiles',
       resources: [
         { label: 'chezmoi', url: 'https://www.chezmoi.io' },
         { label: 'GNU Stow', url: 'https://www.gnu.org/software/stow/' },

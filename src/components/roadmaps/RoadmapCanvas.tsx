@@ -326,10 +326,10 @@ function InfoPanel({ node, accent, completedIds, onToggleComplete, onClose }: In
               {data.description}
             </p>
 
-            {/* DevVault link */}
-            {data.devvaultLink && (
+            {/* DevPiece link */}
+            {data.devpieceLink && (
               <a
-                href={data.devvaultLink}
+                href={data.devpieceLink}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -347,7 +347,7 @@ function InfoPanel({ node, accent, completedIds, onToggleComplete, onClose }: In
                 }}
               >
                 <span>🔍</span>
-                <span>Ver en DevVault</span>
+                <span>Ver en DevPiece</span>
                 <span style={{ marginLeft: 'auto', opacity: 0.7 }}>→</span>
               </a>
             )}
@@ -526,7 +526,7 @@ interface RoadmapCanvasProps {
 }
 
 export default function RoadmapCanvas({ roadmap, slug }: RoadmapCanvasProps) {
-  const storageKey = `devvault-roadmap-${slug}`;
+  const storageKey = `devpiece-roadmap-${slug}`;
   const [completedIds, setCompletedIds] = useState<Set<string>>(() => {
     if (typeof window === 'undefined') return new Set();
     try {

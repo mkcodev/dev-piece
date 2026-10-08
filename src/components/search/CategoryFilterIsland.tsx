@@ -110,9 +110,9 @@ const DIFF_CONFIG: Record<string, { label: string; dotColor: string }> = {
   advanced: { label: 'Avanzado', dotColor: 'bg-red' },
 };
 
-const FAV_KEY = 'devvault-favorites';
-const INT_KEY = 'devvault-integrations';
-const ALT_KEY = 'devvault-alternatives';
+const FAV_KEY = 'devpiece-favorites';
+const INT_KEY = 'devpiece-integrations';
+const ALT_KEY = 'devpiece-alternatives';
 
 function getFavs(): Array<Record<string, unknown>> {
   try { return JSON.parse(localStorage.getItem(FAV_KEY) ?? '[]'); } catch { return []; }

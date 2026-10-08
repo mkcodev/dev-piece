@@ -148,7 +148,7 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
   <!-- Bottom links -->
   <div class="p-3 border-t border-surface0 space-y-1">
     <a
-      href="https://github.com/devvault/devvault"
+      href="https://github.com/mkcodev/dev-piece"
       target="_blank"
       rel="noopener noreferrer"
       class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-subtext1 hover:text-text hover:bg-surface0/50 transition-all"
@@ -181,8 +181,8 @@ const navItems = Object.entries(CATEGORY_CONFIG).map(([slug, config], idx) => ({
     const dotCore = document.getElementById('dot-core');
     if (!dots) return;
     try {
-      const favs = JSON.parse(localStorage.getItem('devvault-favorites')     ?? '[]');
-      const ints = JSON.parse(localStorage.getItem('devvault-integrations')  ?? '[]');
+      const favs = JSON.parse(localStorage.getItem('devpiece-favorites')     ?? '[]');
+      const ints = JSON.parse(localStorage.getItem('devpiece-integrations')  ?? '[]');
       const hasFav  = Array.isArray(favs) && favs.length > 0;
       const hasInt  = Array.isArray(ints) && ints.length > 0;
       const hasCore = hasFav && hasInt && favs.some((f: any) =>

@@ -9,11 +9,11 @@ interface Props {
   isFavoriteable?: boolean;
 }
 
-const FAV_GUIDES_KEY   = 'devvault-guides-favorites';
-const DONE_GUIDES_KEY  = 'devvault-guides-completed';
-const STEPS_PREFIX     = 'devvault-guide-steps-';
-const FAV_TOOLS_KEY    = 'devvault-favorites';
-const INT_TOOLS_KEY    = 'devvault-integrations';
+const FAV_GUIDES_KEY   = 'devpiece-guides-favorites';
+const DONE_GUIDES_KEY  = 'devpiece-guides-completed';
+const STEPS_PREFIX     = 'devpiece-guide-steps-';
+const FAV_TOOLS_KEY    = 'devpiece-favorites';
+const INT_TOOLS_KEY    = 'devpiece-integrations';
 
 function loadSteps(slug: string): Record<string, boolean> {
   try { return JSON.parse(localStorage.getItem(STEPS_PREFIX + slug) ?? '{}'); } catch { return {}; }
