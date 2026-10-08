@@ -6,7 +6,6 @@
 // - Card expand from click
 // - Dynamic view-transition-name assignment
 // - Accent color morphing
-// - Sidebar sliding pill
 import { CATEGORY_CONFIG } from '../../lib/utils';
 
 // Category order matches sidebar order
@@ -91,35 +90,6 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
     if (accent) {
       document.documentElement.style.setProperty('--page-accent', accent);
     }
-  }
-
-  /* -------------------------------------------------- */
-  /*  Sidebar sliding pill                               */
-  /* -------------------------------------------------- */
-  function updateSidebarPill() {
-    const nav = document.querySelector('.sidebar-pill-track');
-    if (!nav) return;
-
-    let pill = document.getElementById('sidebar-pill');
-    if (!pill) {
-      pill = document.createElement('div');
-      pill.id = 'sidebar-pill';
-      pill.className = 'sidebar-pill-indicator';
-      nav.appendChild(pill);
-    }
-
-    const activeLink = nav.querySelector('.sidebar-link-active');
-    if (!activeLink) {
-      pill.style.opacity = '0';
-      return;
-    }
-
-    const navRect  = nav.getBoundingClientRect();
-    const linkRect = activeLink.getBoundingClientRect();
-
-    pill.style.top    = `${linkRect.top - navRect.top + nav.scrollTop}px`;
-    pill.style.height = `${linkRect.height}px`;
-    pill.style.opacity = '1';
   }
 
   /* -------------------------------------------------- */
@@ -216,7 +186,6 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
   /* -------------------------------------------------- */
   document.addEventListener('astro:page-load', () => {
     progressHide();
-    updateSidebarPill();
     clearTransitionNames();
 
     /* Trigger stagger animations */
@@ -233,7 +202,6 @@ const CATEGORY_ACCENTS: Record<string, string> = Object.fromEntries(
   });
 
   /* Initial load */
-  updateSidebarPill();
   const initCat = getCategoryFromPath(window.location.pathname);
   applyAccent(initCat);
 </script>

@@ -4,6 +4,7 @@ import '@fontsource-variable/jetbrains-mono/wght.css';
 import onestLatin from '@fontsource-variable/onest/files/onest-latin-wght-normal.woff2?url';
 import '../styles/globals.css';
 import '../styles/transitions.css';
+import '../styles/nav.css';
 import Header from '../components/layout/Header.astro';
 import Sidebar from '../components/layout/Sidebar.astro';
 import Footer from '../components/layout/Footer.astro';
@@ -71,6 +72,23 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
       description: 'El hub definitivo de productividad para desarrolladores',
     })} />
 
+    <!-- Sidebar rail state before first paint; re-applied after each swap because
+         the router replaces <html> attributes on navigation -->
+    <script is:inline>
+      (() => {
+        const apply = () => {
+          try {
+            if (localStorage.getItem('devpiece-sidebar-collapsed') === '1') document.documentElement.dataset.sidebar = 'rail';
+          } catch {}
+        };
+        apply();
+        if (!window.__dpRail) {
+          window.__dpRail = true;
+          document.addEventListener('astro:after-swap', apply);
+        }
+      })();
+    </script>
+
     <!-- Migrate localStorage keys from the old DevVault name (runs before islands hydrate) -->
     <script is:inline>
       try {
@@ -99,7 +117,7 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
       <Sidebar transition:persist="sidebar" />
 
       <!-- Main area -->
-      <div class="flex-1 flex flex-col min-w-0 lg:ml-[240px]">
+      <div class="flex-1 flex flex-col min-w-0 lg:ml-[var(--sidebar-w)]">
         <!-- Header persists too -->
         <Header transition:persist="header" />
 
