@@ -89,6 +89,21 @@ const canonicalUrl = canonical ?? new URL(Astro.url.pathname, siteUrl).href;
       })();
     </script>
 
+    <!-- Lets CSS hide `.reveal` cards before first paint so motion.ts can stagger them in.
+         If that module never runs, the flag is dropped and cards stay visible. -->
+    <script is:inline>
+      (() => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const apply = () => { document.documentElement.dataset.motion = 'on'; };
+        apply();
+        setTimeout(() => { if (!window.__dpMotionLive) delete document.documentElement.dataset.motion; }, 2500);
+        if (!window.__dpMotion) {
+          window.__dpMotion = true;
+          document.addEventListener('astro:after-swap', () => { if (window.__dpMotionLive) apply(); });
+        }
+      })();
+    </script>
+
     <!-- Migrate localStorage keys from the old DevVault name (runs before islands hydrate) -->
     <script is:inline>
       try {

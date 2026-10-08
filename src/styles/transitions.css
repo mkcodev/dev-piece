@@ -167,13 +167,15 @@ html[data-transition-type="card-expand"] ::view-transition-old(page-main) {
   overflow: hidden;
 }
 
+/* Spotlight: follows the pointer (--mx/--my set by src/scripts/motion.ts),
+   resting at the top centre when there is no fine pointer */
 .tool-card::before {
   content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    ellipse 80% 60% at 50% -10%,
-    rgba(186, 187, 241, 0.06) 0%,
+    260px circle at var(--mx, 50%) var(--my, -10%),
+    color-mix(in srgb, var(--card-accent, #babbf1) 12%, transparent) 0%,
     transparent 70%
   );
   opacity: 0;
@@ -182,8 +184,10 @@ html[data-transition-type="card-expand"] ::view-transition-old(page-main) {
   z-index: 0;
 }
 
+/* Tilt: --rx/--ry come from motion.ts; only applied while hovered so resting
+   cards do not become containing blocks */
 .tool-card:hover {
-  transform: translateY(-2px);
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-2px);
   box-shadow: var(--shadow-3);
   border-color: color-mix(in srgb, var(--card-accent, #babbf1) 45%, #51576d);
 }
@@ -236,20 +240,23 @@ html[data-transition-type="card-expand"] ::view-transition-old(page-main) {
 }
 
 /* ----------------------------------------------------------
-   7. SCROLL-DRIVEN ANIMATIONS — category grid cards
-   Chrome 115+, silent fallback in others
+   7. STAGGERED REVEAL — card grids
+   motion.ts adds .is-in per batch of cards entering the viewport,
+   with --reveal-i as the index inside the batch. Fill is "backwards"
+   so the finished animation never pins transform over hover/tilt.
    ---------------------------------------------------------- */
-@supports (animation-timeline: scroll()) {
-  @keyframes card-scroll-in {
-    from { opacity: 0; transform: translateY(22px) scale(0.98); filter: blur(2px); }
-    to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
-  }
+@keyframes card-reveal {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
 
-  .scroll-reveal {
-    animation: card-scroll-in linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 28%;
-  }
+html[data-motion='on'] .reveal:not(.is-in) {
+  opacity: 0;
+}
+
+.reveal.is-in {
+  animation: card-reveal var(--dur-page) var(--ease-out-expo) backwards;
+  animation-delay: calc(var(--reveal-i, 0) * 55ms);
 }
 
 /* ----------------------------------------------------------
