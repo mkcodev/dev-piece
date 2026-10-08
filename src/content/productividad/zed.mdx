@@ -1,0 +1,58 @@
+---
+name: Zed
+description: Editor de código ultrarrápido escrito en Rust por los creadores de Atom. Renderizado por GPU, colaboración en tiempo real e IA integrada.
+category: productividad
+tags: [editor, rust, ai, collaboration, performance, vim-mode]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install ZedIndustries.Zed
+  brew: brew install --cask zed
+  scoop: scoop bucket add extras; scoop install extras/zed
+  manual: curl -f https://zed.dev/install.sh | sh
+links:
+  repo: https://github.com/zed-industries/zed
+  docs: https://zed.dev/docs/
+  website: https://zed.dev/
+related: [vscode/vscode-settings, neovim/lazyvim, ai-tools/claude-code]
+addedAt: 2026-10-08
+---
+
+## Un editor que no se nota
+
+Zed abre al instante y escribe sin latencia incluso en ficheros enormes, porque está escrito en Rust y dibuja la interfaz directamente en la GPU. Trae de serie lo que en VS Code son extensiones: LSP, Tree-sitter, terminal integrada, Git, modo Vim y un panel de agente de IA.
+
+## Configuración
+
+Los ajustes son un JSON (`zed: open settings` en la paleta, `Ctrl/⌘ Shift P`):
+
+```jsonc
+// settings.json
+{
+  "theme": "Catppuccin Frappé",
+  "buffer_font_family": "JetBrains Mono",
+  "buffer_font_size": 15,
+  "vim_mode": true,
+  "relative_line_numbers": true,
+  "format_on_save": "on",
+  "inlay_hints": { "enabled": true },
+  "terminal": { "font_family": "JetBrainsMono Nerd Font" }
+}
+```
+
+Los temas y lenguajes adicionales se instalan desde `zed: extensions`.
+
+## IA en el editor
+
+- **Agent panel:** un agente que lee y edita el proyecto, con modelos de Anthropic, OpenAI, Google u Ollama en local.
+- **Edit predictions:** autocompletado de varias líneas que predice tu siguiente cambio.
+- **Agentes externos:** puede alojar agentes como Claude Code o Gemini CLI mediante el Agent Client Protocol.
+
+## Colaboración
+
+Invita a alguien a tu proyecto y editáis los mismos ficheros con cursores compartidos, con chat y llamada de voz integrados.
+
+## ¿Zed o VS Code?
+
+Zed si valoras la velocidad y te basta con su ecosistema (que crece rápido). VS Code si dependes de extensiones concretas, como depuradores específicos o herramientas de tu empresa.

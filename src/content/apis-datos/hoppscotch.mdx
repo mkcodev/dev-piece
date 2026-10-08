@@ -1,0 +1,53 @@
+---
+name: Hoppscotch
+description: Cliente de APIs open source que funciona en el navegador. REST, GraphQL, WebSocket y SSE, sin instalar nada y con opción autoalojada.
+category: apis-datos
+tags: [api, http, graphql, websocket, postman-alternative, web]
+os: [cross]
+difficulty: beginner
+install:
+  winget: winget install hoppscotch.Hoppscotch
+  brew: brew install --cask hoppscotch
+  scoop: scoop bucket add extras; scoop install extras/hoppscotch
+  manual: https://hoppscotch.io/
+links:
+  repo: https://github.com/hoppscotch/hoppscotch
+  docs: https://docs.hoppscotch.io/
+  website: https://hoppscotch.io/
+related: [apis-datos/bruno, cli-tools/httpie, web-resources/it-tools]
+addedAt: 2026-10-08
+---
+
+## Un Postman ligero en una pestaña
+
+Abres hoppscotch.io y ya puedes lanzar peticiones: sin descargas ni registro. Es rápido, tiene buen modo oscuro y cubre bastante más que REST.
+
+## Protocolos
+
+```
+REST        → métodos, cabeceras, query params, body JSON/form/multipart
+GraphQL     → explorador del schema con autocompletado
+Realtime    → WebSocket, Server-Sent Events, Socket.IO y MQTT
+```
+
+## Funciones clave
+
+- **Colecciones y entornos:** variables con `<<baseUrl>>` y entornos por proyecto.
+- **Scripts pre-request y tests:** en JavaScript, para encadenar tokens o validar respuestas.
+- **Generar código:** convierte cualquier petición a curl, fetch, axios, Python y muchos más.
+- **Importar:** colecciones de Postman, Insomnia y OpenAPI.
+
+## CORS y localhost
+
+Desde el navegador, algunas peticiones fallan por CORS o porque apuntan a `localhost`. Para eso existen la extensión de navegador de Hoppscotch, el agente de escritorio (Hoppscotch Agent) o directamente la app de escritorio.
+
+## Autoalojado
+
+Para equipos que no quieren datos fuera: Hoppscotch Community Edition se despliega con Docker y añade espacios de trabajo compartidos y usuarios.
+
+## CLI para CI
+
+```bash
+npm install -g @hoppscotch/cli
+hopp test coleccion.json -e entorno.json
+```

@@ -1,0 +1,73 @@
+---
+name: Bruno
+description: Cliente de APIs open source y offline. Las colecciones se guardan como ficheros de texto en tu repo, versionadas con Git y sin cuentas en la nube.
+category: apis-datos
+tags: [api, http, rest, graphql, postman-alternative, git]
+os: [windows, macos, linux]
+featured: true
+difficulty: beginner
+install:
+  winget: winget install Bruno.Bruno
+  brew: brew install --cask bruno
+  scoop: scoop bucket add extras; scoop install extras/bruno
+  npm: npm install -g @usebruno/cli
+links:
+  repo: https://github.com/usebruno/bruno
+  docs: https://docs.usebruno.com/
+  website: https://www.usebruno.com/
+related: [apis-datos/hoppscotch, cli-tools/xh, vscode/rest-client]
+addedAt: 2026-10-08
+---
+
+## Postman, pero en tu repositorio
+
+Bruno guarda cada petición como un fichero de texto plano dentro de una carpeta de tu proyecto. Eso significa que las colecciones viajan con el código, se revisan en los PRs y nunca dependen de una cuenta o de una sincronización en la nube. Funciona completamente offline.
+
+## Así es una petición
+
+```
+meta {
+  name: Crear usuario
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/users
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Ada",
+    "email": "ada@example.com"
+  }
+}
+
+tests {
+  test("devuelve 201", function () {
+    expect(res.status).to.equal(201);
+  });
+}
+```
+
+## Entornos y secretos
+
+Las variables por entorno (local, staging, prod) viven en `environments/`. Los valores sensibles se marcan como secretos y no se guardan en el fichero, o se leen de un `.env` que no subes al repo con `{{process.env.API_KEY}}`.
+
+## En CI
+
+```bash
+npm install -g @usebruno/cli
+bru run --env staging            # Ejecuta toda la colección con sus tests
+bru run usuarios/ --env local    # Solo una carpeta
+```
+
+## Migrar desde Postman o Insomnia
+
+Bruno importa colecciones de Postman, Insomnia y especificaciones OpenAPI desde el menú de importación.

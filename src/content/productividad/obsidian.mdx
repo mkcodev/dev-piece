@@ -1,0 +1,52 @@
+---
+name: Obsidian
+description: Notas en Markdown local enlazadas entre sí. Tu segundo cerebro técnico, con snippets, decisiones y aprendizajes que puedes versionar con Git.
+category: productividad
+tags: [notes, markdown, knowledge-base, second-brain, local-first]
+os: [windows, macos, linux]
+difficulty: beginner
+install:
+  winget: winget install Obsidian.Obsidian
+  brew: brew install --cask obsidian
+  scoop: scoop bucket add extras; scoop install extras/obsidian
+links:
+  website: https://obsidian.md/
+  docs: https://help.obsidian.md/
+related: [productividad/zed, dotfiles/chezmoi, learning/missing-semester]
+addedAt: 2026-10-08
+---
+
+## Notas que te pertenecen
+
+Un "vault" de Obsidian es solo una carpeta con ficheros `.md`. No hay formato propietario ni dependes de un servicio: puedes abrir tus notas con cualquier editor, buscarlas con ripgrep y versionarlas con Git.
+
+## Para qué lo usa un dev
+
+- **Diario técnico:** qué hiciste, qué rompiste, cómo lo arreglaste. Dentro de seis meses lo agradecerás.
+- **Snippets y comandos** que siempre olvidas, con bloques de código resaltados.
+- **Decisiones de arquitectura (ADR)** de tus proyectos.
+- **Apuntes de cursos** enlazados entre sí por conceptos.
+
+## Enlaces y grafo
+
+```markdown
+Hoy migré el proyecto de [[nvm]] a [[fnm]].
+Ver también: [[Node#Versiones]] y ![[diagrama.png]]
+
+#tooling #node
+```
+
+`[[...]]` enlaza notas (aunque aún no existan), `#` crea etiquetas y el panel de backlinks muestra qué notas apuntan a la actual. La vista de grafo dibuja esas conexiones.
+
+## Plugins de la comunidad que merecen la pena
+
+```
+Git           → commit y push automáticos del vault
+Dataview      → consultas sobre tus notas como si fueran una base de datos
+Templater     → plantillas con fecha, título y lógica
+Excalidraw    → diagramas a mano dentro de las notas
+```
+
+## Sincronizar
+
+Obsidian Sync es de pago; la alternativa gratuita para devs es guardar el vault en un repositorio privado con el plugin Git. Obsidian es gratuito también para uso comercial.
