@@ -489,11 +489,11 @@ function ProgressBar({
           <div
             style={{
               height: '100%',
-              width: `${pct}%`,
+              width: '100%',
+              transform: `scaleX(${pct / 100})`,
+              transformOrigin: 'left center',
               background: `linear-gradient(90deg, ${accent}, ${C.lavender})`,
-              borderRadius: '99px',
-              transition: 'width 400ms cubic-bezier(0.22, 1, 0.36, 1)',
-              boxShadow: `0 0 8px ${accent}60`,
+              transition: 'transform var(--dur-slow) var(--ease-out-expo)',
             }}
           />
         </div>
